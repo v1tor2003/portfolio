@@ -1,0 +1,30 @@
+.nav-bar{
+  width: 100%;
+  height: 50px;
+  border-bottom: 1px solid grey;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-container {
+  margin-left: 80px;
+}
+
+.logo-container span {
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.links-container{
+  margin-right: 80px;
+  display: flex;
+  width: 300px;
+  justify-content: space-evenly;
+}
+
+.links-container link {
+  text-decoration: none;
+  color: white;
+}
+
