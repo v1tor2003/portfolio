@@ -1,0 +1,27 @@
+@import '../../primaryStyles/variables.scss';
+
+
+.container {
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  justify-items: center;
+}
+
+.btn {
+  font-family: $IBMPlexMono;
+  border: 1px solid transparent;
+  outline: 1px solid white;
+  background-color: transparent;
+  color: $letters;
+  padding: 10px 25px;
+  letter-spacing: 1.6px;
+  border-radius: 5px;
+  transition: 0.3s ease-out;
+
+  &:hover{
+    background-color: $light;
+    color: $background;
+  }
+}

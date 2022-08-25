@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400&display=swap');
+
+$Cinzel:'Cinzel', sans-serif;
+$IBMPlexMono: 'IBM Plex Mono', sans-serif;
+//colors
+$dark: #000;
+$background: #0d0d25;
+$light: rgb(190, 190, 190);
+$letters: #fff;
+$primary: #517fc9;
+//spacing
+$spacing-medium: 10px;
+$spacing-large: 20px;
+
+// border
+$border-radius: 5px;
+
+// navbar
+$nav-height: 100px;
+
+@mixin breakpoint($breakpoint) {
+  @if $breakpoint == md {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+}

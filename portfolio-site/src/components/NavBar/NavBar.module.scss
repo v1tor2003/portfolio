@@ -1,30 +1,128 @@
-.nav-bar{
+@import '../../primaryStyles/variables.scss';
+
+.navbar {
   width: 100%;
-  height: 50px;
-  border-bottom: 1px solid grey;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+  height: $nav-height;
+  padding: 0 3rem;
+  font-family: $Cinzel;
+  background-color: rgba(#000, 0.2);
+  @include breakpoint(md) {
+    padding: 0 3rem;
+  }
+  transition: 0.3s ease all;
 
-.logo-container {
-  margin-left: 80px;
-}
+  &__container {
+    overflow: hidden;
+    color: $light;
+    margin: 0 auto;
+    max-width: 1920px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 100;
 
-.logo-container span {
-  font-weight: 500;
-  cursor: pointer;
-}
+    &__logo {
+      padding: 1rem 1rem;
+      cursor: default;
+      font-size: 1.75rem;
+      font-weight: bold;
+      text-decoration: none;
+      color: $light;
+    }
 
-.links-container{
-  margin-right: 80px;
-  display: flex;
-  width: 300px;
-  justify-content: space-evenly;
-}
+    &__elements {
+      top: 0;
+      right: 100%;
+      bottom: 0;
+      width: 100%;
+      height: 100vh;
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: rgba($dark, 0.88);
+      backdrop-filter: blur(1px);
+      transform: translate(0);
+      transition: 0.3s ease transform;
 
-.links-container link {
-  text-decoration: none;
-  color: white;
-}
+      @include breakpoint(md) {
+        transform: none;
+        flex-direction: row;
+        background: transparent;
+        width: auto;
+        height: 100%;
+        position: static;
+      }
+      
+      ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: $spacing-large;
+        
+        @include breakpoint(md) {
+          flex-direction: row;
+          align-items: center;
+          margin-bottom: 0;
+          margin-right: calc(0.5rem + #{$spacing-medium});
+        }
+        li {
+          &:not(:last-child){
+            margin-bottom: $spacing-large;
+            @include breakpoint(md){
+              margin-bottom: 0;
+              margin-right: $spacing-medium;
+            }
+          }
+          a {
+            font-size: 1.25rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            padding: 1rem 1.5rem;
+            border-radius: $border-radius;
+            transition: 0.3s ease all;
 
+            &:hover {
+              color: $letters;
+              background: rgba($letters, 0.1);
+            }
+            
+            &:active {
+              border-radius: calc(#{$border-radius} + 6px);
+              background: linear-gradient(rgba($light, 0.2), rgba($light, 0.3));
+            }
+                        
+          }
+        }
+      }
+      
+      &.isMenu {
+        transform: translate(100%);
+        gap: 2rem;
+      }
+    }
+
+    &__toggle {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 2rem;
+      transition: 0.3s ease all;
+      position: relative;
+
+      &:hover {
+        color: $primary;
+      }
+
+      @include breakpoint(md) {
+        display: none;
+        }
+      }
+    }
+}
