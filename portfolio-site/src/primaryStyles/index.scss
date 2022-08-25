@@ -1,0 +1,20 @@
+@import './variables.scss';
+
+* {
+  padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html{
+  font-size: 75%;
+}
+
+body {
+  background-color: $dark;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+}
