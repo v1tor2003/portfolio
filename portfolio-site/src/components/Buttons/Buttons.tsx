@@ -7,7 +7,7 @@ export const Buttons: React.FC <{}> = () => {
   const gitUrl: string = 'https://github.com/v1tor2003'
   
   return (
-    <React.Fragment>
+    <React.Fragment >
       <div className={styles.container}>
         <div>
           <a href={cvFile} download={`Vitor's CV`}><button className={styles.btn}>Download CV</button></a>

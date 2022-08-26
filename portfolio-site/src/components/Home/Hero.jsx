@@ -17,7 +17,7 @@ export const Hero = () => {
             <Typewriter 
               options={{
                 autoStart: true,
-                strings: ['a fullstack dev', 'a C enjoyer', 'a Rails lover', 'a React adventurous', 'a CSS hater'],
+                strings: ['a fullstack dev', 'a C enjoyer', 'a Rails lover', 'a React adventurous', 'a CSS hater', 'a JAVA beginner'],
                 loop: true,
                 cursor: "_",
                 delay: 100,
