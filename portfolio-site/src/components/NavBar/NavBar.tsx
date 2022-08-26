@@ -5,7 +5,7 @@ import { AiOutlineClose } from 'react-icons/ai'
 import * as data from './links.json'
 import { Link } from 'react-router-dom'
 
-const linksData = JSON.stringify(data)
+const linksData: string = JSON.stringify(data)
 const links = JSON.parse(linksData).links
 
 type LinkModel = {

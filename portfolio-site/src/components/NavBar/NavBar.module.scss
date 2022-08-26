@@ -117,7 +117,7 @@
       position: relative;
 
       &:hover {
-        color: $primary;
+        color: $letters;
       }
 
       @include breakpoint(md) {

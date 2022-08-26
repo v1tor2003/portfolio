@@ -10,9 +10,9 @@ export const Hero = () => {
       <div className={styles.overlay}></div>
       <video src={Video} autoPlay loop muted/>
       <div className={styles.content}>
-        <h2>Hi, my name is</h2>
-        <h1>Vitor</h1>
-        <h3>I am </h3>
+        <h2 className={styles.hi}>Hi, my name is</h2>
+        <h1 className={styles.myname}>Vitor</h1>
+        <h3 className={styles.desc}>I am </h3>
         <span className={styles.animation}>
             <Typewriter 
               options={{
