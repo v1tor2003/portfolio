@@ -42,24 +42,28 @@ video {
   background-color: rgba($dark, 0.3);
 }
 
-h1 {
+.myname {
+  cursor: default;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 7rem;
 }
 
-h2{
+.hi {
+  cursor: default;
   font-size: 25px;
   color: $light;
 }
 
-h3{
+.desc {
+  cursor: default;
   color: $light;
   font-weight: normal;
   font-size: 17px;
 }
 
 .animation{
+  cursor: default;
   font-weight: bold;
   font-size: 15px;
 }

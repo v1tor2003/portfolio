@@ -4,8 +4,6 @@ import styles from './SharedLayout.module.scss'
 import { Outlet } from 'react-router-dom'
 
 export const SharedLayout: React.FC <{}> = () => {
-  const topTag: string = `printf("`
-  const bottomTag: string = `");`
   return (
     <React.Fragment>
         <NavBar/>
