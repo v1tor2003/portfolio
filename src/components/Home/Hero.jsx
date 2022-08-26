@@ -20,7 +20,7 @@ export const Hero = () => {
                 strings: ['a fullstack dev', 'a C enjoyer', 'a Rails lover', 'a React adventurous', 'a CSS hater', 'a JAVA beginner'],
                 loop: true,
                 cursor: "_",
-                delay: 100,
+                delay: 150,
               }}
             />
           </span>
