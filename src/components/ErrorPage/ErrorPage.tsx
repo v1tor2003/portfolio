@@ -8,7 +8,7 @@ export const  ErrorPage: React.FC<{}> = () => {
   return (
       <div className={styles.error__container}>
         <h2 className={styles.error}>404</h2>
-        <h4 className={styles.message}>Page not found</h4>
+        <h4 className={styles.message}>Page not found.</h4>
         <div>
           <Link to='/'><button>{btnText}</button></Link> 
         </div>
