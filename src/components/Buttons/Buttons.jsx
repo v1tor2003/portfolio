@@ -1,10 +1,10 @@
 import React from 'react'
 import styles from './Buttons.module.scss'
-import cvFile from '../../images/ResumeEN.png'
+import cvFile from '../../images/Resume.pdf'
 import {AiFillGithub} from 'react-icons/ai'
 
-export const Buttons: React.FC <{}> = () => {
-  const gitUrl: string = 'https://github.com/v1tor2003'
+export const Buttons = () => {
+  const gitUrl = 'https://github.com/v1tor2003'
   
   return (
     <React.Fragment >
