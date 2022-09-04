@@ -1,11 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import ProfilePhoto from '../../images/profile.jpg'
 import styles from './About.module.scss'
-
+import ProfilePhoto from '../../images/profile.jpg'
 export const Profile: React.FC<{}> = () => {
   const btnText: string= `Let's talk`
-  
+
   return (
     <React.Fragment>
       <div className={styles.pic}>
