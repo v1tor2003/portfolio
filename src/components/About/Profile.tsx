@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import ProfilePhoto from '../../images/profile.jpeg'
+import ProfilePhoto from '../../images/profile.jpg'
 import styles from './About.module.scss'
 
 export const Profile: React.FC<{}> = () => {
