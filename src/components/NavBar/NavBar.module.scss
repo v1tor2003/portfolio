@@ -10,7 +10,13 @@
     padding: 0 3rem;
   }
   transition: 0.3s ease all;
-
+  &__message {
+    text-align: center;
+    font-size: 1.5rem;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+  }
   &__container {
     overflow: hidden;
     color: $light;

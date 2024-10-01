@@ -48,6 +48,7 @@ export const NavBar: React.FC<{}> = () => {
   
   return (
     <header className={styles.navbar}>  
+      <div className={styles.navbar__message}>Outdated version. Major update is comming soon...</div>
       <div className={styles.navbar__container}>
         <h2 className={styles.navbar__container__logo}>Personal Portfolio</h2>
         <nav className={`${styles.navbar__container__elements} ${menuOpen && window.innerWidth < 768? styles.isMenu : ""}`}>
