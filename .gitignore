@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Tasks & Issues
+/.issues
+
+# Next.js
+/.next/
