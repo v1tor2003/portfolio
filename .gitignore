@@ -27,3 +27,6 @@ yarn-error.log*
 
 # Next.js
 /.next/
+
+# Local Agent Tooling
+/.agents/
