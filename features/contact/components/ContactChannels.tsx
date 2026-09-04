@@ -1,4 +1,4 @@
-import { Globe, Mail, MapPin } from "lucide-react";
+import { Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/icons";
 
 export const CONTACT_LINKS = [
@@ -31,7 +31,7 @@ export function ContactChannels() {
 				</div>
 				<p className="text-sm text-zinc-400 leading-relaxed">
 					Feel free to reach out directly through any of the secure channels
-					below or transmit a packet using the terminal form.
+					below or transmit a message packet using the interactive terminal.
 				</p>
 			</div>
 
@@ -67,17 +67,6 @@ export function ContactChannels() {
 						</a>
 					);
 				})}
-			</div>
-
-			<div className="rounded-lg border border-zinc-900 bg-zinc-950/40 p-4 text-xs space-y-2 text-zinc-500">
-				<div className="flex items-center space-x-2">
-					<MapPin className="h-3.5 w-3.5 text-zinc-600" />
-					<span>LOCATION: São Paulo, Brazil [UTC-3]</span>
-				</div>
-				<div className="flex items-center space-x-2">
-					<Globe className="h-3.5 w-3.5 text-zinc-600" />
-					<span>WORK_MODE: Remote / Hybrid Server-Side Infrastructure</span>
-				</div>
 			</div>
 		</div>
 	);

@@ -28,7 +28,7 @@ export function ContactSection() {
 					<div className="lg:col-span-5">
 						<ContactChannels />
 					</div>
-					<div className="lg:col-span-7">
+					<div className="mt-8 lg:mt-0 lg:col-span-7">
 						<ContactTerminal />
 					</div>
 				</div>
