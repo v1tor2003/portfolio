@@ -1,9 +1,0 @@
-@import '../../primaryStyles/variables.scss';
-
-.container{
-  height: calc(100vh - #{$nav-height});
-  background-color: $background;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
