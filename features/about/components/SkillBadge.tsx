@@ -11,4 +11,3 @@ export function SkillBadge({ name }: SkillBadgeProps) {
 		</div>
 	);
 }
-
