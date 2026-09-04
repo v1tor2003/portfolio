@@ -111,9 +111,8 @@ export function ContactTerminal() {
 					"output",
 					`ENGINEER PROFILE:
   Name:     Vítor Pires
-  Role:     Backend Software Engineer & Cloud Architect
-  Mission:  Building resilient server-side microservices, high-throughput APIs,
-            and reliable cloud infrastructure.`,
+  Role:     Backend Software Engineer
+  Mission:  Building resilient server-side microservices, high-throughput APIs and reliable cloud infrastructure.`,
 				);
 				break;
 
@@ -361,7 +360,7 @@ export function ContactTerminal() {
 			</div>
 
 			{/* Terminal Buffer Window */}
-			<div className="p-4 sm:p-5 text-xs sm:text-sm max-h-[380px] min-h-[280px] overflow-y-auto space-y-2">
+			<div className="terminal-scrollbar p-4 sm:p-5 text-xs sm:text-sm max-h-[380px] min-h-[280px] overflow-y-auto space-y-2">
 				{lines.map((line) => {
 					let lineStyle = "text-zinc-300";
 					if (line.type === "system") lineStyle = "text-zinc-500 italic";
