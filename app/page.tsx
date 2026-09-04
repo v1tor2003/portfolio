@@ -7,9 +7,9 @@ import {
 	GitBranch,
 	Mail,
 	Server,
-	User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AboutSection } from "@/features/about/components/AboutSection";
 
 export default function Home() {
 	return (
@@ -70,28 +70,7 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* ABOUT SECTION */}
-			<section
-				id="about"
-				className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full scroll-mt-20"
-			>
-				<div className="space-y-4 border-l-2 border-zinc-800 pl-6">
-					<div className="flex items-center space-x-2 text-zinc-500 font-mono text-sm">
-						<User className="h-4 w-4" />
-						<span>01. ABOUT ME</span>
-					</div>
-					<h2 className="text-3xl sm:text-4xl font-bold text-white">
-						Distributed Systems & Cloud-Native Services
-					</h2>
-					<p className="text-zinc-400 max-w-3xl leading-relaxed">
-						Focused on backend application engineering with deep cloud resource
-						integration. Experienced in designing fault-tolerant REST and
-						event-driven APIs, persistent data layers, and asynchronous
-						messaging pipelines utilizing queues, object stores, and
-						observability tooling on AWS and hybrid environments.
-					</p>
-				</div>
-			</section>
+			<AboutSection />
 
 			{/* PROJECTS SECTION */}
 			<section

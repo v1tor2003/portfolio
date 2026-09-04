@@ -10,4 +10,3 @@ describe("BinaryMatrixCanvas Component", () => {
 		expect(canvas).toHaveClass("fixed", "inset-0", "pointer-events-none");
 	});
 });
-
