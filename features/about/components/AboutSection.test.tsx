@@ -25,4 +25,3 @@ describe("AboutSection Component", () => {
 		expect(screen.getByText("C#")).toBeInTheDocument();
 	});
 });
-

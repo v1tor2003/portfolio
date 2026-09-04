@@ -8,4 +8,3 @@ describe("SkillBadge Component", () => {
 		expect(screen.getByText("C#")).toBeInTheDocument();
 	});
 });
-
