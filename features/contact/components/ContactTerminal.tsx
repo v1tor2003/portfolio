@@ -342,65 +342,22 @@ export function ContactTerminal() {
 			aria-label="Interactive Terminal"
 		>
 			{/* Window Bar */}
-			<div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950 px-4 py-2.5 text-xs text-zinc-400 select-none">
+			<div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950 px-4 py-2 text-xs text-zinc-400 select-none">
 				<div className="flex items-center space-x-2">
-					<span className="h-3 w-3 rounded-full bg-rose-500/80 inline-block" />
-					<span className="h-3 w-3 rounded-full bg-amber-500/80 inline-block" />
-					<span className="h-3 w-3 rounded-full bg-emerald-500/80 inline-block" />
-					<span className="ml-2 text-zinc-400 font-semibold tracking-wide">
+					<div className="flex items-center space-x-1.5">
+						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
+						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
+						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
+					</div>
+					<span className="ml-2 text-zinc-500 font-mono text-[11px]">
 						root@vitor-server:~# [bash]
 					</span>
 				</div>
 
-				<div className="flex items-center space-x-2 text-[10px] text-zinc-500">
-					<span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+				<div className="flex items-center space-x-2 text-[10px] text-zinc-500 font-mono">
+					<span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
 					<span>TLS_1.3_SECURE</span>
 				</div>
-			</div>
-
-			{/* Quick Action Chips for mobile or quick clicks */}
-			<div className="flex flex-wrap items-center gap-2 border-b border-zinc-900 bg-zinc-950/40 px-4 py-2 text-[11px]">
-				<span className="text-zinc-600 select-none">QUICK_RUN:</span>
-				<button
-					type="button"
-					onClick={() => handleCommand("connect")}
-					disabled={state !== "IDLE" || isPending}
-					className="rounded border border-emerald-900/60 bg-emerald-950/30 px-2 py-0.5 text-emerald-400 hover:bg-emerald-900/40 hover:text-emerald-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-				>
-					connect
-				</button>
-				<button
-					type="button"
-					onClick={() => handleCommand("skills")}
-					disabled={state !== "IDLE" || isPending}
-					className="rounded border border-zinc-800 bg-zinc-900/60 px-2 py-0.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-				>
-					skills
-				</button>
-				<button
-					type="button"
-					onClick={() => handleCommand("bio")}
-					disabled={state !== "IDLE" || isPending}
-					className="rounded border border-zinc-800 bg-zinc-900/60 px-2 py-0.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-				>
-					bio
-				</button>
-				<button
-					type="button"
-					onClick={() => handleCommand("help")}
-					disabled={state !== "IDLE" || isPending}
-					className="rounded border border-zinc-800 bg-zinc-900/60 px-2 py-0.5 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-				>
-					help
-				</button>
-				<button
-					type="button"
-					onClick={() => handleCommand("clear")}
-					disabled={state !== "IDLE" || isPending}
-					className="rounded border border-zinc-800 bg-zinc-900/60 px-2 py-0.5 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed ml-auto"
-				>
-					clear
-				</button>
 			</div>
 
 			{/* Terminal Buffer Window */}
