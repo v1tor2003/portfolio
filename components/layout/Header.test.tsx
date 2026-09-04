@@ -28,4 +28,3 @@ describe("Header Component", () => {
 		expect(navElements.length).toBeGreaterThan(1);
 	});
 });
-
