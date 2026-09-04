@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ContactSection } from "./ContactSection";
 
 describe("ContactSection Component", () => {
-	it("renders contact section with heading and call to action", () => {
+	it("renders contact section with heading and indicators", () => {
 		const { container } = render(<ContactSection />);
 
 		expect(container.querySelector("#contact")).toBeInTheDocument();
@@ -11,9 +11,19 @@ describe("ContactSection Component", () => {
 		expect(
 			screen.getByRole("heading", { name: "Let's Connect" }),
 		).toBeInTheDocument();
-		expect(screen.getByRole("link", { name: /Say Hello/i })).toHaveAttribute(
-			"href",
-			"mailto:vitor.pr04@hotmail.com",
-		);
+	});
+
+	it("renders both channels and terminal transmitter subcomponents", () => {
+		render(<ContactSection />);
+
+		expect(
+			screen.getByText("[ DIRECT_COMMUNICATION_CHANNELS ]"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText("TERMINAL_TRANSMITTER [ TCP / PORT: 443 ]"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /\[TRANSMIT_PACKET\]/i }),
+		).toBeInTheDocument();
 	});
 });
