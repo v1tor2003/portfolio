@@ -13,17 +13,14 @@ describe("ContactSection Component", () => {
 		).toBeInTheDocument();
 	});
 
-	it("renders both channels and terminal transmitter subcomponents", () => {
+	it("renders both channels and interactive terminal transmitter subcomponents", () => {
 		render(<ContactSection />);
 
 		expect(
 			screen.getByText("[ DIRECT_COMMUNICATION_CHANNELS ]"),
 		).toBeInTheDocument();
-		expect(
-			screen.getByText("TERMINAL_TRANSMITTER [ TCP / PORT: 443 ]"),
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: /\[TRANSMIT_PACKET\]/i }),
-		).toBeInTheDocument();
+		expect(screen.getByText(/VÍTOR PIRES TERMINAL OS/i)).toBeInTheDocument();
+		expect(screen.getByText("root@vitor-server:~#")).toBeInTheDocument();
+		expect(screen.getByLabelText("Terminal Input")).toBeInTheDocument();
 	});
 });

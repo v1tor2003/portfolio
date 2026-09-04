@@ -24,3 +24,32 @@ body {
 		"Courier New", monospace;
 	min-height: 100vh;
 }
+
+/* Minimalist Monospace Terminal Scrollbar */
+.terminal-scrollbar {
+	--scrollbar-thumb: #27272a;
+	--scrollbar-track: #09090b;
+
+	scrollbar-width: thin;
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+@supports not (scrollbar-color: auto) {
+	.terminal-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	.terminal-scrollbar::-webkit-scrollbar-thumb {
+		background: var(--scrollbar-thumb);
+		border-radius: 3px;
+	}
+
+	.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #3f3f46;
+	}
+
+	.terminal-scrollbar::-webkit-scrollbar-track {
+		background: var(--scrollbar-track);
+	}
+}
