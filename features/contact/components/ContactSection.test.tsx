@@ -19,7 +19,7 @@ describe("ContactSection Component", () => {
 		expect(
 			screen.getByText("[ DIRECT_COMMUNICATION_CHANNELS ]"),
 		).toBeInTheDocument();
-		expect(screen.getByText(/VÍTOR PIRES TERMINAL OS/i)).toBeInTheDocument();
+		expect(screen.getByText(/SYSTEM TERMINAL OS/i)).toBeInTheDocument();
 		expect(screen.getByText("root@vitor-server:~#")).toBeInTheDocument();
 		expect(screen.getByLabelText("Terminal Input")).toBeInTheDocument();
 	});
