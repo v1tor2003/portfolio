@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { ContactChannels } from "./ContactChannels";
-import { ContactForm } from "./ContactForm";
+import { ContactTerminal } from "./ContactTerminal";
 
 export function ContactSection() {
 	return (
@@ -29,7 +29,7 @@ export function ContactSection() {
 						<ContactChannels />
 					</div>
 					<div className="lg:col-span-7">
-						<ContactForm />
+						<ContactTerminal />
 					</div>
 				</div>
 			</div>
