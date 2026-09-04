@@ -5,6 +5,6 @@ import HomePage from "./page";
 test("renders homepage title", () => {
 	render(<HomePage />);
 	expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-		"Vítor Pires",
+		"VÍTÓR PIRES.",
 	);
 });
