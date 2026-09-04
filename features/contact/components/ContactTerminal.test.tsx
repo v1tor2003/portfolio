@@ -22,7 +22,7 @@ describe("ContactTerminal Component", () => {
 	it("renders terminal initial banner and root prompt", () => {
 		render(<ContactTerminal />);
 
-		expect(screen.getByText(/VÍTOR PIRES TERMINAL OS/i)).toBeInTheDocument();
+		expect(screen.getByText(/SYSTEM TERMINAL OS/i)).toBeInTheDocument();
 		expect(screen.getByText("root@vitor-server:~#")).toBeInTheDocument();
 		expect(screen.getByLabelText("Terminal Input")).toBeInTheDocument();
 	});

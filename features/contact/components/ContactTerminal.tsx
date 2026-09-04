@@ -23,12 +23,12 @@ const INITIAL_LINES: TerminalLine[] = [
 	{
 		id: "sys-1",
 		type: "system",
-		text: "VÍTOR PIRES TERMINAL OS [v2.6.0-release]",
+		text: "SYSTEM TERMINAL OS [v2.6.0-release]",
 	},
 	{
 		id: "sys-2",
 		type: "system",
-		text: "Type 'help' for commands, or 'connect' to initiate secure message packet.",
+		text: "Type 'help' for commands.",
 	},
 ];
 
@@ -331,7 +331,7 @@ export function ContactTerminal() {
 
 	return (
 		<section
-			className="rounded-lg border border-zinc-800 bg-black/95 font-mono shadow-2xl overflow-hidden cursor-text"
+			className="rounded-lg border border-zinc-800 bg-black/95 font-mono shadow-2xl overflow-hidden cursor-text flex flex-col h-[320px]"
 			onClick={() => inputRef.current?.focus()}
 			onKeyDown={(e) => {
 				if (e.target === e.currentTarget) {
@@ -341,7 +341,7 @@ export function ContactTerminal() {
 			aria-label="Interactive Terminal"
 		>
 			{/* Window Bar */}
-			<div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950 px-4 py-2 text-xs text-zinc-400 select-none">
+			<div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950 px-4 py-2 text-xs text-zinc-400 select-none shrink-0">
 				<div className="flex items-center space-x-2">
 					<div className="flex items-center space-x-1.5">
 						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
@@ -360,7 +360,7 @@ export function ContactTerminal() {
 			</div>
 
 			{/* Terminal Buffer Window */}
-			<div className="terminal-scrollbar p-4 sm:p-5 text-xs sm:text-sm max-h-[380px] min-h-[280px] overflow-y-auto space-y-2">
+			<div className="terminal-scrollbar flex-1 p-4 sm:p-5 text-xs sm:text-sm overflow-y-auto space-y-2">
 				{lines.map((line) => {
 					let lineStyle = "text-zinc-300";
 					if (line.type === "system") lineStyle = "text-zinc-500 italic";

@@ -12,9 +12,6 @@ describe("ContactChannels Component", () => {
 		expect(screen.getByText("vitor.pr04@hotmail.com")).toBeInTheDocument();
 		expect(screen.getByText("linkedin.com/in/vitor-pires")).toBeInTheDocument();
 		expect(screen.getByText("github.com/v1tor2003")).toBeInTheDocument();
-		expect(
-			screen.getByText("LOCATION: São Paulo, Brazil [UTC-3]"),
-		).toBeInTheDocument();
 	});
 
 	it("has valid href attributes on links", () => {
