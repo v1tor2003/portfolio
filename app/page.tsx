@@ -1,9 +1,9 @@
-import { AboutSection } from "@/features/about/components/AboutSection";
-import { ContactSection } from "@/features/contact/components/ContactSection";
-import { HeroSection } from "@/features/hero/components/HeroSection";
-import { MigrationSection } from "@/features/migration/components/MigrationSection";
-import { ProjectsSection } from "@/features/projects/components/ProjectsSection";
-import { ResumeSection } from "@/features/resume/components/ResumeSection";
+import { AboutSection } from "@/features/about";
+import { ContactSection } from "@/features/contact";
+import { HeroSection } from "@/features/hero";
+import { MigrationSection } from "@/features/migration";
+import { ProjectsSection } from "@/features/projects";
+import { ResumeSection } from "@/features/resume";
 
 export default function Home() {
 	return (

@@ -3,21 +3,14 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { contactSchema } from "../schemas/contact.schema";
 import { sendContactEmail } from "../server/send-contact-email";
-
-interface TerminalLine {
-	id: string;
-	type: "system" | "input" | "output" | "error" | "success" | "prompt";
-	text: string;
-}
-
-type TerminalState =
-	| "IDLE"
-	| "PROMPT_NAME"
-	| "PROMPT_EMAIL"
-	| "PROMPT_SUBJECT"
-	| "PROMPT_MESSAGE"
-	| "PROMPT_CONFIRM"
-	| "TRANSMITTING";
+import type {
+	ContactDraft,
+	TerminalLine,
+	TerminalState,
+} from "../types/terminal.types";
+import { TerminalHeader } from "./TerminalHeader";
+import { TerminalInputForm } from "./TerminalInputForm";
+import { TerminalLineItem } from "./TerminalLineItem";
 
 const INITIAL_LINES: TerminalLine[] = [
 	{
@@ -32,6 +25,14 @@ const INITIAL_LINES: TerminalLine[] = [
 	},
 ];
 
+const INITIAL_DRAFT: ContactDraft = {
+	name: "",
+	email: "",
+	subject: "",
+	message: "",
+	botField: "",
+};
+
 export function ContactTerminal() {
 	const [lines, setLines] = useState<TerminalLine[]>(INITIAL_LINES);
 	const [inputValue, setInputValue] = useState("");
@@ -39,15 +40,7 @@ export function ContactTerminal() {
 	const [history, setHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState<number>(-1);
 	const [isPending, startTransition] = useTransition();
-
-	// Draft state for connect wizard
-	const [draft, setDraft] = useState({
-		name: "",
-		email: "",
-		subject: "",
-		message: "",
-		botField: "",
-	});
+	const [draft, setDraft] = useState<ContactDraft>(INITIAL_DRAFT);
 
 	const bufferRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -133,13 +126,7 @@ export function ContactTerminal() {
 			case "send":
 			case "mail":
 				setState("PROMPT_NAME");
-				setDraft({
-					name: "",
-					email: "",
-					subject: "",
-					message: "",
-					botField: "",
-				});
+				setDraft(INITIAL_DRAFT);
 				addLine(
 					"system",
 					"--- INITIATING SECURE TRANSMISSION WIZARD (Type 'cancel' at any time) ---",
@@ -221,7 +208,7 @@ export function ContactTerminal() {
 				}
 				setDraft((prev) => ({ ...prev, message: trimmed }));
 				setState("PROMPT_CONFIRM");
-				addLine("prompt", `[?] Transmit packet to server gateway now? [Y/n]:`);
+				addLine("prompt", "[?] Transmit packet to server gateway now? [Y/n]:");
 				break;
 			}
 
@@ -308,25 +295,6 @@ export function ContactTerminal() {
 		}
 	};
 
-	const getPromptLabel = () => {
-		switch (state) {
-			case "PROMPT_NAME":
-				return "name >";
-			case "PROMPT_EMAIL":
-				return "email >";
-			case "PROMPT_SUBJECT":
-				return "subject >";
-			case "PROMPT_MESSAGE":
-				return "message >";
-			case "PROMPT_CONFIRM":
-				return "confirm [Y/n] >";
-			case "TRANSMITTING":
-				return "transmitting...";
-			default:
-				return "root@vitor-server:~#";
-		}
-	};
-
 	return (
 		<section
 			className="rounded-lg border border-zinc-800 bg-black/95 font-mono shadow-2xl overflow-hidden cursor-text flex flex-col h-[320px]"
@@ -338,75 +306,25 @@ export function ContactTerminal() {
 			}}
 			aria-label="Interactive Terminal"
 		>
-			{/* Window Bar */}
-			<div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950 px-4 py-2 text-xs text-zinc-400 select-none shrink-0">
-				<div className="flex items-center space-x-2">
-					<div className="flex items-center space-x-1.5">
-						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
-						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
-						<span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
-					</div>
-					<span className="ml-2 text-zinc-500 font-mono text-[11px]">
-						root@vitor-server:~# [bash]
-					</span>
-				</div>
+			<TerminalHeader />
 
-				<div className="flex items-center space-x-2 text-[10px] text-zinc-500 font-mono">
-					<span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-					<span>TLS_1.3_SECURE</span>
-				</div>
-			</div>
-
-			{/* Terminal Buffer Window */}
 			<div
 				ref={bufferRef}
 				className="terminal-scrollbar flex-1 p-4 sm:p-5 text-xs sm:text-sm overflow-y-auto space-y-2"
 			>
-				{lines.map((line) => {
-					let lineStyle = "text-zinc-300";
-					if (line.type === "system") lineStyle = "text-zinc-500 italic";
-					if (line.type === "input") lineStyle = "text-white font-bold";
-					if (line.type === "error") lineStyle = "text-rose-400";
-					if (line.type === "success")
-						lineStyle = "text-emerald-400 font-semibold";
-					if (line.type === "prompt")
-						lineStyle = "text-amber-300 font-semibold";
+				{lines.map((line) => (
+					<TerminalLineItem key={line.id} line={line} />
+				))}
 
-					return (
-						<div key={line.id} className={`${lineStyle} whitespace-pre-wrap`}>
-							{line.text}
-						</div>
-					);
-				})}
-
-				{/* Active Input Line with Blinking Cursor */}
-				<form
+				<TerminalInputForm
+					state={state}
+					inputValue={inputValue}
+					isPending={isPending}
+					inputRef={inputRef}
+					onChange={setInputValue}
 					onSubmit={handleSubmit}
-					className="flex items-center space-x-2 pt-1"
-				>
-					<span
-						className={`shrink-0 font-bold ${
-							state === "IDLE" ? "text-emerald-400" : "text-amber-400"
-						}`}
-					>
-						{getPromptLabel()}
-					</span>
-
-					<div className="relative flex-1 flex items-center">
-						<input
-							ref={inputRef}
-							type="text"
-							value={inputValue}
-							onChange={(e) => setInputValue(e.target.value)}
-							onKeyDown={handleKeyDown}
-							disabled={state === "TRANSMITTING" || isPending}
-							className="w-full bg-transparent text-white focus:outline-none caret-white"
-							spellCheck={false}
-							autoComplete="off"
-							aria-label="Terminal Input"
-						/>
-					</div>
-				</form>
+					onKeyDown={handleKeyDown}
+				/>
 			</div>
 		</section>
 	);
