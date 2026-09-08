@@ -26,7 +26,7 @@ export function Footer() {
 						<span>GitHub</span>
 					</a>
 					<a
-						href="https://linkedin.com/in/vitor-pires"
+						href="https://linkedin.com/in/pires-vitor"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center space-x-1.5 text-zinc-400 transition-colors hover:text-white"

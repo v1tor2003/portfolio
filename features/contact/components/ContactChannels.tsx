@@ -10,8 +10,8 @@ export const CONTACT_LINKS = [
 	},
 	{
 		label: "LINKEDIN",
-		value: "linkedin.com/in/vitor-pires",
-		href: "https://linkedin.com/in/vitor-pires",
+		value: "linkedin.com/in/pires-vitor",
+		href: "https://linkedin.com/in/pires-vitor",
 		icon: LinkedinIcon,
 	},
 	{

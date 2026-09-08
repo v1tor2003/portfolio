@@ -21,7 +21,7 @@ describe("Footer Component", () => {
 		expect(githubLink).toHaveAttribute("href", "https://github.com/v1tor2003");
 		expect(linkedinLink).toHaveAttribute(
 			"href",
-			"https://linkedin.com/in/vitor-pires",
+			"https://linkedin.com/in/pires-vitor",
 		);
 		expect(emailLink).toHaveAttribute("href", "mailto:vitor.pr04@hotmail.com");
 	});
