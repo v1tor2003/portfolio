@@ -1,4 +1,4 @@
-import type { TerminalLine } from "../types/terminal.types";
+import type { TerminalLine } from "./terminal.types";
 
 interface TerminalLineItemProps {
 	line: TerminalLine;
@@ -14,3 +14,4 @@ export function TerminalLineItem({ line }: TerminalLineItemProps) {
 
 	return <div className={`${lineStyle} whitespace-pre-wrap`}>{line.text}</div>;
 }
+

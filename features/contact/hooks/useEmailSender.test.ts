@@ -50,7 +50,7 @@ describe("useEmailSender Hook", () => {
 		expect(result.current.isPending).toBe(false);
 	});
 
-	it("handles failure result cleanly", async () => {
+	it("handles error results cleanly and updates state", async () => {
 		vi.mocked(sendContactEmail).mockResolvedValueOnce({
 			success: false,
 			message: "Failed to dispatch email transmission.",
@@ -68,8 +68,12 @@ describe("useEmailSender Hook", () => {
 			});
 		});
 
-		expect(actionResult?.success).toBe(false);
+		expect(actionResult).toEqual({
+			success: false,
+			message: "Failed to dispatch email transmission.",
+		});
 		expect(result.current.result?.success).toBe(false);
+		expect(result.current.isPending).toBe(false);
 	});
 
 	it("resets result state when reset is called", async () => {

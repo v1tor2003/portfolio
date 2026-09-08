@@ -1,11 +1,12 @@
 export { ContactChannels } from "./components/ContactChannels";
 export { ContactHeader } from "./components/ContactHeader";
 export { ContactSection } from "./components/ContactSection";
-export { ContactTerminal } from "./components/ContactTerminal";
-export { TerminalHeader } from "./components/TerminalHeader";
-export { TerminalInputForm } from "./components/TerminalInputForm";
-export { TerminalLineItem } from "./components/TerminalLineItem";
 export { useEmailSender } from "./hooks/useEmailSender";
 export * from "./schemas/contact.schema";
 export * from "./server/send-contact-email";
-export * from "./types/terminal.types";
+export { ContactTerminal } from "./terminal/ContactTerminal";
+export { TerminalHeader } from "./terminal/TerminalHeader";
+export { TerminalInputForm } from "./terminal/TerminalInputForm";
+export { TerminalLineItem } from "./terminal/TerminalLineItem";
+export * from "./terminal/terminal.types";
+export { useTerminal } from "./terminal/useTerminal";

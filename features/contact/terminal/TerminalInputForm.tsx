@@ -1,5 +1,5 @@
 import type React from "react";
-import type { TerminalState } from "../types/terminal.types";
+import type { TerminalState } from "./terminal.types";
 
 interface TerminalInputFormProps {
 	state: TerminalState;
@@ -66,3 +66,4 @@ export function TerminalInputForm({
 		</form>
 	);
 }
+
