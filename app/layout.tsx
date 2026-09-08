@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Share_Tech_Mono } from "next/font/google";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
+import { Footer, Header } from "@/components/layout";
 import { BinaryMatrixCanvas } from "@/features/binary-animations/components/BinaryMatrixCanvas";
 import "./globals.css";
 
