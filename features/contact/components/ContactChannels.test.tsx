@@ -10,7 +10,7 @@ describe("ContactChannels Component", () => {
 			screen.getByText("[ DIRECT_COMMUNICATION_CHANNELS ]"),
 		).toBeInTheDocument();
 		expect(screen.getByText("vitor.pr04@hotmail.com")).toBeInTheDocument();
-		expect(screen.getByText("linkedin.com/in/vitor-pires")).toBeInTheDocument();
+		expect(screen.getByText("linkedin.com/in/pires-vitor")).toBeInTheDocument();
 		expect(screen.getByText("github.com/v1tor2003")).toBeInTheDocument();
 	});
 

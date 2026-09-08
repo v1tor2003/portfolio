@@ -49,15 +49,13 @@ export function ContactTerminal() {
 		botField: "",
 	});
 
-	const terminalEndRef = useRef<HTMLDivElement>(null);
+	const bufferRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const scrollToBottom = () => {
-		terminalEndRef.current?.scrollIntoView?.({ behavior: "smooth" });
-	};
-
 	useEffect(() => {
-		scrollToBottom();
+		if (bufferRef.current) {
+			bufferRef.current.scrollTop = bufferRef.current.scrollHeight;
+		}
 	}, [lines]);
 
 	const addLine = (type: TerminalLine["type"], text: string, prefix = "") => {
@@ -121,7 +119,7 @@ export function ContactTerminal() {
 					"output",
 					`CHANNELS:
   Email:    vitor.pr04@hotmail.com
-  LinkedIn: https://linkedin.com/in/vitor-pires
+  LinkedIn: https://linkedin.com/in/pires-vitor
   GitHub:   https://github.com/v1tor2003`,
 				);
 				break;
@@ -360,7 +358,10 @@ export function ContactTerminal() {
 			</div>
 
 			{/* Terminal Buffer Window */}
-			<div className="terminal-scrollbar flex-1 p-4 sm:p-5 text-xs sm:text-sm overflow-y-auto space-y-2">
+			<div
+				ref={bufferRef}
+				className="terminal-scrollbar flex-1 p-4 sm:p-5 text-xs sm:text-sm overflow-y-auto space-y-2"
+			>
 				{lines.map((line) => {
 					let lineStyle = "text-zinc-300";
 					if (line.type === "system") lineStyle = "text-zinc-500 italic";
@@ -406,8 +407,6 @@ export function ContactTerminal() {
 						/>
 					</div>
 				</form>
-
-				<div ref={terminalEndRef} />
 			</div>
 		</section>
 	);
