@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useEmailSender } from "../hooks/useEmailSender";
 import { contactSchema } from "../schemas/contact.schema";
-import { sendContactEmail } from "../server/send-contact-email";
 import type {
 	ContactDraft,
 	TerminalLine,
@@ -39,8 +39,8 @@ export function ContactTerminal() {
 	const [state, setState] = useState<TerminalState>("IDLE");
 	const [history, setHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState<number>(-1);
-	const [isPending, startTransition] = useTransition();
 	const [draft, setDraft] = useState<ContactDraft>(INITIAL_DRAFT);
+	const { sendEmail, isPending } = useEmailSender();
 
 	const bufferRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -224,32 +224,23 @@ export function ContactTerminal() {
 				setState("TRANSMITTING");
 				addLine("system", "[TRANSMITTING] Encrypting packet via TLS_1.3...");
 
-				startTransition(async () => {
-					try {
-						const res = await sendContactEmail(draft);
-						if (res.success) {
-							addLine(
-								"success",
-								`[STATUS: 200 OK] ${res.message || "Packet delivered successfully!"}`,
-							);
-							addLine(
-								"system",
-								"Transmission complete. Thank you for reaching out!",
-							);
-						} else {
-							addLine(
-								"error",
-								`[STATUS: 400] ${res.message || "Failed to dispatch transmission."}`,
-							);
-						}
-					} catch {
+				sendEmail(draft).then((res) => {
+					if (res.success) {
+						addLine(
+							"success",
+							`[STATUS: 200 OK] ${res.message || "Packet delivered successfully!"}`,
+						);
+						addLine(
+							"system",
+							"Transmission complete. Thank you for reaching out!",
+						);
+					} else {
 						addLine(
 							"error",
-							"[STATUS: 500] Network timeout reaching gateway host.",
+							`[STATUS: 400] ${res.message || "Failed to dispatch transmission."}`,
 						);
-					} finally {
-						setState("IDLE");
 					}
+					setState("IDLE");
 				});
 				break;
 			}

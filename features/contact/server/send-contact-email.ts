@@ -1,8 +1,9 @@
 "use server";
 
+import { z } from "zod";
 import { env } from "@/lib/env";
 import { contactSchema } from "../schemas/contact.schema";
-import { createResendClient } from "./resend-client";
+import { ResendClientFactory } from "./resend-client";
 import { SendResendEmailCommand } from "./send-resend-email.command";
 
 export interface ContactActionResult {
@@ -21,7 +22,7 @@ export async function sendContactEmail(
 		return {
 			success: false,
 			message: "Invalid transmission payload. Please verify your fields.",
-			errors: parsed.error.flatten().fieldErrors,
+			errors: z.flattenError(parsed.error).fieldErrors,
 		};
 	}
 
@@ -46,38 +47,26 @@ export async function sendContactEmail(
 		};
 	}
 
-	try {
-		const client = createResendClient(env.RESEND_API_KEY);
-		const command = new SendResendEmailCommand({
+	const client = ResendClientFactory.create();
+
+	const result = await client.send(
+		new SendResendEmailCommand({
 			from: env.CONTACT_FROM_EMAIL,
 			to: env.CONTACT_TO_EMAIL,
 			reply_to: email,
 			subject: `[Portfolio Contact] ${subject} - ${name}`,
 			text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
-		});
+		}),
+	);
 
-		const result = await client.send(command);
-
-		if (result.error) {
-			console.error(
-				"[SendContactEmail] Failed to dispatch via Resend:",
-				result.error.message,
-			);
-			return {
-				success: false,
-				message: "Failed to dispatch email transmission.",
-			};
-		}
-
-		return {
-			success: true,
-			message: "Packet dispatched successfully via Resend.",
-		};
-	} catch (error) {
-		console.error("[SendContactEmail] Network error:", error);
+	if (result.error)
 		return {
 			success: false,
-			message: "Transmission timed out or network error encountered.",
+			message: "Failed to dispatch email transmission.",
 		};
-	}
+
+	return {
+		success: true,
+		message: "Packet dispatched successfully via Resend.",
+	};
 }

@@ -7,7 +7,7 @@ interface TerminalInputFormProps {
 	isPending: boolean;
 	inputRef: React.RefObject<HTMLInputElement | null>;
 	onChange: (value: string) => void;
-	onSubmit: (e: React.FormEvent) => void;
+	onSubmit: (e: React.SubmitEvent) => void;
 	onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
