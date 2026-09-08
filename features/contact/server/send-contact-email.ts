@@ -1,6 +1,9 @@
 "use server";
 
+import { env } from "@/lib/env";
 import { contactSchema } from "../schemas/contact.schema";
+import { createResendClient } from "./resend-client";
+import { SendResendEmailCommand } from "./send-resend-email.command";
 
 export interface ContactActionResult {
 	success: boolean;
@@ -34,9 +37,7 @@ export async function sendContactEmail(
 		};
 	}
 
-	const apiKey = process.env.RESEND_API_KEY;
-
-	if (!apiKey) {
+	if (!env.RESEND_API_KEY) {
 		// Mock/simulated transmission when no provider key is configured
 		return {
 			success: true,
@@ -46,29 +47,21 @@ export async function sendContactEmail(
 	}
 
 	try {
-		const toEmail = process.env.CONTACT_TO_EMAIL || "vitor.pr04@hotmail.com";
-		const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
-
-		const response = await fetch("https://api.resend.com/emails", {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${apiKey}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				from: fromEmail,
-				to: toEmail,
-				reply_to: email,
-				subject: `[Portfolio Contact] ${subject} - ${name}`,
-				text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
-			}),
+		const client = createResendClient(env.RESEND_API_KEY);
+		const command = new SendResendEmailCommand({
+			from: env.CONTACT_FROM_EMAIL,
+			to: env.CONTACT_TO_EMAIL,
+			reply_to: email,
+			subject: `[Portfolio Contact] ${subject} - ${name}`,
+			text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
 		});
 
-		if (!response.ok) {
-			const errorText = await response.text();
+		const result = await client.send(command);
+
+		if (result.error) {
 			console.error(
 				"[SendContactEmail] Failed to dispatch via Resend:",
-				errorText,
+				result.error.message,
 			);
 			return {
 				success: false,
