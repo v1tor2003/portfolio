@@ -19,20 +19,13 @@ export function useEmailSender(): UseEmailSenderReturn {
 
 	const sendEmail = useCallback(
 		async (data: unknown): Promise<ContactActionResult> => {
-			let res: ContactActionResult = {
-				success: false,
-				message: "Transmission aborted.",
-			};
-
-			await new Promise<void>((resolve) => {
+			return new Promise((resolve) => {
 				startTransition(async () => {
-					res = await sendContactEmail(data);
+					const res = await sendContactEmail(data);
 					setResult(res);
-					resolve();
+					resolve(res);
 				});
 			});
-
-			return res;
 		},
 		[],
 	);
@@ -48,3 +41,4 @@ export function useEmailSender(): UseEmailSenderReturn {
 		reset,
 	};
 }
+
