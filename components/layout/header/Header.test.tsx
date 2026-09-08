@@ -17,7 +17,7 @@ describe("Header Component", () => {
 		expect(screen.getByText("// 05. Contact")).toBeInTheDocument();
 	});
 
-	it("toggles mobile menu on button click", () => {
+	it("toggles mobile menu on button click and closes on item selection", () => {
 		render(<Header />);
 		const toggleBtn = screen.getByLabelText("Toggle Navigation Menu");
 		expect(toggleBtn).toBeInTheDocument();
@@ -25,6 +25,10 @@ describe("Header Component", () => {
 		// Click to open mobile menu
 		fireEvent.click(toggleBtn);
 		const navElements = screen.getAllByText("// 01. About");
-		expect(navElements.length).toBeGreaterThan(1);
+		expect(navElements.length).toBe(2);
+
+		// Click mobile menu link to close
+		fireEvent.click(navElements[1]);
+		expect(screen.getAllByText("// 01. About").length).toBe(1);
 	});
 });
