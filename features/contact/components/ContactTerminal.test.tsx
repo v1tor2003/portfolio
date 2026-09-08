@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ContactTerminal } from "./ContactTerminal";
+import { TerminalHeader } from "./TerminalHeader";
+import { TerminalLineItem } from "./TerminalLineItem";
 
 vi.mock("../server/send-contact-email", () => ({
 	sendContactEmail: vi.fn(),
@@ -61,12 +63,12 @@ describe("ContactTerminal Component", () => {
 
 		const input = screen.getByLabelText("Terminal Input");
 
-		// 1. Initiate connect
+		// 1. Trigger connect command
 		fireEvent.change(input, { target: { value: "connect" } });
 		submitInput(input);
 
 		expect(
-			screen.getByText(/INITIATING SECURE TRANSMISSION WIZARD/i),
+			screen.getByText(/--- INITIATING SECURE TRANSMISSION WIZARD/i),
 		).toBeInTheDocument();
 		expect(screen.getByText("[?] Enter your name:")).toBeInTheDocument();
 
@@ -121,5 +123,24 @@ describe("ContactTerminal Component", () => {
 			);
 			expect(screen.getByText(/STATUS: 200 OK/i)).toBeInTheDocument();
 		});
+	});
+
+	it("renders TerminalHeader and TerminalLineItem in isolation", () => {
+		const { unmount: unmountHeader } = render(<TerminalHeader />);
+		expect(screen.getByText("root@vitor-server:~# [bash]")).toBeInTheDocument();
+		expect(screen.getByText("TLS_1.3_SECURE")).toBeInTheDocument();
+		unmountHeader();
+
+		const { unmount: unmountLine } = render(
+			<TerminalLineItem
+				line={{
+					id: "test-line",
+					type: "system",
+					text: "TEST_SYSTEM_OUTPUT",
+				}}
+			/>,
+		);
+		expect(screen.getByText("TEST_SYSTEM_OUTPUT")).toBeInTheDocument();
+		unmountLine();
 	});
 });
