@@ -27,8 +27,7 @@ export class FetchResumeCommand extends BaseRequest<
 			"User-Agent": "vitor-portfolio-app",
 		};
 
-		if (this.input.token)
-			headers.Authorization = `Bearer ${this.input.token}`;
+		if (this.input.token) headers.Authorization = `Bearer ${this.input.token}`;
 
 		return {
 			method: "GET",

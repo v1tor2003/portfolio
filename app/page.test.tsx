@@ -11,15 +11,35 @@ describe("HomePage Component", () => {
 		expect(screen.getByText("Backend Software Engineer.")).toBeInTheDocument();
 	});
 
-	it("renders all single-page scroll sections", () => {
-		const { container } = render(<HomePage />);
+	it("renders navigation portal cards to dedicated subpages", () => {
+		render(<HomePage />);
 
-		expect(container.querySelector("#hero")).toBeInTheDocument();
-		expect(container.querySelector("#about")).toBeInTheDocument();
-		expect(container.querySelector("#projects")).toBeInTheDocument();
-		expect(container.querySelector("#resume")).toBeInTheDocument();
-		expect(container.querySelector("#migration")).toBeInTheDocument();
-		expect(container.querySelector("#contact")).toBeInTheDocument();
+		expect(screen.getByText("01. ABOUT")).toBeInTheDocument();
+		expect(screen.getByText("02. PROJECTS")).toBeInTheDocument();
+		expect(screen.getByText("03. RESUME")).toBeInTheDocument();
+		expect(screen.getByText("04. MIGRATION")).toBeInTheDocument();
+		expect(screen.getByText("05. CONTACT")).toBeInTheDocument();
+
+		expect(screen.getByText("01. ABOUT").closest("a")).toHaveAttribute(
+			"href",
+			"/about",
+		);
+		expect(screen.getByText("02. PROJECTS").closest("a")).toHaveAttribute(
+			"href",
+			"/projects",
+		);
+		expect(screen.getByText("03. RESUME").closest("a")).toHaveAttribute(
+			"href",
+			"/resume",
+		);
+		expect(screen.getByText("04. MIGRATION").closest("a")).toHaveAttribute(
+			"href",
+			"/migration",
+		);
+		expect(screen.getByText("05. CONTACT").closest("a")).toHaveAttribute(
+			"href",
+			"/contact",
+		);
 	});
 
 	it("renders view projects and contact buttons", () => {

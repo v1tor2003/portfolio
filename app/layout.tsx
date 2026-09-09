@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Share_Tech_Mono } from "next/font/google";
-import { Footer, Header } from "@/components/layout";
+import { Footer, Header, PageTransition } from "@/components/layout";
 import { BinaryMatrixCanvas } from "@/features/binary-animations/components/BinaryMatrixCanvas";
 import "./globals.css";
 
@@ -41,7 +41,9 @@ export default function RootLayout({
 				/>
 				<div className="relative z-10 flex min-h-screen flex-col">
 					<Header />
-					<main className="flex-1">{children}</main>
+					<main className="flex-1 flex flex-col">
+						<PageTransition>{children}</PageTransition>
+					</main>
 					<Footer />
 				</div>
 			</body>
