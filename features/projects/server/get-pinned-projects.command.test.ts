@@ -9,7 +9,7 @@ describe("GetPinnedProjectsCommand", () => {
 		const http = command.toHttp();
 
 		expect(http.method).toBe("GET");
-		expect(http.path).toBe("/users/v1tor2003/repos?sort=updated&per_page=30");
+		expect(http.path).toBe("/users/v1tor2003/repos?sort=updated&per_page=100");
 		expect(http.headers?.Accept).toBe("application/vnd.github.v3+json");
 		expect(http.headers?.["User-Agent"]).toBe("vitor-portfolio-app");
 		expect(http.headers?.Authorization).toBeUndefined();
@@ -29,6 +29,6 @@ describe("GetPinnedProjectsCommand", () => {
 		const command = new GetPinnedProjectsCommand({});
 		const http = command.toHttp();
 
-		expect(http.path).toBe("/users/v1tor2003/repos?sort=updated&per_page=30");
+		expect(http.path).toBe("/users/v1tor2003/repos?sort=updated&per_page=100");
 	});
 });

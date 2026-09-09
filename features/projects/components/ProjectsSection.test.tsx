@@ -45,16 +45,20 @@ describe("ProjectsSection Component", () => {
 		totalWork: 7,
 	};
 
-	it("renders section title and description", () => {
+	it("renders section title with link to GitHub profile and description", () => {
 		render(
 			<ProjectsSection
 				initialProjects={[mockPersonalProject, mockWorkProject]}
 				initialActivity={mockActivity}
 			/>,
 		);
-		expect(
-			screen.getByText("Backend Open Source & Cloud Work"),
-		).toBeInTheDocument();
+		const titleLink = screen.getByRole("link", {
+			name: /featured github repositories/i,
+		});
+		expect(titleLink).toBeInTheDocument();
+		expect(titleLink).toHaveAttribute("href", "https://github.com/v1tor2003");
+		expect(titleLink).toHaveAttribute("target", "_blank");
+		expect(titleLink).toHaveAttribute("rel", "noopener noreferrer");
 		expect(screen.getByText("02. FEATURED PROJECTS")).toBeInTheDocument();
 	});
 

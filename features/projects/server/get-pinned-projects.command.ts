@@ -38,7 +38,7 @@ export class GetPinnedProjectsCommand extends BaseRequest<
 
 		return {
 			method: "GET",
-			path: `/users/${username}/repos?sort=updated&per_page=30`,
+			path: `/users/${username}/repos?sort=updated&per_page=100`,
 			headers,
 		};
 	}

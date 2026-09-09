@@ -67,3 +67,19 @@ When navigating to `/projects` via the navbar:
 2. Created `features/projects/components/ProjectsSkeleton.tsx` with cyberpunk pulsing activity matrix, header, tabs, and card skeletons.
 3. Added `app/projects/loading.tsx` to ensure Next.js App Router performs instant (0ms) route navigation from the navbar, streaming the skeleton immediately while server data is resolved.
 
+---
+
+## 5. Issue: Project Grid Pagination State Persistence Across Tab Switches
+
+### Problem
+When paginating to page 2 or beyond in the "Personal" projects tab, switching to the "Work" tab could cause an out-of-bounds page index or confusion if the second tab had fewer items than the current page index.
+
+### Resolution
+In `ProjectGrid.tsx`, added a reset effect hook:
+```tsx
+useEffect(() => {
+	setCurrentPage(1);
+}, [projects]);
+```
+This ensures that whenever the filtered project array updates (such as switching tabs or applying search/filters), pagination cleanly and predictably resets to page 1.
+

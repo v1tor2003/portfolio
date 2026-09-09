@@ -1,7 +1,8 @@
 "use client";
 
-import { GitBranch } from "lucide-react";
+import { ExternalLink, GitBranch } from "lucide-react";
 import { useMemo, useState } from "react";
+import { GithubIcon } from "@/components/ui/icons";
 import type {
 	GitActivityData,
 	Project,
@@ -52,12 +53,22 @@ export function ProjectsSection({
 					<span>02. FEATURED PROJECTS</span>
 				</div>
 				<h2 className="text-3xl sm:text-4xl font-bold text-white font-mono">
-					Backend Open Source & Cloud Work
+					<a
+						href="https://github.com/v1tor2003"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-3 hover:text-emerald-400 transition-colors group"
+					>
+						<span>Featured Github Repositories</span>
+						<GithubIcon
+							size={26}
+							className="text-zinc-400 group-hover:text-emerald-400 transition-colors"
+						/>
+						<ExternalLink className="h-5 w-5 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
+					</a>
 				</h2>
 				<p className="text-zinc-400 max-w-3xl leading-relaxed font-mono">
-					Explore personal server-side open-source libraries (like
-					`@v1tor2003/command-api`) and enterprise backend services, highlighted
-					with custom Git activity graphs.
+					A showcase of open-source libraries and learning projects, as well as enterprise backend services visualized through custom Git activity graphs.
 				</p>
 			</div>
 

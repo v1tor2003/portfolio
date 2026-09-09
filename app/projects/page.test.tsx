@@ -12,7 +12,7 @@ describe("ProjectsPage Route", () => {
 		expect(
 			screen.getByRole("heading", {
 				level: 2,
-				name: /Backend Open Source & Cloud Work/i,
+				name: /Featured Github Repositories/i,
 			}),
 		).toBeInTheDocument();
 		expect(screen.getByText(/02\. FEATURED PROJECTS/i)).toBeInTheDocument();
