@@ -55,7 +55,7 @@ export class ResumeService implements IResumeService {
 	constructor(deps?: ResumeServiceDependencies) {
 		this.client = deps?.client ?? defaultCreateGitHubClient();
 		this.readFallback = deps?.readFallback ?? defaultReadFallbackFile;
-		this.token = deps?.token ?? env.GITHUB_RESUME_TOKEN;
+		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
 		this.owner = deps?.owner ?? env.RESUME_REPO_OWNER;
 		this.repo = deps?.repo ?? env.RESUME_REPO_NAME;
 		this.filePath = deps?.filePath ?? env.RESUME_FILE_PATH;
