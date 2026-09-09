@@ -1,4 +1,5 @@
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import type { NavItem } from "./nav-data";
 
 interface MobileNavToggleProps {
@@ -36,14 +37,14 @@ export function MobileNavMenu({ items, isOpen, onClose }: MobileNavMenuProps) {
 		>
 			<div className="flex flex-col space-y-4 font-mono">
 				{items.map((item) => (
-					<a
+					<Link
 						key={item.href}
 						href={item.href}
 						onClick={onClose}
 						className="text-zinc-400 hover:text-white transition-colors"
 					>
 						{item.label}
-					</a>
+					</Link>
 				))}
 			</div>
 		</nav>

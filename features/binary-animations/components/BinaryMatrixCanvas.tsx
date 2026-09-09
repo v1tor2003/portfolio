@@ -6,12 +6,34 @@ interface BinaryMatrixCanvasProps {
 	opacity?: number;
 	fontSize?: number;
 	speedMultiplier?: number;
+	color?: string;
+	highlightColor?: string;
+	characters?: readonly string[];
+}
+
+function normalizeRgb(colorStr: string): string {
+	if (colorStr.startsWith("#")) {
+		const cleanHex = colorStr.replace("#", "");
+		const fullHex =
+			cleanHex.length === 3
+				? cleanHex
+						.split("")
+						.map((c) => c + c)
+						.join("")
+				: cleanHex;
+		const num = parseInt(fullHex, 16);
+		return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+	}
+	return colorStr;
 }
 
 export function BinaryMatrixCanvas({
 	opacity = 0.12,
 	fontSize = 14,
 	speedMultiplier = 1,
+	color = "255, 255, 255",
+	highlightColor = "255, 255, 255",
+	characters = ["0", "1"],
 }: BinaryMatrixCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -36,26 +58,24 @@ export function BinaryMatrixCanvas({
 		const drops: number[] = Array.from({ length: columns }, () =>
 			Math.floor(Math.random() * -100),
 		);
-		const binaryChars = ["0", "1"];
+		const baseRgb = normalizeRgb(color);
+		const highRgb = normalizeRgb(highlightColor);
 
 		const render = () => {
-			// Semi-transparent fade effect for trail effect
 			ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 			ctx.font = `${fontSize}px var(--font-mono), monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
-				const char =
-					binaryChars[Math.floor(Math.random() * binaryChars.length)];
+				const char = characters[Math.floor(Math.random() * characters.length)];
 				const x = i * fontSize;
 				const y = drops[i] * fontSize;
 
-				// Vary character brightness subtly
 				const isHighlight = Math.random() > 0.95;
 				ctx.fillStyle = isHighlight
-					? `rgba(255, 255, 255, ${opacity * 2})`
-					: `rgba(255, 255, 255, ${opacity})`;
+					? `rgba(${highRgb}, ${Math.min(1, opacity * 2.5)})`
+					: `rgba(${baseRgb}, ${opacity})`;
 
 				ctx.fillText(char, x, y);
 
@@ -75,7 +95,7 @@ export function BinaryMatrixCanvas({
 			window.removeEventListener("resize", handleResize);
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [fontSize, opacity, speedMultiplier]);
+	}, [characters, color, fontSize, highlightColor, opacity, speedMultiplier]);
 
 	return (
 		<canvas
