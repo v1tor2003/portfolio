@@ -144,4 +144,3 @@ export function createDefaultCommandRegistry(): CommandRegistry {
 
 	return registry;
 }
-

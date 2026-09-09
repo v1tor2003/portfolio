@@ -41,4 +41,3 @@ export function useEmailSender(): UseEmailSenderReturn {
 		reset,
 	};
 }
-

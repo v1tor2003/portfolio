@@ -1,4 +1,4 @@
-import { contactSchema } from "../schemas/contact.schema";
+import { contactSchema } from "../../schemas/contact.schema";
 import type { ContactDraft, TerminalState } from "./terminal.types";
 
 export interface WizardStepDefinition {

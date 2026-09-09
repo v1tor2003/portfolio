@@ -14,4 +14,3 @@ export function TerminalLineItem({ line }: TerminalLineItemProps) {
 
 	return <div className={`${lineStyle} whitespace-pre-wrap`}>{line.text}</div>;
 }
-

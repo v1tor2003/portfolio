@@ -1,15 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
+import type {
+	CommandContext,
+	TerminalCommandHandler,
+} from "./terminal-commands";
 import {
 	BioCommand,
 	ClearCommand,
 	CommandRegistry,
 	ConnectCommand,
+	createDefaultCommandRegistry,
 	HelpCommand,
 	SkillsCommand,
 	SocialsCommand,
-	createDefaultCommandRegistry,
 } from "./terminal-commands";
-import type { CommandContext, TerminalCommandHandler } from "./terminal-commands";
 
 describe("terminal-commands and CommandRegistry", () => {
 	it("registers and executes a command", () => {
@@ -126,16 +129,28 @@ describe("terminal-commands and CommandRegistry", () => {
 		};
 
 		new HelpCommand().execute(ctx);
-		expect(addLine).toHaveBeenCalledWith("output", expect.stringContaining("AVAILABLE COMMANDS"));
+		expect(addLine).toHaveBeenCalledWith(
+			"output",
+			expect.stringContaining("AVAILABLE COMMANDS"),
+		);
 
 		new SkillsCommand().execute(ctx);
-		expect(addLine).toHaveBeenCalledWith("output", expect.stringContaining("TECH STACK MATRIX"));
+		expect(addLine).toHaveBeenCalledWith(
+			"output",
+			expect.stringContaining("TECH STACK MATRIX"),
+		);
 
 		new BioCommand().execute(ctx);
-		expect(addLine).toHaveBeenCalledWith("output", expect.stringContaining("ENGINEER PROFILE"));
+		expect(addLine).toHaveBeenCalledWith(
+			"output",
+			expect.stringContaining("ENGINEER PROFILE"),
+		);
 
 		new SocialsCommand().execute(ctx);
-		expect(addLine).toHaveBeenCalledWith("output", expect.stringContaining("CHANNELS"));
+		expect(addLine).toHaveBeenCalledWith(
+			"output",
+			expect.stringContaining("CHANNELS"),
+		);
 
 		new ClearCommand().execute(ctx);
 		expect(clearLines).toHaveBeenCalled();
@@ -144,4 +159,3 @@ describe("terminal-commands and CommandRegistry", () => {
 		expect(startWizard).toHaveBeenCalled();
 	});
 });
-

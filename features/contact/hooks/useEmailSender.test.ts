@@ -98,4 +98,3 @@ describe("useEmailSender Hook", () => {
 		expect(result.current.result).toBeNull();
 	});
 });
-

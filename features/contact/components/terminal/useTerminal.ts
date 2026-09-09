@@ -2,13 +2,13 @@
 
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useEmailSender } from "../hooks/useEmailSender";
-import { createDefaultCommandRegistry } from "./terminal-commands";
+import { useEmailSender } from "../../hooks/useEmailSender";
 import type {
 	ContactDraft,
 	TerminalLine,
 	TerminalState,
 } from "./terminal.types";
+import { createDefaultCommandRegistry } from "./terminal-commands";
 import { WIZARD_STEPS } from "./wizard-steps";
 
 const INITIAL_LINES: TerminalLine[] = [
@@ -150,10 +150,7 @@ export function useTerminal() {
 					if (state === "PROMPT_SUBJECT")
 						addLine("prompt", "[?] Enter subject of inquiry:");
 					if (state === "PROMPT_MESSAGE")
-						addLine(
-							"prompt",
-							"[?] Enter message payload (min 10 characters):",
-						);
+						addLine("prompt", "[?] Enter message payload (min 10 characters):");
 					return;
 				}
 
@@ -257,4 +254,3 @@ export function useTerminal() {
 		focusInput,
 	};
 }
-

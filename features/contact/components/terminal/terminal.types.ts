@@ -20,4 +20,3 @@ export interface ContactDraft {
 	message: string;
 	botField: string;
 }
-
