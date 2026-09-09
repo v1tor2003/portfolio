@@ -34,3 +34,10 @@
 ### 3. Dual Route & Hash Compatibility in `useActiveSection`
 - **Issue**: Previously, `useActiveSection` queried the DOM directly via `document.querySelector(item.href)`. When `item.href` was changed to `/about`, `document.querySelector` threw `SyntaxError: Invalid selector /about`.
 - **Resolution**: Updated `useActiveSection` to evaluate `usePathname()` first for path routes starting with `/`, and only fall back to DOM selector queries for fragment anchors starting with `#`.
+
+### 4. On-Demand PDF Iframe Lazy Initialization
+- **Issue**: Previously, visiting `/resume` immediately mounted `<iframe src="/api/resume">`, initiating heavy PDF streaming and rendering on initial page mount without user interaction.
+- **Resolution**: Updated `ResumeViewer` to maintain an explicit `isOpen` state defaulting to `false`. Renders a lightweight terminal standby card with a `PREVIEW RESUME (PDF)` button. Clicking the button mounts the iframe on demand, optimizing bandwidth and eliminating unnecessary background requests.
+
+
+

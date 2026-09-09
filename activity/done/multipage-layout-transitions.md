@@ -28,10 +28,16 @@
    - `components/layout/header/useActiveSection.ts`: Modernized hook to inspect `usePathname()` for route matching while retaining anchor fallback compatibility.
    - `features/hero/components/HeroActions.tsx`: Updated CTA buttons to use Next.js `<Link>` to `/projects` and `/contact`.
 
+5. **On-Demand Resume Preview & Canvas Customization**:
+   - `features/resume/components/ResumeViewer.tsx`: Updated to render in a standby state by default with a `PREVIEW RESUME (PDF)` trigger button. The heavy iframe only loads on demand upon explicit user click, with a `CLOSE PREVIEW` button to dismiss.
+   - `features/binary-animations/components/BinaryMatrixCanvas.tsx`: Added customizable props (`color`, `highlightColor`, `characters`, `opacity`, `speedMultiplier`, `fontSize`) with RGB hex/string normalization.
+
 ---
 
 ## Verification & Compliance Metrics
 
-- **Vitest**: 38 test suites, 102 tests passing (100% green).
+- **Vitest**: 38 test suites, 104 tests passing (100% green).
 - **Biome**: 0 errors, 0 warnings across 112 files.
-- **Turbopack Build**: Static production build succeeded with typecheck in ~1.6s, generating all 9 static and dynamic routes.
+- **Turbopack Build**: Static production build succeeded with typecheck in ~2.3s, generating all 9 static and dynamic routes.
+
+

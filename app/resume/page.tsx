@@ -20,7 +20,7 @@ export default function ResumePage() {
 						className="inline-flex items-center gap-2 text-xs sm:text-sm text-zinc-400 hover:text-white transition-colors"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span>BACK TO PORTFOLIO</span>
+						<span>BACK TO HOME</span>
 					</Link>
 
 					<ResumeDownloadButton />
@@ -32,7 +32,7 @@ export default function ResumePage() {
 						<span>{"DOCUMENT_VIEWER // VITOR_PIRES"}</span>
 					</div>
 					<h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
-						Curriculum Vitae
+						Resume
 					</h1>
 					<p className="text-zinc-400 max-w-3xl leading-relaxed text-sm sm:text-base font-sans">
 						Synchronized on-demand from the dedicated LaTeX resume repository.
