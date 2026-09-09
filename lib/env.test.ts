@@ -10,4 +10,10 @@ describe("Typed Environment Configuration", () => {
 	it("identifies valid runtime environment", () => {
 		expect(["development", "test", "production"]).toContain(env.NODE_ENV);
 	});
+
+	it("provides default resume repository configuration", () => {
+		expect(env.RESUME_REPO_OWNER).toBe("v1tor2003");
+		expect(env.RESUME_REPO_NAME).toBe("resume");
+		expect(env.RESUME_FILE_PATH).toBe("vitor-pires-resume.pdf");
+	});
 });
