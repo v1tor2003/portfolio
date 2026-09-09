@@ -8,4 +8,14 @@ describe("ResumeSection Component", () => {
 		expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
 		expect(screen.getByText("03. RESUME SYNC")).toBeInTheDocument();
 	});
+
+	it("renders download button and preview link", () => {
+		render(<ResumeSection />);
+		expect(
+			screen.getByRole("link", { name: /download cv/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", { name: /preview online/i }),
+		).toBeInTheDocument();
+	});
 });
