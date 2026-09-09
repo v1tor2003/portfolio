@@ -24,8 +24,8 @@ Implemented the full Projects Page & Section with GitHub integration, featuring:
    - Real-time commit stats summary, hover state inspection, and intensity legend.
 
 3. **Tabbed Navigation (Matrix Switch)**:
-   - Positioned directly above the activity graph for immediate visibility and intuitive context switching.
-   - Framer Motion animated active pill indicator.
+   - Positioned directly above the activity graph taking the full width of the container, split 50/50 ("half half") in a two-column grid.
+   - Framer Motion animated active pill indicator expanding across each tab.
    - Strictly adhering to user-specified tab labels:
      - `// 01. PERSONAL`
      - `// 02. WORK (ENTERPRISE CONTRIBUTIONS)`

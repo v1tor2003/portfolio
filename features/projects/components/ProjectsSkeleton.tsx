@@ -22,9 +22,9 @@ export function ProjectsSkeleton() {
 			</div>
 
 			{/* Tabs Skeleton (Matrix Switch) */}
-			<div className="flex gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg w-fit">
-				<div className="h-8 w-32 bg-zinc-800/80 rounded" />
-				<div className="h-8 w-60 bg-zinc-800/50 rounded" />
+			<div className="w-full grid grid-cols-2 gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg">
+				<div className="h-8.5 bg-zinc-800/80 rounded w-full" />
+				<div className="h-8.5 bg-zinc-800/50 rounded w-full" />
 			</div>
 
 			{/* Activity Matrix Skeleton */}

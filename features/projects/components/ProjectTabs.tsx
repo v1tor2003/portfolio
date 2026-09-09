@@ -22,7 +22,7 @@ const TABS: { id: ProjectCategory; label: string }[] = [
 
 export function ProjectTabs({ activeTab, onTabChange }: ProjectTabsProps) {
 	return (
-		<div className="flex flex-wrap items-center gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg font-mono">
+		<div className="w-full grid grid-cols-2 gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg font-mono">
 			{TABS.map((tab) => {
 				const isActive = activeTab === tab.id;
 				const isPersonal = tab.id === "personal";
@@ -32,7 +32,7 @@ export function ProjectTabs({ activeTab, onTabChange }: ProjectTabsProps) {
 						key={tab.id}
 						type="button"
 						onClick={() => onTabChange(tab.id)}
-						className={`relative px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors z-10 ${
+						className={`relative w-full flex items-center justify-center px-2 sm:px-4 py-2.5 text-[11px] sm:text-xs md:text-sm font-medium rounded-md transition-colors z-10 text-center truncate ${
 							isActive
 								? isPersonal
 									? "text-emerald-400 font-semibold"
@@ -51,7 +51,7 @@ export function ProjectTabs({ activeTab, onTabChange }: ProjectTabsProps) {
 								transition={{ type: "spring", stiffness: 350, damping: 30 }}
 							/>
 						)}
-						<span className="relative z-10">{tab.label}</span>
+						<span className="relative z-10 truncate">{tab.label}</span>
 					</button>
 				);
 			})}
