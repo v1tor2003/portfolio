@@ -30,3 +30,7 @@ yarn-error.log*
 
 # Local Agent Tooling
 /.agents/
+
+# TypeScript Cache
+*.tsbuildinfo
+

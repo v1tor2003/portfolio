@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { NavItem } from "./nav-data";
 
 interface DesktopNavProps {
@@ -14,7 +15,7 @@ export function DesktopNav({ items, activeSection }: DesktopNavProps) {
 			{items.map((item) => {
 				const isActive = activeSection === item.href;
 				return (
-					<a
+					<Link
 						key={item.href}
 						href={item.href}
 						className={`transition-colors hover:text-white ${
@@ -22,7 +23,7 @@ export function DesktopNav({ items, activeSection }: DesktopNavProps) {
 						}`}
 					>
 						{item.label}
-					</a>
+					</Link>
 				);
 			})}
 		</nav>

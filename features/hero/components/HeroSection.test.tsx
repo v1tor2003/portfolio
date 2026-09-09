@@ -18,13 +18,13 @@ describe("HeroSection Component", () => {
 		).toBeInTheDocument();
 	});
 
-	it("renders call to action buttons with correct anchors", () => {
+	it("renders call to action buttons with correct route links", () => {
 		render(<HeroSection />);
 		const projectsLink = screen.getByText("View Backend Projects").closest("a");
 		const contactLink = screen.getByText("Contact Me").closest("a");
 
-		expect(projectsLink).toHaveAttribute("href", "#projects");
-		expect(contactLink).toHaveAttribute("href", "#contact");
+		expect(projectsLink).toHaveAttribute("href", "/projects");
+		expect(contactLink).toHaveAttribute("href", "/contact");
 	});
 
 	it("renders subcomponents in isolation", () => {
