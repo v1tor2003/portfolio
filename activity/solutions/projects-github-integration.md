@@ -52,3 +52,18 @@ Enterprise GitHub accounts and internal proprietary repositories cannot be queri
 
 ### Resolution
 Implemented `generateGitActivityData(52)` which deterministically models weekday enterprise engineering velocity alongside weekend personal open-source commits. This satisfies Issue #6 requirements and the user's architectural guidance while ensuring 0 external network dependencies in offline or unauthenticated environments.
+
+---
+
+## 4. Issue: Page Transition Content Disappearance & Navigation Stall
+
+### Problem
+When navigating to `/projects` via the navbar:
+1. Client navigation stalled waiting for the server component to complete data fetching without an instant route skeleton.
+2. `components/layout/PageTransition.tsx` used `<AnimatePresence mode="wait">` with `exit={{ opacity: 0, y: -8 }}` and `key={pathname}`. In Next.js App Router, when `pathname` updates alongside server streaming, `AnimatePresence` cloned the incoming page as the exiting child and faded it to `opacity: 0`, unmounting it and causing the screen content to vanish across pages.
+
+### Resolution
+1. Removed `AnimatePresence mode="wait"` exit unmount loop in `PageTransition.tsx`, keeping smooth enter transitions (`opacity: 0 -> 1`, `y: 8 -> 0`).
+2. Created `features/projects/components/ProjectsSkeleton.tsx` with cyberpunk pulsing activity matrix, header, tabs, and card skeletons.
+3. Added `app/projects/loading.tsx` to ensure Next.js App Router performs instant (0ms) route navigation from the navbar, streaming the skeleton immediately while server data is resolved.
+

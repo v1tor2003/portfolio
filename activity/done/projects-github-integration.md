@@ -33,13 +33,16 @@ Implemented the full Projects Page & Section with GitHub integration, featuring:
    - Clean card layout with repository badges, pinned indicator, language dots, star and fork metrics, and direct GitHub links.
    - `ProjectReadmeModal`: On-demand markdown fetching from `/api/projects/readme?owner=...&repo=...`, raw copying with feedback, terminal header, and keyboard/escape dismissal.
 
-5. **Server Component Prefetching**:
-   - `app/projects/page.tsx` prefetches projects and git activity server-side with instant SSR rendering.
+5. **Server Component Prefetching & Instant Route Suspense**:
+   - `app/projects/loading.tsx`: Instant (0ms) route navigation skeleton while server data resolves.
+   - `ProjectsSkeleton`: Cyberpunk pulsing skeleton for activity matrix, tabs, and card grid.
+   - Stabilized `components/layout/PageTransition.tsx` to prevent exit unmounting loops in Next.js App Router.
 
 ---
 
 ## 2. Validation & Quality Verification
 
-- **Vitest**: 48 test files, 131 tests passing (100% green).
-- **Biome**: 0 errors, 0 warnings across 114 files.
-- **Turbopack Build**: Static production build succeeded in ~900ms.
+- **Vitest**: 49 test files, 133 tests passing (100% green).
+- **Biome**: 0 errors, 0 warnings across 136 files.
+- **Turbopack Build**: Static production build succeeded in ~850ms.
+
