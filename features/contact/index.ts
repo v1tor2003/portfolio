@@ -5,5 +5,7 @@ export { ContactTerminal } from "./components/ContactTerminal";
 export { TerminalHeader } from "./components/TerminalHeader";
 export { TerminalInputForm } from "./components/TerminalInputForm";
 export { TerminalLineItem } from "./components/TerminalLineItem";
+export { useEmailSender } from "./hooks/useEmailSender";
 export * from "./schemas/contact.schema";
+export * from "./server/send-contact-email";
 export * from "./types/terminal.types";

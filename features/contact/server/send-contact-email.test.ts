@@ -1,17 +1,25 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/env", () => ({
+	env: {
+		NODE_ENV: "test",
+		RESEND_API_KEY: undefined as string | undefined,
+		CONTACT_TO_EMAIL: "vitor.pr04@hotmail.com",
+		CONTACT_FROM_EMAIL: "onboarding@resend.dev",
+	},
+}));
+
+import { env } from "@/lib/env";
 import { sendContactEmail } from "./send-contact-email";
 
 describe("sendContactEmail Server Action", () => {
-	const originalEnv = process.env;
-
 	beforeEach(() => {
-		vi.resetModules();
-		process.env = { ...originalEnv };
+		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = undefined;
 	});
 
 	afterEach(() => {
-		process.env = originalEnv;
 		vi.restoreAllMocks();
+		vi.unstubAllGlobals();
 	});
 
 	it("rejects invalid form data and returns field errors", async () => {
@@ -29,7 +37,7 @@ describe("sendContactEmail Server Action", () => {
 	});
 
 	it("returns simulated success when RESEND_API_KEY is not configured", async () => {
-		delete process.env.RESEND_API_KEY;
+		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = undefined;
 
 		const result = await sendContactEmail({
 			name: "Margaret Hamilton",
@@ -56,13 +64,15 @@ describe("sendContactEmail Server Action", () => {
 		expect(result.message).toBe("Message received.");
 	});
 
-	it("calls Resend API when RESEND_API_KEY is provided", async () => {
-		process.env.RESEND_API_KEY = "re_test_123456";
+	it("calls Resend API via command-api when RESEND_API_KEY is provided", async () => {
+		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
 
-		const fetchMock = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({ id: "mock_resend_id" }),
-		});
+		const fetchMock = vi.fn().mockResolvedValue(
+			new Response(JSON.stringify({ id: "mock_resend_id" }), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			}),
+		);
 		vi.stubGlobal("fetch", fetchMock);
 
 		const result = await sendContactEmail({
@@ -74,14 +84,39 @@ describe("sendContactEmail Server Action", () => {
 		});
 
 		expect(result.success).toBe(true);
+		expect(result.message).toBe("Packet dispatched successfully via Resend.");
 		expect(fetchMock).toHaveBeenCalledWith(
 			"https://api.resend.com/emails",
 			expect.objectContaining({
 				method: "POST",
-				headers: expect.objectContaining({
-					Authorization: "Bearer re_test_123456",
-				}),
 			}),
 		);
+
+		const headers = fetchMock.mock.calls[0][1]?.headers as Headers;
+		expect(headers.get("Authorization")).toBe("Bearer re_test_123456");
+		expect(headers.get("Content-Type")).toBe("application/json");
+	});
+
+	it("handles Resend API error cleanly", async () => {
+		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
+
+		const fetchMock = vi.fn().mockResolvedValue(
+			new Response(JSON.stringify({ message: "Invalid API key" }), {
+				status: 401,
+				headers: { "Content-Type": "application/json" },
+			}),
+		);
+		vi.stubGlobal("fetch", fetchMock);
+
+		const result = await sendContactEmail({
+			name: "Linus Torvalds",
+			email: "torvalds@kernel.org",
+			subject: "Kernel Git Plumbing",
+			message:
+				"Looking at your Git activity graph and distributed system projects.",
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.message).toBe("Failed to dispatch email transmission.");
 	});
 });
