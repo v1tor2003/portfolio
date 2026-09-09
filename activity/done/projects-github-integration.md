@@ -33,7 +33,7 @@ Implemented the full Projects Page & Section with GitHub integration, featuring:
 4. **Project Cards & On-Demand Terminal README Modal**:
    - Fixed consistent card height (`h-[280px]`) for clean, uniform grid geometry.
    - Entire card surface is interactive (`role="button"`, cursor-pointer, keyboard accessible) and triggers the README details modal on click, with nested external links stopping propagation.
-   - `ProjectReadmeModal`: Renders rich markdown using `react-markdown` with customized cyberpunk styling (emerald headings, borders, formatted code blocks, blockquotes, and link states), on-demand fetching from `/api/projects/readme`, raw copying, and keyboard/escape dismissal.
+   - `ProjectReadmeModal`: Renders rich markdown using `react-markdown` with customized cyberpunk styling (emerald headings, borders, formatted code blocks, blockquotes, and link states), on-demand fetching from `/api/projects/readme`, background scroll locking (`document.body.style.overflow = "hidden"`), raw copying, and keyboard/escape dismissal.
 
 5. **Server Component Prefetching & Instant Route Suspense**:
    - `app/projects/loading.tsx`: Instant (0ms) route navigation skeleton while server data resolves.
@@ -44,7 +44,7 @@ Implemented the full Projects Page & Section with GitHub integration, featuring:
 
 ## 2. Validation & Quality Verification
 
-- **Vitest**: 49 test files, 134 tests passing (100% green).
+- **Vitest**: 49 test files, 135 tests passing (100% green).
 - **Biome**: 0 errors, 0 warnings across 136 files.
-- **Turbopack Build**: Static production build succeeded in ~800ms.
+- **Turbopack Build**: Static production build succeeded in ~600ms.
 

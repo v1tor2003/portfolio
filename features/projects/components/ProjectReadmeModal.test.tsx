@@ -60,4 +60,21 @@ describe("ProjectReadmeModal Component", () => {
 
 		expect(handleClose).toHaveBeenCalled();
 	});
+
+	it("disables background scrolling on body when open and restores on close", () => {
+		const { unmount } = render(
+			<ProjectReadmeModal
+				isOpen={true}
+				onClose={() => {}}
+				owner="v1tor2003"
+				repo="command-api"
+			/>,
+		);
+
+		expect(document.body.style.overflow).toBe("hidden");
+
+		unmount();
+
+		expect(document.body.style.overflow).toBe("");
+	});
 });

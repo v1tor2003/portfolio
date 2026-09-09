@@ -84,6 +84,18 @@ export function ProjectReadmeModal({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [isOpen, onClose]);
 
+	// Lock body scroll when modal is open
+	useEffect(() => {
+		if (!isOpen) return;
+
+		const originalOverflow = document.body.style.overflow;
+		document.body.style.overflow = "hidden";
+
+		return () => {
+			document.body.style.overflow = originalOverflow;
+		};
+	}, [isOpen]);
+
 	const handleCopy = async () => {
 		if (!content) return;
 		try {
