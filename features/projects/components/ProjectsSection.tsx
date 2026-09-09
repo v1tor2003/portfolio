@@ -61,19 +61,19 @@ export function ProjectsSection({
 				</p>
 			</div>
 
-			{/* Git Contribution Activity Matrix */}
-			<GitActivityGraph
-				activity={activityData}
-				activeCategory={activeCategory}
-			/>
-
-			{/* Navigation Tabs */}
+			{/* Navigation Tabs (Matrix Switch) */}
 			<div className="pt-2">
 				<ProjectTabs
 					activeTab={activeCategory}
 					onTabChange={setActiveCategory}
 				/>
 			</div>
+
+			{/* Git Contribution Activity Matrix */}
+			<GitActivityGraph
+				activity={activityData}
+				activeCategory={activeCategory}
+			/>
 
 			{/* Filtered Project Grid */}
 			<ProjectGrid

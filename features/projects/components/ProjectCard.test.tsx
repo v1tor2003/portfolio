@@ -44,4 +44,18 @@ describe("ProjectCard Component", () => {
 
 		expect(handleViewReadme).toHaveBeenCalledWith(mockProject);
 	});
+
+	it("calls onViewReadme when clicking anywhere on the card container", () => {
+		const handleViewReadme = vi.fn();
+		render(
+			<ProjectCard project={mockProject} onViewReadme={handleViewReadme} />,
+		);
+
+		const card = screen.getByRole("button", {
+			name: /view details and readme for @v1tor2003\/command-api/i,
+		});
+		fireEvent.click(card);
+
+		expect(handleViewReadme).toHaveBeenCalledWith(mockProject);
+	});
 });

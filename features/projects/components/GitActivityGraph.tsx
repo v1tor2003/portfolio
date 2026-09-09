@@ -139,8 +139,8 @@ export function GitActivityGraph({
 			</div>
 
 			{/* Matrix grid view with horizontal scrolling */}
-			<div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-				<div className="inline-flex gap-1">
+			<div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex justify-center">
+				<div className="inline-flex gap-1 mx-auto">
 					{weeks.map((week, wIdx) => (
 						<div key={`week-${wIdx}`} className="flex flex-col gap-1">
 							{week.map((day) => {

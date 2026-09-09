@@ -21,6 +21,12 @@ export function ProjectsSkeleton() {
 				</div>
 			</div>
 
+			{/* Tabs Skeleton (Matrix Switch) */}
+			<div className="flex gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg w-fit">
+				<div className="h-8 w-32 bg-zinc-800/80 rounded" />
+				<div className="h-8 w-60 bg-zinc-800/50 rounded" />
+			</div>
+
 			{/* Activity Matrix Skeleton */}
 			<div className="w-full bg-black/40 border border-zinc-800 rounded-lg p-4 sm:p-5 space-y-4">
 				<div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
@@ -44,18 +50,12 @@ export function ProjectsSkeleton() {
 				</div>
 			</div>
 
-			{/* Tabs Skeleton */}
-			<div className="flex gap-2 p-1.5 bg-black/40 border border-zinc-800 rounded-lg w-fit">
-				<div className="h-8 w-32 bg-zinc-800/80 rounded" />
-				<div className="h-8 w-60 bg-zinc-800/50 rounded" />
-			</div>
-
 			{/* Grid Skeleton */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 				{[1, 2, 3, 4, 5, 6].map((i) => (
 					<div
 						key={i}
-						className="flex flex-col justify-between bg-zinc-950/70 border border-zinc-800/80 rounded-lg p-5 space-y-6"
+						className="h-[280px] flex flex-col justify-between bg-zinc-950/70 border border-zinc-800/80 rounded-lg p-5 space-y-4"
 					>
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
