@@ -4,11 +4,11 @@ import { ContactTerminal } from "./ContactTerminal";
 import { TerminalHeader } from "./TerminalHeader";
 import { TerminalLineItem } from "./TerminalLineItem";
 
-vi.mock("../server/send-contact-email", () => ({
+vi.mock("../../server/send-contact-email", () => ({
 	sendContactEmail: vi.fn(),
 }));
 
-import { sendContactEmail } from "../server/send-contact-email";
+import { sendContactEmail } from "../../server/send-contact-email";
 
 function submitInput(input: HTMLElement) {
 	const form = input.closest("form");

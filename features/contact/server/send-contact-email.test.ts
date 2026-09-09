@@ -4,17 +4,22 @@ vi.mock("@/lib/env", () => ({
 	env: {
 		NODE_ENV: "test",
 		RESEND_API_KEY: undefined as string | undefined,
+		RESEND_API_LOGGING: false,
 		CONTACT_TO_EMAIL: "vitor.pr04@hotmail.com",
 		CONTACT_FROM_EMAIL: "onboarding@resend.dev",
 	},
 }));
 
 import { env } from "@/lib/env";
+import { contactRateLimiter } from "./rate-limiter";
+import { ResendClientFactory } from "./resend-email.service";
 import { sendContactEmail } from "./send-contact-email";
 
 describe("sendContactEmail Server Action", () => {
 	beforeEach(() => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = undefined;
+		ResendClientFactory._resetInstance();
+		vi.clearAllMocks();
 	});
 
 	afterEach(() => {
@@ -66,6 +71,7 @@ describe("sendContactEmail Server Action", () => {
 
 	it("calls Resend API via command-api when RESEND_API_KEY is provided", async () => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
+		ResendClientFactory._resetInstance();
 
 		const fetchMock = vi.fn().mockResolvedValue(
 			new Response(JSON.stringify({ id: "mock_resend_id" }), {
@@ -99,6 +105,9 @@ describe("sendContactEmail Server Action", () => {
 
 	it("handles Resend API error cleanly", async () => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
+		ResendClientFactory._resetInstance();
+
+		vi.spyOn(console, "error").mockImplementation(() => {});
 
 		const fetchMock = vi.fn().mockResolvedValue(
 			new Response(JSON.stringify({ message: "Invalid API key" }), {
@@ -118,5 +127,19 @@ describe("sendContactEmail Server Action", () => {
 
 		expect(result.success).toBe(false);
 		expect(result.message).toBe("Failed to dispatch email transmission.");
+	});
+
+	it("returns rate limit error when client exceeds quota", async () => {
+		vi.spyOn(contactRateLimiter, "isRateLimited").mockReturnValueOnce(true);
+
+		const result = await sendContactEmail({
+			name: "Spammy Spammer",
+			email: "spammer@flood.com",
+			subject: "Flood Transmission",
+			message: "Flooding the system with rapid requests.",
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.message).toContain("Rate limit exceeded");
 	});
 });
