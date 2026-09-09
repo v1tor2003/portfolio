@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, FileText, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface ProjectReadmeModalProps {
 	isOpen: boolean;
@@ -179,9 +180,76 @@ export function ProjectReadmeModal({
 							)}
 
 							{!loading && !error && (
-								<pre className="whitespace-pre-wrap break-words font-mono text-zinc-300 bg-black/40 p-4 rounded border border-zinc-900">
-									{content}
-								</pre>
+								<div className="space-y-4 font-mono">
+									<ReactMarkdown
+										components={{
+											h1: ({ children }) => (
+												<h1 className="text-xl sm:text-2xl font-bold text-white border-b border-zinc-800 pb-2 pt-1">
+													{children}
+												</h1>
+											),
+											h2: ({ children }) => (
+												<h2 className="text-lg sm:text-xl font-bold text-emerald-400 border-b border-zinc-800/80 pb-1.5 pt-4">
+													{children}
+												</h2>
+											),
+											h3: ({ children }) => (
+												<h3 className="text-base font-semibold text-zinc-200 pt-3">
+													{children}
+												</h3>
+											),
+											p: ({ children }) => (
+												<p className="leading-relaxed text-zinc-300">
+													{children}
+												</p>
+											),
+											ul: ({ children }) => (
+												<ul className="list-disc list-inside space-y-1 pl-2 text-zinc-300">
+													{children}
+												</ul>
+											),
+											ol: ({ children }) => (
+												<ol className="list-decimal list-inside space-y-1 pl-2 text-zinc-300">
+													{children}
+												</ol>
+											),
+											blockquote: ({ children }) => (
+												<blockquote className="border-l-2 border-emerald-500/60 pl-3 italic text-zinc-400 bg-emerald-950/20 py-1 rounded-r">
+													{children}
+												</blockquote>
+											),
+											code: ({ children, className }) => {
+												const isInline = !className;
+												if (isInline) {
+													return (
+														<code className="bg-zinc-900 border border-zinc-800 text-emerald-300 px-1.5 py-0.5 rounded text-[11px] sm:text-xs">
+															{children}
+														</code>
+													);
+												}
+												return (
+													<div className="bg-zinc-900/90 border border-zinc-800 rounded p-3 overflow-x-auto my-3 text-xs sm:text-sm">
+														<code className="text-emerald-400 font-mono">
+															{children}
+														</code>
+													</div>
+												);
+											},
+											a: ({ href, children }) => (
+												<a
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors"
+												>
+													{children}
+												</a>
+											),
+										}}
+									>
+										{content}
+									</ReactMarkdown>
+								</div>
 							)}
 						</div>
 

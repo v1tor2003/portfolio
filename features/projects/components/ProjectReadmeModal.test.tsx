@@ -37,7 +37,7 @@ describe("ProjectReadmeModal Component", () => {
 		expect(screen.getByText(/command-api\/README\.md/i)).toBeInTheDocument();
 		await waitFor(() => {
 			expect(
-				screen.getByText(/# command-api documentation/),
+				screen.getByRole("heading", { name: /command-api documentation/i }),
 			).toBeInTheDocument();
 		});
 

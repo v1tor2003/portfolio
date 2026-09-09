@@ -33,7 +33,7 @@ Implemented the full Projects Page & Section with GitHub integration, featuring:
 4. **Project Cards & On-Demand Terminal README Modal**:
    - Fixed consistent card height (`h-[280px]`) for clean, uniform grid geometry.
    - Entire card surface is interactive (`role="button"`, cursor-pointer, keyboard accessible) and triggers the README details modal on click, with nested external links stopping propagation.
-   - `ProjectReadmeModal`: On-demand markdown fetching from `/api/projects/readme?owner=...&repo=...`, raw copying with feedback, terminal header, and keyboard/escape dismissal.
+   - `ProjectReadmeModal`: Renders rich markdown using `react-markdown` with customized cyberpunk styling (emerald headings, borders, formatted code blocks, blockquotes, and link states), on-demand fetching from `/api/projects/readme`, raw copying, and keyboard/escape dismissal.
 
 5. **Server Component Prefetching & Instant Route Suspense**:
    - `app/projects/loading.tsx`: Instant (0ms) route navigation skeleton while server data resolves.
