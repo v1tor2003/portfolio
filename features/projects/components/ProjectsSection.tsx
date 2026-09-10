@@ -52,19 +52,20 @@ export function ProjectsSection({
 					<GitBranch className="h-4 w-4" />
 					<span>02. FEATURED PROJECTS</span>
 				</div>
-				<h2 className="text-3xl sm:text-4xl font-bold text-white font-mono">
+				<h2 className="text-3xl sm:text-4xl font-bold text-white font-mono flex flex-wrap items-center gap-3">
+					<span>Featured Github Repositories</span>
 					<a
 						href="https://github.com/v1tor2003"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-3 hover:text-emerald-400 transition-colors group"
+						aria-label="GitHub Profile"
+						className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-blue-400 border-b-2 border-transparent hover:border-blue-400 pb-0.5 transition-all group"
 					>
-						<span>Featured Github Repositories</span>
 						<GithubIcon
 							size={26}
-							className="text-zinc-400 group-hover:text-emerald-400 transition-colors"
+							className="text-zinc-400 group-hover:text-blue-400 transition-colors"
 						/>
-						<ExternalLink className="h-5 w-5 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
+						<ExternalLink className="h-5 w-5 text-zinc-400 group-hover:text-blue-400 transition-colors" />
 					</a>
 				</h2>
 				<p className="text-zinc-400 max-w-3xl leading-relaxed font-mono">

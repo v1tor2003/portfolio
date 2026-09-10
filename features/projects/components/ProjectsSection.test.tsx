@@ -52,8 +52,11 @@ describe("ProjectsSection Component", () => {
 				initialActivity={mockActivity}
 			/>,
 		);
+		expect(
+			screen.getByText("Featured Github Repositories"),
+		).toBeInTheDocument();
 		const titleLink = screen.getByRole("link", {
-			name: /featured github repositories/i,
+			name: /github profile/i,
 		});
 		expect(titleLink).toBeInTheDocument();
 		expect(titleLink).toHaveAttribute("href", "https://github.com/v1tor2003");
