@@ -61,4 +61,20 @@ describe("ProjectsService", () => {
 		const page1Ids = new Set(page1.projects.map((p) => p.id));
 		expect(page2.projects.some((p) => page1Ids.has(p.id))).toBe(false);
 	});
+
+	it("prioritizes and sorts pinned repositories first", async () => {
+		const service = new ProjectsService();
+		const projects = await service.getProjects("personal");
+
+		expect(projects.length).toBeGreaterThan(0);
+		// If pinned items exist, all pinned items must appear before non-pinned items
+		let foundUnpinned = false;
+		for (const project of projects) {
+			if (project.isPinned) {
+				expect(foundUnpinned).toBe(false);
+			} else {
+				foundUnpinned = true;
+			}
+		}
+	});
 });

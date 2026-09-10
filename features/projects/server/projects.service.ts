@@ -275,7 +275,10 @@ export class ProjectsService implements IProjectsService {
 				token: this.token,
 			});
 
-			const result = await this.client.send(command);
+			const [result, pinnedSet] = await Promise.all([
+				this.client.send(command),
+				this.fetchPinnedRepoNames(),
+			]);
 
 			if (
 				isOk(result) &&
@@ -285,11 +288,19 @@ export class ProjectsService implements IProjectsService {
 				const remoteRepos = result.data;
 				// Merge or map fetched repositories
 				const mapped: Project[] = remoteRepos
-					.filter((repo) => !repo.name.startsWith(".")) // Filter config/hidden repos
+					.filter(
+						(repo) =>
+							!repo.name.startsWith(".") &&
+							repo.name.toLowerCase() !== this.username.toLowerCase(),
+					) // Filter config/hidden/profile repos
 					.map((repo) => {
 						const existing = SEED_PERSONAL_PROJECTS.find(
 							(p) => p.repo.toLowerCase() === repo.name.toLowerCase(),
 						);
+
+						const isPinned =
+							pinnedSet.has(repo.name.toLowerCase()) ||
+							Boolean(existing?.isPinned);
 
 						return {
 							id: repo.name,
@@ -310,14 +321,14 @@ export class ProjectsService implements IProjectsService {
 								repo.topics && repo.topics.length > 0
 									? repo.topics
 									: existing?.topics || ["typescript", "open-source"],
-							isPinned: existing ? existing.isPinned : false,
+							isPinned,
 							hasReadme: true,
 							owner: repo.owner.login,
 							repo: repo.name,
 						};
 					});
 
-				// Keep featured repos like command-api pinned at the top
+				// Sort pinned repositories to the top, then sort by stars descending
 				const pinnedFirst = mapped.sort((a, b) => {
 					if (a.isPinned && !b.isPinned) return -1;
 					if (!a.isPinned && b.isPinned) return 1;
@@ -335,6 +346,91 @@ export class ProjectsService implements IProjectsService {
 		const combined = [...personalProjects, ...SEED_WORK_PROJECTS];
 		this.cachedProjects = { data: combined, timestamp: now };
 		return combined;
+	}
+
+	private async fetchPinnedRepoNames(): Promise<Set<string>> {
+		const pinnedNames = new Set<string>();
+
+		if (this.token) {
+			try {
+				const query = `
+					query($username: String!) {
+						user(login: $username) {
+							pinnedItems(first: 10, types: REPOSITORY) {
+								nodes {
+									... on Repository {
+										name
+									}
+								}
+							}
+						}
+					}
+				`;
+				const res = await fetch("https://api.github.com/graphql", {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+						"Content-Type": "application/json",
+						"User-Agent": "vitor-portfolio-app",
+					},
+					body: JSON.stringify({
+						query,
+						variables: { username: this.username },
+					}),
+				});
+
+				if (res.ok) {
+					const json = await res.json();
+					const nodes = json.data?.user?.pinnedItems?.nodes;
+					if (Array.isArray(nodes)) {
+						for (const node of nodes) {
+							if (node?.name) {
+								pinnedNames.add(node.name.toLowerCase());
+							}
+						}
+						if (pinnedNames.size > 0) {
+							return pinnedNames;
+						}
+					}
+				}
+			} catch {
+				// Fallback to scraping
+			}
+		}
+
+		try {
+			const res = await fetch(`https://github.com/${this.username}`, {
+				headers: {
+					"User-Agent": "vitor-portfolio-app",
+				},
+			});
+			if (res.ok) {
+				const html = await res.text();
+				const regex = new RegExp(
+					`class="pinned-item-list-item-content"[\\s\\S]*?href="/${this.username}/([^"/]+)"`,
+					"g",
+				);
+				const matches = Array.from(html.matchAll(regex));
+				for (const m of matches) {
+					if (m[1] && m[1].toLowerCase() !== this.username.toLowerCase()) {
+						pinnedNames.add(m[1].toLowerCase());
+					}
+				}
+				if (pinnedNames.size > 0) {
+					return pinnedNames;
+				}
+			}
+		} catch {
+			// Fallback to seed pinned list
+		}
+
+		for (const p of SEED_PERSONAL_PROJECTS) {
+			if (p.isPinned) {
+				pinnedNames.add(p.repo.toLowerCase());
+			}
+		}
+
+		return pinnedNames;
 	}
 }
 
