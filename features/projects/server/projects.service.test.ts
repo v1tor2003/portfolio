@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ProjectsService } from "./projects.service";
 
 describe("ProjectsService", () => {
@@ -76,5 +76,79 @@ describe("ProjectsService", () => {
 				foundUnpinned = true;
 			}
 		}
+	});
+
+	it("merges real enterprise contributions from GraphQL when workToken is supplied", async () => {
+		const originalFetch = globalThis.fetch;
+		const mockGraphQLResponse = {
+			data: {
+				viewer: {
+					contributionsCollection: {
+						contributionCalendar: {
+							weeks: [
+								{
+									contributionDays: [
+										{
+											date: "2026-08-05",
+											contributionCount: 16,
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+			},
+		};
+
+		globalThis.fetch = vi.fn().mockImplementation((url) => {
+			if (typeof url === "string" && url.includes("/graphql")) {
+				return Promise.resolve({
+					ok: true,
+					json: () => Promise.resolve(mockGraphQLResponse),
+				});
+			}
+			return originalFetch(url);
+		});
+
+		try {
+			const service = new ProjectsService({
+				workToken: "mock-work-token",
+			});
+			const activity = await service.getGitActivity();
+			expect(activity.totalWork).toBeGreaterThan(0);
+			const targetDay = activity.days.find((d) => d.date === "2026-08-05");
+			expect(targetDay).toBeDefined();
+			expect(targetDay?.count).toBeGreaterThanOrEqual(16);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+	});
+
+	it("returns realistic AWS architecture mock projects for work category", async () => {
+		const service = new ProjectsService();
+		const workProjects = await service.getProjects("work");
+
+		expect(workProjects.length).toBeGreaterThanOrEqual(6);
+		const allTopics = workProjects.flatMap((p) => p.topics);
+
+		// Verifies that AWS core services specified by the user are represented
+		expect(allTopics.some((t) => t.includes("sqs"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("sns"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("s3"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("ses"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("kinesis"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("rds"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("opensearch"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("cloudwatch"))).toBe(true);
+	});
+
+	it("retrieves architecture README documentation for enterprise projects", async () => {
+		const service = new ProjectsService();
+		const readme = await service.getReadme("enterprise", "event-mesh-sqs-sns");
+
+		expect(readme).toContain("Enterprise Event Mesh (AWS SNS + SQS)");
+		expect(readme).toContain("Dead-Letter Queues");
+		expect(readme).toContain("CloudWatch Monitoring");
 	});
 });

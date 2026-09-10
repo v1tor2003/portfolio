@@ -39,7 +39,9 @@ export interface ProjectsServiceDependencies {
 	client?: ApiClient;
 	contributionsClient?: ApiClient;
 	token?: string;
+	workToken?: string;
 	username?: string;
+	workUsername?: string;
 }
 
 function defaultCreateGitHubClient(): ApiClient {
@@ -62,7 +64,9 @@ export class ProjectsService implements IProjectsService {
 	private readonly client: ApiClient;
 	private readonly contributionsClient: ApiClient;
 	private readonly token?: string;
+	private readonly workToken?: string;
 	private readonly username: string;
+	private readonly workUsername: string;
 
 	// In-memory cache for projects & readmes to minimize external network requests
 	private cachedProjects: { data: Project[]; timestamp: number } | null = null;
@@ -79,7 +83,10 @@ export class ProjectsService implements IProjectsService {
 		this.contributionsClient =
 			deps?.contributionsClient ?? defaultCreateContributionsClient();
 		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
+		this.workToken = deps?.workToken ?? env.GITHUB_WORK_TOKEN;
 		this.username = deps?.username ?? "v1tor2003";
+		this.workUsername =
+			deps?.workUsername ?? env.GITHUB_WORK_USERNAME ?? "vitor-pires_tecnosul";
 	}
 
 	async getProjects(category?: ProjectCategory): Promise<Project[]> {
@@ -124,17 +131,21 @@ export class ProjectsService implements IProjectsService {
 
 		try {
 			const command = new GetGitActivityCommand({ username: this.username });
-			const result = await this.contributionsClient.send(command);
+			const [result, realWorkMap] = await Promise.all([
+				this.contributionsClient.send(command).catch(() => null),
+				this.fetchRealWorkContributions(),
+			]);
 
-			if (
-				isOk(result) &&
-				result.data &&
-				Array.isArray(result.data.contributions) &&
-				result.data.contributions.length > 0
-			) {
+			const personalContributions =
+				result && isOk(result) && Array.isArray(result.data?.contributions)
+					? result.data.contributions
+					: [];
+
+			if (personalContributions.length > 0 || realWorkMap) {
 				const merged = this.mergeRealContributionsWithWork(
-					result.data.contributions,
+					personalContributions,
 					52,
+					realWorkMap,
 				);
 				this.cachedActivity = { data: merged, timestamp: now };
 				return merged;
@@ -148,9 +159,80 @@ export class ProjectsService implements IProjectsService {
 		return fallbackActivity;
 	}
 
+	private async fetchRealWorkContributions(): Promise<Map<
+		string,
+		number
+	> | null> {
+		if (!this.workToken) return null;
+		try {
+			const query = `
+				query {
+					viewer {
+						contributionsCollection {
+							contributionCalendar {
+								weeks {
+									contributionDays {
+										date
+										contributionCount
+									}
+								}
+							}
+						}
+					}
+				}
+			`;
+			const res = await fetch("https://api.github.com/graphql", {
+				method: "POST",
+				headers: {
+					Authorization: `bearer ${this.workToken}`,
+					"User-Agent": "vitor-portfolio-app",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ query }),
+			});
+			if (!res.ok) return null;
+			const data = (await res.json()) as {
+				data?: {
+					viewer?: {
+						contributionsCollection?: {
+							contributionCalendar?: {
+								weeks?: Array<{
+									contributionDays?: Array<{
+										date: string;
+										contributionCount: number;
+									}>;
+								}>;
+							};
+						};
+					};
+				};
+			};
+
+			const weeks =
+				data?.data?.viewer?.contributionsCollection?.contributionCalendar
+					?.weeks;
+			if (!weeks) return null;
+
+			const map = new Map<string, number>();
+			for (const week of weeks) {
+				if (week.contributionDays) {
+					for (const day of week.contributionDays) {
+						if (day.contributionCount > 0) {
+							map.set(day.date, day.contributionCount);
+						}
+					}
+				}
+			}
+			return map;
+		} catch {
+			return null;
+		}
+	}
+
 	private mergeRealContributionsWithWork(
 		contributions: Array<{ date: string; count: number }>,
 		weeks = 52,
+		realWorkContributionsMap?: Map<string, number> | null,
 	): GitActivityData {
 		const totalDays = weeks * 7;
 		const today = new Date();
@@ -172,17 +254,22 @@ export class ProjectsService implements IProjectsService {
 			const personalCount = contributionMap.get(dateStr) ?? 0;
 			totalPersonal += personalCount;
 
-			// Deterministic enterprise activity for weekdays
 			let workCount = 0;
-			if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-				const seed = dateStr
-					.split("-")
-					.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 7);
-				const rand = (Math.sin(seed) * 10000) % 1;
-				const absRand = Math.abs(rand);
-				if (absRand > 0.25) {
-					workCount = Math.floor(absRand * 8) + 2;
-					totalWork += workCount;
+			if (realWorkContributionsMap) {
+				workCount = realWorkContributionsMap.get(dateStr) ?? 0;
+				totalWork += workCount;
+			} else {
+				// Deterministic enterprise activity fallback for weekdays
+				if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+					const seed = dateStr
+						.split("-")
+						.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 7);
+					const rand = (Math.sin(seed) * 10000) % 1;
+					const absRand = Math.abs(rand);
+					if (absRand > 0.25) {
+						workCount = Math.floor(absRand * 8) + 2;
+						totalWork += workCount;
+					}
 				}
 			}
 
