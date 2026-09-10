@@ -36,7 +36,7 @@ export function ResumeSection() {
 				</div>
 			</div>
 
-			<ResumeViewer initialOpen={true} />
+			<ResumeViewer />
 		</section>
 	);
 }
