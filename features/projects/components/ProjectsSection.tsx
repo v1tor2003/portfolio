@@ -92,6 +92,7 @@ export function ProjectsSection({
 			<ProjectGrid
 				projects={filteredProjects}
 				onViewReadme={(p) => setSelectedProject(p)}
+				category={activeCategory}
 			/>
 
 			{/* On-demand README Modal */}
