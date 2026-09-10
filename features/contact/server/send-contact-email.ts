@@ -1,32 +1,60 @@
 "use server";
 
-import { contactSchema } from "../schemas/contact.schema";
+import { z } from "zod";
+import { type ContactFormData, contactSchema } from "../schemas/contact.schema";
+import { contactRateLimiter } from "./rate-limiter";
+import { resendEmailService } from "./resend-email.service";
 
 export interface ContactActionResult {
 	success: boolean;
 	message: string;
-	errors?: Record<string, string[]>;
+	errors?: Partial<Record<keyof ContactFormData, string[]>>;
 	simulated?: boolean;
+}
+
+async function getClientIp(): Promise<string> {
+	try {
+		const { headers } = await import("next/headers");
+		const headerList = await headers();
+		return (
+			headerList.get("x-forwarded-for")?.split(",")[0].trim() ||
+			headerList.get("x-real-ip") ||
+			"127.0.0.1"
+		);
+	} catch {
+		return "127.0.0.1";
+	}
 }
 
 export async function sendContactEmail(
 	data: unknown,
 ): Promise<ContactActionResult> {
+	const clientIp = await getClientIp();
+
+	if (contactRateLimiter.isRateLimited(clientIp)) {
+		return {
+			success: false,
+			message:
+				"Rate limit exceeded. Please wait a few minutes before transmitting again.",
+		};
+	}
+
 	const parsed = contactSchema.safeParse(data);
 
 	if (!parsed.success) {
 		return {
 			success: false,
 			message: "Invalid transmission payload. Please verify your fields.",
-			errors: parsed.error.flatten().fieldErrors,
+			errors: z.flattenError(parsed.error).fieldErrors as Partial<
+				Record<keyof ContactFormData, string[]>
+			>,
 		};
 	}
 
-	const { name, email, subject, message, botField } = parsed.data;
+	const { botField } = parsed.data;
 
 	// Honeypot spam trap
 	if (botField && botField.trim().length > 0) {
-		// Silently drop bot packets
 		return {
 			success: true,
 			message: "Message received.",
@@ -34,10 +62,16 @@ export async function sendContactEmail(
 		};
 	}
 
-	const apiKey = process.env.RESEND_API_KEY;
+	const dispatchResult = await resendEmailService.send(parsed.data);
 
-	if (!apiKey) {
-		// Mock/simulated transmission when no provider key is configured
+	if (!dispatchResult.success) {
+		return {
+			success: false,
+			message: "Failed to dispatch email transmission.",
+		};
+	}
+
+	if (dispatchResult.simulated) {
 		return {
 			success: true,
 			message: "Packet transmitted successfully (Simulated mode).",
@@ -45,46 +79,8 @@ export async function sendContactEmail(
 		};
 	}
 
-	try {
-		const toEmail = process.env.CONTACT_TO_EMAIL || "vitor.pr04@hotmail.com";
-		const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
-
-		const response = await fetch("https://api.resend.com/emails", {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${apiKey}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				from: fromEmail,
-				to: toEmail,
-				reply_to: email,
-				subject: `[Portfolio Contact] ${subject} - ${name}`,
-				text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
-			}),
-		});
-
-		if (!response.ok) {
-			const errorText = await response.text();
-			console.error(
-				"[SendContactEmail] Failed to dispatch via Resend:",
-				errorText,
-			);
-			return {
-				success: false,
-				message: "Failed to dispatch email transmission.",
-			};
-		}
-
-		return {
-			success: true,
-			message: "Packet dispatched successfully via Resend.",
-		};
-	} catch (error) {
-		console.error("[SendContactEmail] Network error:", error);
-		return {
-			success: false,
-			message: "Transmission timed out or network error encountered.",
-		};
-	}
+	return {
+		success: true,
+		message: "Packet dispatched successfully via Resend.",
+	};
 }

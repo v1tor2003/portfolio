@@ -1,6 +1,6 @@
 import { ContactChannels } from "./ContactChannels";
 import { ContactHeader } from "./ContactHeader";
-import { ContactTerminal } from "./ContactTerminal";
+import { ContactTerminal } from "./terminal/ContactTerminal";
 
 export function ContactSection() {
 	return (
