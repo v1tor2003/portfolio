@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 interface PageTransitionProps {
 	children: ReactNode;
@@ -10,7 +10,7 @@ interface PageTransitionProps {
 
 const MotionDiv = motion.div as React.ComponentType<{
 	key?: string | null;
-	initial?: Record<string, unknown>;
+	initial?: Record<string, unknown> | boolean;
 	animate?: Record<string, unknown>;
 	transition?: Record<string, unknown>;
 	className?: string;
@@ -19,12 +19,17 @@ const MotionDiv = motion.div as React.ComponentType<{
 
 export function PageTransition({ children }: PageTransitionProps) {
 	const pathname = usePathname();
+	const isFirstMount = useRef(true);
+
+	useEffect(() => {
+		isFirstMount.current = false;
+	}, []);
 
 	return (
 		<div className="w-full flex-1 flex flex-col">
 			<MotionDiv
 				key={pathname}
-				initial={{ opacity: 0, y: 8 }}
+				initial={isFirstMount.current ? false : { opacity: 0, y: 8 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.2, ease: "easeInOut" }}
 				className="w-full flex-1"

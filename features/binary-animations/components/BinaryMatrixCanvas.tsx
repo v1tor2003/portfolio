@@ -11,6 +11,8 @@ interface BinaryMatrixCanvasProps {
 	characters?: readonly string[];
 }
 
+const DEFAULT_CHARACTERS = ["0", "1"] as const;
+
 function normalizeRgb(colorStr: string): string {
 	if (colorStr.startsWith("#")) {
 		const cleanHex = colorStr.replace("#", "");
@@ -33,7 +35,7 @@ export function BinaryMatrixCanvas({
 	speedMultiplier = 1,
 	color = "255, 255, 255",
 	highlightColor = "255, 255, 255",
-	characters = ["0", "1"],
+	characters = DEFAULT_CHARACTERS,
 }: BinaryMatrixCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -45,27 +47,31 @@ export function BinaryMatrixCanvas({
 		if (!ctx) return;
 
 		let animationFrameId: number;
+		let columns = 0;
+		let drops: number[] = [];
 
-		const handleResize = () => {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-		};
-
-		handleResize();
-		window.addEventListener("resize", handleResize);
-
-		const columns = Math.floor(canvas.width / fontSize);
-		const drops: number[] = Array.from({ length: columns }, () =>
-			Math.floor(Math.random() * -100),
-		);
 		const baseRgb = normalizeRgb(color);
 		const highRgb = normalizeRgb(highlightColor);
 
-		const render = () => {
-			ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+		const initDimensions = () => {
+			const width =
+				window.innerWidth || document.documentElement.clientWidth || 300;
+			const height =
+				window.innerHeight || document.documentElement.clientHeight || 150;
+			canvas.width = width;
+			canvas.height = height;
+			columns = Math.floor(width / fontSize);
+			const totalRows = Math.max(1, Math.floor(height / fontSize));
+			drops = Array.from({ length: columns }, () =>
+				Math.floor(Math.random() * totalRows),
+			);
+		};
 
-			ctx.font = `${fontSize}px var(--font-mono), monospace`;
+		initDimensions();
+		window.addEventListener("resize", initDimensions);
+
+		const stepDrops = () => {
+			ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
 				const char = characters[Math.floor(Math.random() * characters.length)];
@@ -79,12 +85,28 @@ export function BinaryMatrixCanvas({
 
 				ctx.fillText(char, x, y);
 
-				if (y > canvas.height && Math.random() > 0.975) {
-					drops[i] = 0;
+				if (y > canvas.height) {
+					if (Math.random() > 0.975 || y > canvas.height + 100) {
+						drops[i] = 0;
+					}
 				}
 
 				drops[i] += 0.5 * speedMultiplier;
 			}
+		};
+
+		// Pre-warm the canvas with trails so bit rain is visible immediately on first load
+		for (let s = 0; s < 40; s++) {
+			ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			stepDrops();
+		}
+
+		const render = () => {
+			ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			stepDrops();
 
 			animationFrameId = requestAnimationFrame(render);
 		};
@@ -92,10 +114,17 @@ export function BinaryMatrixCanvas({
 		render();
 
 		return () => {
-			window.removeEventListener("resize", handleResize);
+			window.removeEventListener("resize", initDimensions);
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [characters, color, fontSize, highlightColor, opacity, speedMultiplier]);
+	}, [
+		color,
+		fontSize,
+		highlightColor,
+		opacity,
+		speedMultiplier,
+		Array.isArray(characters) ? characters.join(",") : characters,
+	]);
 
 	return (
 		<canvas

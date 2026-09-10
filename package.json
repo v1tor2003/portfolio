@@ -33,7 +33,8 @@
     "lint": "biome check app/",
     "format": "biome format --write app/",
     "check": "biome check --write app/",
-    "test": "vitest run"
+    "test": "vitest run",
+    "ci": "npm run lint && npm run test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.11",
