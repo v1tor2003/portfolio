@@ -41,10 +41,10 @@ export function ResumeViewer({
 					</div>
 
 					<div className="space-y-2 max-w-md">
-						<h3 className="text-lg font-bold text-white tracking-tight">
+						<h3 className="text-lg font-bold text-white font-mono tracking-tight">
 							Vector PDF Resume Document
 						</h3>
-						<p className="text-xs text-zinc-400 leading-relaxed font-sans">
+						<p className="text-xs text-zinc-400 leading-relaxed font-mono">
 							Compiled on demand from dedicated LaTeX sources. Launch the inline
 							preview viewer or download the document directly.
 						</p>
