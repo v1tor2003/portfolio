@@ -112,6 +112,14 @@ export function ProjectGrid({
 
 	return (
 		<div className="space-y-6">
+			<ProjectPagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				totalItems={totalCount}
+				itemsPerPage={ITEMS_PER_PAGE}
+				onPageChange={handlePageChange}
+			/>
+
 			{isLoadingPage ? (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
 					{Array.from({ length: Math.min(ITEMS_PER_PAGE, 6) }).map((_, i) => (
@@ -138,14 +146,6 @@ export function ProjectGrid({
 					))}
 				</MotionDiv>
 			)}
-
-			<ProjectPagination
-				currentPage={currentPage}
-				totalPages={totalPages}
-				totalItems={totalCount}
-				itemsPerPage={ITEMS_PER_PAGE}
-				onPageChange={handlePageChange}
-			/>
 		</div>
 	);
 }
