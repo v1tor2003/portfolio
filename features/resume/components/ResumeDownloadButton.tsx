@@ -12,11 +12,11 @@ export function ResumeDownloadButton({
 			href="/api/resume?download=true"
 			download="vitor-pires-resume.pdf"
 			aria-label="Download CV"
-			className={`inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 font-mono text-xs sm:text-sm font-semibold rounded border border-zinc-700 hover:border-zinc-500 transition-all duration-150 ${className}`}
+			className={`inline-flex items-center gap-2 px-4 py-2.5 bg-black hover:bg-zinc-900 text-white font-mono text-xs sm:text-sm font-semibold rounded border border-zinc-700 hover:border-zinc-500 transition-all duration-150 ${className}`}
 		>
-			<Download className="h-4 w-4 text-emerald-400" />
+			<Download className="h-4 w-4 text-white" />
 			<span>DOWNLOAD CV</span>
-			<span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+			<span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-700">
 				PDF
 			</span>
 		</a>

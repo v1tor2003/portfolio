@@ -28,10 +28,10 @@ export function ResumeSection() {
 						target="_blank"
 						rel="noopener noreferrer"
 						aria-label="Preview online"
-						className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-950/70 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs sm:text-sm font-semibold rounded border border-zinc-800 hover:border-zinc-700 transition-colors"
+						className="inline-flex items-center gap-2 px-4 py-2.5 bg-black hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs sm:text-sm font-semibold rounded border border-zinc-800 hover:border-zinc-600 transition-colors"
 					>
 						<span>OPEN IN NEW TAB</span>
-						<ExternalLink className="h-4 w-4 text-zinc-500" />
+						<ExternalLink className="h-4 w-4 text-zinc-400" />
 					</a>
 				</div>
 			</div>
