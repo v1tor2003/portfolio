@@ -4,6 +4,8 @@ import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
 import { env } from "@/lib/env";
 import { FetchResumeCommand } from "./fetch-resume.command";
 
+export type ResumeLocale = "en" | "pt-BR";
+
 export interface ResumeFileResult {
 	buffer: Buffer;
 	fileName: string;
@@ -14,19 +16,28 @@ export interface ResumeFileResult {
 }
 
 export interface IResumeService {
-	getResume(): Promise<ResumeFileResult>;
+	getResume(locale?: ResumeLocale): Promise<ResumeFileResult>;
 }
 
 export interface ResumeServiceDependencies {
 	client?: ApiClient;
-	readFallback?: () => Buffer;
+	readFallback?: (locale?: ResumeLocale) => Buffer;
 	token?: string;
 	owner?: string;
 	repo?: string;
 	filePath?: string;
 }
 
-function defaultReadFallbackFile(): Buffer {
+function defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
+	const specificPath = path.join(
+		process.cwd(),
+		"public",
+		"resumes",
+		`vitor-pires-resume-${locale}.pdf`,
+	);
+	if (fs.existsSync(specificPath)) {
+		return fs.readFileSync(specificPath);
+	}
 	const fallbackPath = path.join(
 		process.cwd(),
 		"public",
@@ -61,8 +72,10 @@ export class ResumeService implements IResumeService {
 		this.filePath = deps?.filePath ?? env.RESUME_FILE_PATH;
 	}
 
-	async getResume(): Promise<ResumeFileResult> {
-		if (this.token) {
+	async getResume(locale: ResumeLocale = "en"): Promise<ResumeFileResult> {
+		const targetFileName = `vitor-pires-resume-${locale}.pdf`;
+
+		if (this.token && locale === "en") {
 			try {
 				const command = new FetchResumeCommand({
 					owner: this.owner,
@@ -81,7 +94,7 @@ export class ResumeService implements IResumeService {
 
 						return {
 							buffer,
-							fileName: response.name || this.filePath,
+							fileName: targetFileName,
 							contentType: "application/pdf",
 							size: buffer.length,
 							isFallback: false,
@@ -94,10 +107,10 @@ export class ResumeService implements IResumeService {
 			}
 		}
 
-		const fallbackBuffer = this.readFallback();
+		const fallbackBuffer = this.readFallback(locale);
 		return {
 			buffer: fallbackBuffer,
-			fileName: this.filePath,
+			fileName: targetFileName,
 			contentType: "application/pdf",
 			size: fallbackBuffer.length,
 			isFallback: true,

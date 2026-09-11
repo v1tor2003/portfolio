@@ -6,9 +6,19 @@ describe("getResume helper", () => {
 		const resume = await getResume();
 
 		expect(resume.contentType).toBe("application/pdf");
-		expect(resume.fileName).toBe("vitor-pires-resume.pdf");
+		expect(resume.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(resume.buffer).toBeInstanceOf(Buffer);
 		expect(resume.buffer.length).toBeGreaterThan(0);
 		expect(["remote", "local-fallback"]).toContain(resume.source);
+	});
+
+	it("retrieves the pt-BR resume when specified", async () => {
+		const resume = await getResume("pt-BR");
+
+		expect(resume.contentType).toBe("application/pdf");
+		expect(resume.fileName).toBe("vitor-pires-resume-pt-BR.pdf");
+		expect(resume.buffer).toBeInstanceOf(Buffer);
+		expect(resume.buffer.length).toBeGreaterThan(0);
+		expect(resume.source).toBe("local-fallback");
 	});
 });
