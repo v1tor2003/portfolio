@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 	description:
 		"Backend Software Engineer specializing in server-side systems backed by cloud infrastructures",
 	icons: {
-		icon: "/vp-logo.png",
-		apple: "/vp-logo.png",
+		icon: [{ url: "/vp-logo.svg", type: "image/svg+xml" }],
+		apple: "/vp-logo.svg",
 	},
 };
 
