@@ -12,6 +12,7 @@ import { GetProjectReadmeCommand } from "./get-project-readme.command";
 import {
 	FALLBACK_READMES,
 	generateGitActivityData,
+	HISTORICAL_WORK_CONTRIBUTIONS,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
 } from "./projects-seed.data";
@@ -159,11 +160,11 @@ export class ProjectsService implements IProjectsService {
 		return fallbackActivity;
 	}
 
-	private async fetchRealWorkContributions(): Promise<Map<
-		string,
-		number
-	> | null> {
-		if (!this.workToken) return null;
+	private async fetchRealWorkContributions(): Promise<Map<string, number>> {
+		const map = new Map<string, number>(
+			Object.entries(HISTORICAL_WORK_CONTRIBUTIONS),
+		);
+		if (!this.workToken) return map;
 		try {
 			const query = `
 				query {
@@ -190,7 +191,7 @@ export class ProjectsService implements IProjectsService {
 				},
 				body: JSON.stringify({ query }),
 			});
-			if (!res.ok) return null;
+			if (!res.ok) return map;
 			const data = (await res.json()) as {
 				data?: {
 					viewer?: {
@@ -211,21 +212,21 @@ export class ProjectsService implements IProjectsService {
 			const weeks =
 				data?.data?.viewer?.contributionsCollection?.contributionCalendar
 					?.weeks;
-			if (!weeks) return null;
+			if (!weeks) return map;
 
-			const map = new Map<string, number>();
 			for (const week of weeks) {
 				if (week.contributionDays) {
 					for (const day of week.contributionDays) {
 						if (day.contributionCount > 0) {
-							map.set(day.date, day.contributionCount);
+							const existing = map.get(day.date) ?? 0;
+							map.set(day.date, Math.max(existing, day.contributionCount));
 						}
 					}
 				}
 			}
 			return map;
 		} catch {
-			return null;
+			return map;
 		}
 	}
 
@@ -240,6 +241,7 @@ export class ProjectsService implements IProjectsService {
 		for (const item of contributions) {
 			contributionMap.set(item.date, item.count);
 		}
+		const hasPersonal = contributions.length > 0;
 
 		const days: GitActivityDay[] = [];
 		let totalPersonal = 0;
@@ -251,13 +253,30 @@ export class ProjectsService implements IProjectsService {
 			const dateStr = d.toISOString().split("T")[0];
 			const dayOfWeek = d.getDay(); // 0 = Sun, 6 = Sat
 
-			const personalCount = contributionMap.get(dateStr) ?? 0;
+			let personalCount = contributionMap.get(dateStr) ?? 0;
+			if (!hasPersonal) {
+				// Deterministic fallback for personal open-source activity when API is offline/mocked
+				const seed = dateStr
+					.split("-")
+					.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 13);
+				const rand = (Math.sin(seed) * 10000) % 1;
+				const absRand = Math.abs(rand);
+				if (dayOfWeek === 0 || dayOfWeek === 6) {
+					if (absRand > 0.4) {
+						personalCount = Math.floor(absRand * 6) + 1;
+					}
+				} else if (absRand > 0.7) {
+					personalCount = Math.floor(absRand * 3) + 1;
+				}
+			}
 			totalPersonal += personalCount;
 
 			let workCount = 0;
-			if (realWorkContributionsMap) {
+			if (realWorkContributionsMap?.has(dateStr)) {
 				workCount = realWorkContributionsMap.get(dateStr) ?? 0;
 				totalWork += workCount;
+			} else if (realWorkContributionsMap && this.workToken) {
+				workCount = 0;
 			} else {
 				// Deterministic enterprise activity fallback for weekdays
 				if (dayOfWeek !== 0 && dayOfWeek !== 6) {

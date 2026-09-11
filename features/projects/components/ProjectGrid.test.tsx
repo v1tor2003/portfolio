@@ -171,4 +171,35 @@ describe("ProjectGrid Component", () => {
 
 		vi.unstubAllGlobals();
 	});
+
+	it("renders work confidentiality disclaimer card when category is work", () => {
+		render(
+			<ProjectGrid
+				projects={mockProjects}
+				category="work"
+				onViewReadme={() => {}}
+			/>,
+		);
+
+		expect(
+			screen.getByText(/RESTRICTED ACCESS \/\/ ARCHITECTURAL REFERENCE/i),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(/Enterprise Architecture & Reference Implementations/i),
+		).toBeInTheDocument();
+	});
+
+	it("does not render work disclaimer when category is personal", () => {
+		render(
+			<ProjectGrid
+				projects={mockProjects}
+				category="personal"
+				onViewReadme={() => {}}
+			/>,
+		);
+
+		expect(
+			screen.queryByText(/RESTRICTED ACCESS \/\/ ARCHITECTURAL REFERENCE/i),
+		).not.toBeInTheDocument();
+	});
 });

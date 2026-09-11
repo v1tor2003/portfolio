@@ -151,4 +151,21 @@ describe("ProjectsService", () => {
 		expect(readme).toContain("Dead-Letter Queues");
 		expect(readme).toContain("CloudWatch Monitoring");
 	});
+
+	it("incorporates historical enterprise activity as a static initial baseline", async () => {
+		const service = new ProjectsService({
+			token: undefined,
+			workToken: undefined,
+		});
+		const activity = await service.getGitActivity();
+
+		// Check for presence of verified historical dates from the 2025-2026 enterprise records
+		const novCommit = activity.days.find((d) => d.date === "2025-11-04");
+		const julCommit = activity.days.find((d) => d.date === "2026-07-01");
+
+		expect(novCommit).toBeDefined();
+		expect(novCommit?.count).toBeGreaterThanOrEqual(1);
+		expect(julCommit).toBeDefined();
+		expect(julCommit?.count).toBeGreaterThanOrEqual(21);
+	});
 });

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Project, ProjectCategory } from "../schemas/project.schema";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectPagination } from "./ProjectPagination";
+import { WorkProjectsDisclaimer } from "./WorkProjectsDisclaimer";
 
 const MotionDiv = motion.div as React.ComponentType<{
 	layout?: boolean;
@@ -119,6 +120,8 @@ export function ProjectGrid({
 				itemsPerPage={ITEMS_PER_PAGE}
 				onPageChange={handlePageChange}
 			/>
+
+			{category === "work" && <WorkProjectsDisclaimer />}
 
 			{isLoadingPage ? (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
