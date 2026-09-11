@@ -4,9 +4,6 @@ export function ContactChannels() {
 	return (
 		<div className="space-y-6 font-mono">
 			<div className="space-y-2">
-				<div className="text-xs text-zinc-500 font-semibold tracking-wider">
-					[ DIRECT_COMMUNICATION_CHANNELS ]
-				</div>
 				<p className="text-sm text-zinc-400 leading-relaxed">
 					Feel free to reach out directly through any of the secure channels
 					below or transmit a message packet using the interactive terminal.

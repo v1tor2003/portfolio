@@ -8,7 +8,20 @@ describe("ResumeDownloadButton Component", () => {
 
 		const link = screen.getByRole("link", { name: /download cv/i });
 		expect(link).toBeDefined();
-		expect(link.getAttribute("href")).toBe("/api/resume?download=true");
-		expect(link.getAttribute("download")).toBe("vitor-pires-resume.pdf");
+		expect(link.getAttribute("href")).toBe(
+			"/api/resume?locale=en&download=true",
+		);
+		expect(link.getAttribute("download")).toBe("vitor-pires-resume-en.pdf");
+	});
+
+	it("renders download link for pt-BR locale", () => {
+		render(<ResumeDownloadButton locale="pt-BR" />);
+
+		const link = screen.getByRole("link", { name: /download cv/i });
+		expect(link).toBeDefined();
+		expect(link.getAttribute("href")).toBe(
+			"/api/resume?locale=pt-BR&download=true",
+		);
+		expect(link.getAttribute("download")).toBe("vitor-pires-resume-pt-BR.pdf");
 	});
 });
