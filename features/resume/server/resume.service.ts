@@ -75,12 +75,12 @@ export class ResumeService implements IResumeService {
 	async getResume(locale: ResumeLocale = "en"): Promise<ResumeFileResult> {
 		const targetFileName = `vitor-pires-resume-${locale}.pdf`;
 
-		if (this.token && locale === "en") {
+		if (this.token) {
 			try {
 				const command = new FetchResumeCommand({
 					owner: this.owner,
 					repo: this.repo,
-					path: this.filePath,
+					path: targetFileName,
 					token: this.token,
 				});
 
