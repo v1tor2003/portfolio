@@ -8,21 +8,35 @@ export function CoreHighlights({
 	highlights = CORE_HIGHLIGHTS,
 }: CoreHighlightsProps) {
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono">
+		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-mono">
 			{highlights.map((item) => {
 				const Icon = item.icon;
 				return (
 					<div
 						key={item.title}
-						className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-6 space-y-3 backdrop-blur-sm"
+						className="rounded-lg border border-zinc-800 bg-black p-6 space-y-4 transition-all duration-200 hover:border-zinc-600 flex flex-col justify-between shadow-lg"
 					>
-						<div className="flex items-center space-x-3 text-white">
-							<Icon className="h-5 w-5 text-zinc-400" />
-							<h3 className="font-semibold text-base">{item.title}</h3>
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<div className="h-10 w-10 rounded border border-zinc-800 bg-black flex items-center justify-center text-white shrink-0">
+									<Icon className="h-5 w-5 text-white" />
+								</div>
+								{item.badge && (
+									<span className="text-[10px] tracking-wider text-zinc-400 bg-black border border-zinc-800 px-2 py-0.5 rounded uppercase font-semibold">
+										{item.badge}
+									</span>
+								)}
+							</div>
+
+							<div className="space-y-2">
+								<h3 className="font-bold text-sm sm:text-base text-white tracking-tight">
+									{item.title}
+								</h3>
+								<p className="text-xs text-zinc-300 leading-relaxed">
+									{item.description}
+								</p>
+							</div>
 						</div>
-						<p className="text-xs text-zinc-400 leading-relaxed">
-							{item.description}
-						</p>
 					</div>
 				);
 			})}
