@@ -6,7 +6,7 @@ export function WorkProjectsDisclaimer() {
 			<div className="flex items-center space-x-2 text-xs">
 				<ShieldAlert className="h-4 w-4 text-amber-400 shrink-0" />
 				<span className="text-amber-400/90 font-semibold tracking-wide uppercase">
-					RESTRICTED ACCESS {"//"} ARCHITECTURAL REFERENCE
+					RESTRICTED ACCESS
 				</span>
 			</div>
 

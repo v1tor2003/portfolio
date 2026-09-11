@@ -105,14 +105,7 @@ export function GitActivityGraph({
 	return (
 		<div className="w-full bg-black/40 border border-zinc-800 rounded-lg p-4 sm:p-5 font-mono space-y-4 backdrop-blur-sm">
 			{/* Header metrics */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
-				<div className="flex items-center space-x-2 text-xs text-zinc-400">
-					<span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-					<span className="font-semibold tracking-wider text-zinc-300">
-						{"// ACTIVITY MATRIX"}
-					</span>
-				</div>
-
+			<div className="flex flex-col sm:flex-row sm:items-center justify-center gap-3 border-b border-zinc-800/80 pb-3">
 				<div className="flex items-center gap-4 text-xs">
 					<div
 						className={`flex items-center gap-1.5 transition-colors ${

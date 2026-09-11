@@ -6,9 +6,7 @@ describe("WorkProjectsDisclaimer Component", () => {
 	it("renders the confidentiality badge, heading, and explanation text", () => {
 		render(<WorkProjectsDisclaimer />);
 
-		expect(
-			screen.getByText(/RESTRICTED ACCESS \/\/ ARCHITECTURAL REFERENCE/i),
-		).toBeInTheDocument();
+		expect(screen.getByText(/RESTRICTED ACCESS/i)).toBeInTheDocument();
 		expect(
 			screen.getByRole("heading", {
 				name: /Enterprise Architecture & Reference Implementations/i,

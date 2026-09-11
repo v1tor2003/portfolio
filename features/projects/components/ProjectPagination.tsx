@@ -34,13 +34,8 @@ export function ProjectPagination({
 		>
 			{/* Metadata line */}
 			<div className="text-xs text-zinc-500 flex items-center gap-2">
-				<span className="text-emerald-500/80">{"//"}</span>
 				<span>
 					SHOWING {startItem}–{endItem} OF {totalItems} REPOSITORIES
-				</span>
-				<span className="text-zinc-700">|</span>
-				<span className="text-zinc-400">
-					PAGE {currentPage} OF {totalPages}
 				</span>
 			</div>
 

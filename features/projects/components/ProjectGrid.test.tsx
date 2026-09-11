@@ -181,9 +181,7 @@ describe("ProjectGrid Component", () => {
 			/>,
 		);
 
-		expect(
-			screen.getByText(/RESTRICTED ACCESS \/\/ ARCHITECTURAL REFERENCE/i),
-		).toBeInTheDocument();
+		expect(screen.getByText(/RESTRICTED ACCESS/i)).toBeInTheDocument();
 		expect(
 			screen.getByText(/Enterprise Architecture & Reference Implementations/i),
 		).toBeInTheDocument();
@@ -198,8 +196,6 @@ describe("ProjectGrid Component", () => {
 			/>,
 		);
 
-		expect(
-			screen.queryByText(/RESTRICTED ACCESS \/\/ ARCHITECTURAL REFERENCE/i),
-		).not.toBeInTheDocument();
+		expect(screen.queryByText(/RESTRICTED ACCESS/i)).not.toBeInTheDocument();
 	});
 });

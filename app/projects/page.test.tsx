@@ -16,7 +16,7 @@ describe("ProjectsPage Route", () => {
 			}),
 		).toBeInTheDocument();
 		expect(screen.getByText(/02\. FEATURED PROJECTS/i)).toBeInTheDocument();
-		expect(screen.getByText(/ACTIVITY MATRIX/i)).toBeInTheDocument();
+		expect(screen.getByText(/Personal:/i)).toBeInTheDocument();
 	});
 
 	it("renders immediate loading skeleton on route navigation", () => {

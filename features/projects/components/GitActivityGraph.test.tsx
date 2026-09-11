@@ -19,9 +19,8 @@ describe("GitActivityGraph Component", () => {
 			<GitActivityGraph activity={mockActivity} activeCategory="personal" />,
 		);
 
-		expect(screen.getByText(/4/)).toBeInTheDocument();
-		expect(screen.getByText(/8/)).toBeInTheDocument();
-		expect(screen.getByText(/ACTIVITY MATRIX/i)).toBeInTheDocument();
+		expect(screen.getByText(/Personal: 4 commits/i)).toBeInTheDocument();
+		expect(screen.getByText(/Enterprise: 8 commits/i)).toBeInTheDocument();
 	});
 
 	it("highlights personal activity in personal mode", () => {
