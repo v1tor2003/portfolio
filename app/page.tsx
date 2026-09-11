@@ -34,7 +34,7 @@ const NAVIGATION_CARDS = [
 	{
 		title: "04. MIGRATION",
 		description:
-			"Architectural evolution benchmarks: Vite to Next.js and Node to .NET.",
+			"Architectural evolution from a legacy Create React App to a modern Next.js application.",
 		href: "/migration",
 		icon: BookOpen,
 	},
