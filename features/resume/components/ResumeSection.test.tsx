@@ -6,16 +6,16 @@ describe("ResumeSection Component", () => {
 	it("renders section title and description", () => {
 		render(<ResumeSection />);
 		expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
-		expect(screen.getByText("03. RESUME SYNC")).toBeInTheDocument();
+		expect(screen.getByText("03. RESUME")).toBeInTheDocument();
 	});
 
-	it("renders download button and preview link", () => {
+	it("renders download button and open in new tab link via ResumeViewer", () => {
 		render(<ResumeSection />);
 		expect(
 			screen.getByRole("link", { name: /download cv/i }),
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("link", { name: /preview online/i }),
+			screen.getByRole("link", { name: /open in new tab/i }),
 		).toBeInTheDocument();
 	});
 });

@@ -50,7 +50,7 @@ export function ProjectsSection({
 			<div className="space-y-4 border-l-2 border-zinc-800 pl-6">
 				<div className="flex items-center space-x-2 text-zinc-500 font-mono text-sm">
 					<GitBranch className="h-4 w-4" />
-					<span>02. FEATURED PROJECTS</span>
+					<span>02. PROJECTS</span>
 				</div>
 				<h2 className="text-3xl sm:text-4xl font-bold text-white font-mono flex flex-wrap items-center gap-3">
 					<span>Featured Github Repositories</span>

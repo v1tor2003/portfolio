@@ -13,9 +13,6 @@ describe("HeroSection Component", () => {
 			"VÍTOR PIRES.",
 		);
 		expect(screen.getByText("Backend Software Engineer.")).toBeInTheDocument();
-		expect(
-			screen.getByText("SYSTEM_READY [ BACKEND_ENGINEER ]"),
-		).toBeInTheDocument();
 	});
 
 	it("renders call to action buttons with correct route links", () => {

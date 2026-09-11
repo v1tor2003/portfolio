@@ -34,7 +34,7 @@ describe("MigrationSection Component", () => {
 			screen.getByRole("heading", { name: "Portfolio v2 Architecture" }),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText(/A technical log of modernizing from a legacy/i),
+			screen.getByText(/The previous portfolio was stuck in a legacy/i),
 		).toBeInTheDocument();
 	});
 });
