@@ -85,9 +85,9 @@ export default function Home() {
 										</div>
 									</div>
 									<div className="space-y-1">
-										<h3 className="font-bold text-white text-base group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+										<h3 className="font-bold text-white text-base group-hover:text-white transition-colors flex items-center justify-between">
 											<span>{card.title}</span>
-											<ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-emerald-400" />
+											<ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-white" />
 										</h3>
 										<p className="text-xs text-zinc-400 leading-relaxed font-sans">
 											{card.description}
