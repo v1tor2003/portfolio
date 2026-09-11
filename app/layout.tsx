@@ -21,6 +21,10 @@ export const metadata: Metadata = {
 	title: "Vítor Pires | Backend Software Engineer",
 	description:
 		"Backend Software Engineer specializing in server-side systems backed by cloud infrastructures",
+	icons: {
+		icon: "/vp-logo.png",
+		apple: "/vp-logo.png",
+	},
 };
 
 export default function RootLayout({
