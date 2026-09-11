@@ -27,12 +27,11 @@ describe("About Feature Components", () => {
 			expect(screen.getByText("Backend & Cloud Systems")).toBeInTheDocument();
 		});
 
-		it("renders technical stack skills including AWS, DigitalOcean, and C#", () => {
+		it("renders technical stack skills including AWS, C#, and Docker", () => {
 			render(<AboutSection />);
-			expect(screen.getAllByText("AWS").length).toBeGreaterThanOrEqual(1);
-			expect(screen.getByText("DigitalOcean")).toBeInTheDocument();
-			expect(screen.getByText("Railway")).toBeInTheDocument();
+			expect(screen.getAllByText(/AWS/i).length).toBeGreaterThanOrEqual(1);
 			expect(screen.getAllByText(/C#/i).length).toBeGreaterThanOrEqual(1);
+			expect(screen.getAllByText(/Docker/i).length).toBeGreaterThanOrEqual(1);
 			expect(screen.getAllByText(/SOLID/i).length).toBeGreaterThanOrEqual(1);
 			expect(
 				screen.getAllByText(/Clean Architecture/i).length,
@@ -45,6 +44,11 @@ describe("About Feature Components", () => {
 		it("renders the section badge and comprehensive bio information", () => {
 			render(<AboutHeader />);
 			expect(screen.getByText("01. ABOUT ME")).toBeInTheDocument();
+			expect(
+				screen.getByText(
+					"Server-Side Engineering, Distributed Systems & Software Craftsmanship",
+				),
+			).toBeInTheDocument();
 			expect(
 				screen.getByText(/Backend Software Engineer/i),
 			).toBeInTheDocument();

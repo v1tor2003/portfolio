@@ -1,4 +1,4 @@
-import { GraduationCap, Layers, Sparkles, User, Workflow } from "lucide-react";
+import { User } from "lucide-react";
 
 export function AboutHeader() {
 	return (
