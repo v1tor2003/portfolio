@@ -125,31 +125,48 @@ describe("ProjectsService", () => {
 		}
 	});
 
-	it("returns realistic AWS architecture mock projects for work category", async () => {
+	it("returns realistic AWS, NestJS, and .NET architecture mock projects for work category", async () => {
 		const service = new ProjectsService();
 		const workProjects = await service.getProjects("work");
 
-		expect(workProjects.length).toBeGreaterThanOrEqual(6);
+		// Exactly 9 projects so they fit on a single page without pagination
+		expect(workProjects.length).toBe(9);
 		const allTopics = workProjects.flatMap((p) => p.topics);
 
-		// Verifies that AWS core services specified by the user are represented
+		// Verifies that AWS core services and key frameworks are represented
 		expect(allTopics.some((t) => t.includes("sqs"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("sns"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("s3"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("ses"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("kinesis"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("rds"))).toBe(true);
-		expect(allTopics.some((t) => t.includes("opensearch"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("nestjs"))).toBe(true);
+		expect(allTopics.some((t) => t.includes("dotnet"))).toBe(true);
 		expect(allTopics.some((t) => t.includes("cloudwatch"))).toBe(true);
 	});
 
 	it("retrieves architecture README documentation for enterprise projects", async () => {
 		const service = new ProjectsService();
 		const readme = await service.getReadme("enterprise", "event-mesh-sqs-sns");
+		const nestReadme = await service.getReadme(
+			"enterprise",
+			"nestjs-fleet-telemetry-gateway",
+		);
+		const dotnetReadme = await service.getReadme(
+			"enterprise",
+			"dotnet-iot-telemetry-engine",
+		);
 
 		expect(readme).toContain("Enterprise Event Mesh (AWS SNS + SQS)");
 		expect(readme).toContain("Dead-Letter Queues");
 		expect(readme).toContain("CloudWatch Monitoring");
+
+		expect(nestReadme).toContain(
+			"Enterprise Fleet Telemetry Gateway (NestJS & AWS)",
+		);
+		expect(dotnetReadme).toContain(
+			"High-Throughput IoT Telemetry Ingestion Engine (.NET 9 & AWS)",
+		);
 	});
 
 	it("incorporates historical enterprise activity as a static initial baseline", async () => {

@@ -191,6 +191,55 @@ export const SEED_PERSONAL_PROJECTS: Project[] = [
 
 export const SEED_WORK_PROJECTS: Project[] = [
 	{
+		id: "nestjs-fleet-telemetry-gateway",
+		name: "nestjs-fleet-telemetry-gateway",
+		description:
+			"Enterprise IoT & fleet operations gateway built with NestJS, featuring ABAC/RBAC authorization kernels, AWS EventBridge domain routing, BullMQ/Valkey task processing, and TimescaleDB telemetry partitioning.",
+		category: "work",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
+		stars: 0,
+		forks: 0,
+		language: "TypeScript",
+		topics: [
+			"nestjs",
+			"typescript",
+			"aws-eventbridge",
+			"aws-sqs",
+			"timescaledb",
+			"valkey",
+			"clean-architecture",
+		],
+		isPinned: true,
+		hasReadme: true,
+		owner: "enterprise",
+		repo: "nestjs-fleet-telemetry-gateway",
+	},
+	{
+		id: "dotnet-iot-telemetry-engine",
+		name: "dotnet-iot-telemetry-engine",
+		description:
+			"High-throughput event streaming ingestion engine built on .NET 9 and ASP.NET Core adhering to Vertical Slice Architecture (Sliced Arch), CQRS, AWS IoT Core, Kinesis, Redis distributed caching, and NBomber load testing.",
+		category: "work",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
+		stars: 0,
+		forks: 0,
+		language: "C#",
+		topics: [
+			"dotnet",
+			"csharp",
+			"vertical-slice",
+			"cqrs",
+			"aws-kinesis",
+			"aws-iot",
+			"redis",
+			"nbomber",
+		],
+		isPinned: true,
+		hasReadme: true,
+		owner: "enterprise",
+		repo: "dotnet-iot-telemetry-engine",
+	},
+	{
 		id: "enterprise-event-mesh-sqs-sns",
 		name: "enterprise-event-mesh-sqs-sns",
 		description:
@@ -243,28 +292,6 @@ export const SEED_WORK_PROJECTS: Project[] = [
 		hasReadme: true,
 		owner: "enterprise",
 		repo: "s3-glacier-compliance-vault",
-	},
-	{
-		id: "opensearch-audit-indexing-engine",
-		name: "opensearch-audit-indexing-engine",
-		description:
-			"High-speed document & security audit log indexing engine consuming from an Amazon SQS buffer into an Elasticsearch / OpenSearch cluster with sub-50ms search latency.",
-		category: "work",
-		htmlUrl: "https://github.com/vitor-pires_tecnosul",
-		stars: 0,
-		forks: 0,
-		language: "Python",
-		topics: [
-			"opensearch",
-			"elasticsearch",
-			"aws-sqs",
-			"cloudwatch",
-			"distributed-search",
-		],
-		isPinned: false,
-		hasReadme: true,
-		owner: "enterprise",
-		repo: "opensearch-audit-indexing-engine",
 	},
 	{
 		id: "rds-aurora-resilience-proxy",
@@ -587,18 +614,33 @@ Storing millions of compliance records and attachments in standard storage is co
 - **Lifecycle Tiering Rules**: Objects automatically transition from S3 Standard -> S3 Infrequent Access (30 days) -> S3 Glacier Flexible Retrieval (90 days).
 - **S3 Object Lock**: Legal hold and compliance retention modes prevent deletion or modification throughout mandatory regulatory audit windows.
 `,
-	"enterprise/opensearch-audit-indexing-engine": `# Distributed Audit Search & Indexing Engine (AWS OpenSearch & SQS)
+	"enterprise/nestjs-fleet-telemetry-gateway": `# Enterprise Fleet Telemetry Gateway (NestJS & AWS)
 
-High-speed document and security audit log indexing service with sub-50ms query latency.
+High-performance IoT telemetry ingestion and fleet operations gateway built with NestJS, TypeScript, and AWS EventBridge.
 
 ## Architectural Problem Solved
-Relational databases degrade severely when executing full-text search and complex filtered aggregations across hundreds of millions of audit logs.
+Managing high-velocity drone and IoT device telemetry concurrently with enterprise administrative operations requires strict decoupling of fast-path telemetry streams from transactional domain flows, alongside rigorous multi-tenant role/attribute-based authorization.
 
-## Solution Architecture
-- **SQS Ingestion Buffer**: Decouples search indexing from transactional writes. Microservices push log events to SQS; indexing workers consume in batches of 100.
-- **OpenSearch / Elasticsearch Cluster**: Multi-node index pattern with time-based indices (\`audit-logs-YYYY-MM\`) and rollover policies.
-- **Index State Management (ISM)**: Automatically transitions indices to warm storage after 14 days, reducing cluster RAM overhead.
-- **CloudWatch Integration**: Alarms track cluster \`ClusterStatus.red\` and \`CPUUtilization\` to trigger auto-scaling nodes.
+## Architecture & Components
+- **ABAC/RBAC Policy Kernel**: Dynamic CASL and CTE-backed scope resolution for dealership hierarchies, technicians, and customer accounts.
+- **AWS EventBridge & SQS**: Publishes asynchronous domain events (device activations, warranty claims, maintenance alerts) into decoupled worker queues.
+- **Valkey / Redis In-Memory Cache**: High-throughput distributed caching of drone configurations, geofencing rules, and recent telemetry traces.
+- **TimescaleDB Partitioning**: Hypertable telemetry persistence for mission time-series analysis and spatial flight tracking.
+- **OpenAPI & Scalar Documentation**: Real-time contract-first API schemas served via OpenAPI and interactive Scalar UI.
+`,
+	"enterprise/dotnet-iot-telemetry-engine": `# High-Throughput IoT Telemetry Ingestion Engine (.NET 9 & AWS)
+
+High-throughput distributed ingestion and command processing engine engineered on .NET 9 and ASP.NET Core.
+
+## Architectural Problem Solved
+Streaming high-volume IoT device payloads directly to databases degrades ingestion throughput. This architecture processes high-throughput telemetry streams using non-blocking asynchronous pipelines, Vertical Slice isolation, and load-tested resilience.
+
+## Architecture & Components
+- **Vertical Slice Architecture (Sliced Arch)**: Endpoints, commands, queries, and validators encapsulated per feature slice rather than traditional layer soup.
+- **AWS IoT Core & Kinesis Streaming**: High-throughput message ingestion with partitioned shard processing and Snappy compression.
+- **CQRS & MediatR Pipeline**: Distinct read and write paths with validation behaviors, circuit breakers, and distributed tracing.
+- **Distributed Caching with Redis**: Hot-state device cache with optimistic concurrency locks preventing split-brain telemetry state.
+- **NBomber & xUnit Resilience**: Automated load stress test suites verifying sub-15ms p99 response times under peak ingestion traffic.
 `,
 	"enterprise/rds-aurora-resilience-proxy": `# Enterprise Multi-Tenant RDS Aurora Proxy
 
