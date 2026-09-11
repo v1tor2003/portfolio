@@ -1,9 +1,10 @@
 "use client";
 
-import { ExternalLink, Eye, FileText, X } from "lucide-react";
+import { Eye, FileText, X } from "lucide-react";
 import { useState } from "react";
 import type { ResumeLocale } from "../server/resume.service";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
+import { ResumeOpenExternalButton } from "./ResumeOpenExternalButton";
 
 interface ResumeViewerProps {
 	className?: string;
@@ -22,14 +23,14 @@ export function ResumeViewer({
 	const fileName = `vitor-pires-resume-${locale}.pdf`;
 
 	const LocaleToggle = (
-		<div className="flex items-center rounded border border-zinc-800 bg-zinc-950 p-0.5 text-xs font-mono">
+		<div className="flex h-8 items-center rounded border border-zinc-800 bg-zinc-950 p-0.5 text-xs font-mono">
 			<button
 				type="button"
 				onClick={() => setLocale("en")}
 				aria-pressed={locale === "en"}
-				className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+				className={`h-full px-2.5 flex items-center justify-center rounded transition-colors cursor-pointer text-xs font-semibold ${
 					locale === "en"
-						? "bg-zinc-800 text-white font-semibold"
+						? "bg-zinc-800 text-white"
 						: "text-zinc-400 hover:text-zinc-200"
 				}`}
 			>
@@ -39,9 +40,9 @@ export function ResumeViewer({
 				type="button"
 				onClick={() => setLocale("pt-BR")}
 				aria-pressed={locale === "pt-BR"}
-				className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+				className={`h-full px-2.5 flex items-center justify-center rounded transition-colors cursor-pointer text-xs font-semibold ${
 					locale === "pt-BR"
-						? "bg-zinc-800 text-white font-semibold"
+						? "bg-zinc-800 text-white"
 						: "text-zinc-400 hover:text-zinc-200"
 				}`}
 			>
@@ -65,46 +66,25 @@ export function ResumeViewer({
 								<h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
 									{fileName}
 								</h3>
-								<span className="flex items-center gap-1 text-[10px] tracking-wider text-white bg-black border border-zinc-700 px-2 py-0.5 rounded uppercase font-semibold">
-									{locale === "en" ? "LATEX COMPILED" : "PT-BR LOCALE"}
-								</span>
-								<span className="text-[10px] tracking-wider text-zinc-400 bg-black border border-zinc-800 px-2 py-0.5 rounded uppercase">
-									VECTOR PDF
-								</span>
 							</div>
-							<p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed">
-								{locale === "en"
-									? "Compiled directly from LaTeX source code. Launch the inline interactive document viewer or access the raw file."
-									: "Versão em Português Brasileiro compilada e pronta para visualização interativa ou download."}
-							</p>
 						</div>
 					</div>
 
-					<div className="flex flex-wrap items-center gap-3 shrink-0">
+					<div className="flex items-center gap-2 shrink-0">
 						{LocaleToggle}
 
 						<button
 							type="button"
 							onClick={() => setIsOpen(true)}
 							aria-label="Preview resume"
-							className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black font-bold text-xs sm:text-sm rounded border border-white transition-all shadow-md cursor-pointer group"
+							title="Preview resume"
+							className="inline-flex h-8 w-8 items-center justify-center rounded border border-white bg-white hover:bg-zinc-200 text-black transition-all shadow-sm cursor-pointer group"
 						>
 							<Eye className="h-4 w-4 text-black group-hover:scale-110 transition-transform" />
-							<span>PREVIEW RESUME (PDF)</span>
 						</button>
 
 						<ResumeDownloadButton locale={locale} />
-
-						<a
-							href={`/api/resume?locale=${locale}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="Open in new tab"
-							className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-black hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs sm:text-sm rounded border border-zinc-800 hover:border-zinc-700 transition-colors"
-						>
-							<span>OPEN IN NEW TAB</span>
-							<ExternalLink className="h-3.5 w-3.5" />
-						</a>
+						<ResumeOpenExternalButton locale={locale} />
 					</div>
 				</div>
 			</div>
@@ -119,35 +99,22 @@ export function ResumeViewer({
 				<div className="flex items-center space-x-2.5">
 					<FileText className="h-4 w-4 text-white shrink-0" />
 					<span className="font-semibold text-white">{fileName}</span>
-					<span className="text-zinc-500 hidden sm:inline">
-						— Compiled Vector PDF
-					</span>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-3">
+				<div className="flex items-center gap-2">
 					{LocaleToggle}
 
 					<ResumeDownloadButton locale={locale} />
-
-					<a
-						href={`/api/resume?locale=${locale}`}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
-						aria-label="Open in new tab"
-					>
-						<span>OPEN IN NEW TAB</span>
-						<ExternalLink className="h-3.5 w-3.5" />
-					</a>
+					<ResumeOpenExternalButton locale={locale} />
 
 					<button
 						type="button"
 						onClick={() => setIsOpen(false)}
-						className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+						className="inline-flex h-8 w-8 items-center justify-center rounded border border-zinc-800 bg-black hover:bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors cursor-pointer"
 						aria-label="Close preview"
+						title="Close preview"
 					>
 						<X className="h-4 w-4" />
-						<span className="hidden sm:inline">CLOSE PREVIEW</span>
 					</button>
 				</div>
 			</div>
