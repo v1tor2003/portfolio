@@ -52,14 +52,17 @@ describe("ProjectsSection Component", () => {
 				initialActivity={mockActivity}
 			/>,
 		);
+		expect(
+			screen.getByText("Featured Github Repositories"),
+		).toBeInTheDocument();
 		const titleLink = screen.getByRole("link", {
-			name: /featured github repositories/i,
+			name: /github profile/i,
 		});
 		expect(titleLink).toBeInTheDocument();
 		expect(titleLink).toHaveAttribute("href", "https://github.com/v1tor2003");
 		expect(titleLink).toHaveAttribute("target", "_blank");
 		expect(titleLink).toHaveAttribute("rel", "noopener noreferrer");
-		expect(screen.getByText("02. FEATURED PROJECTS")).toBeInTheDocument();
+		expect(screen.getByText("02. PROJECTS")).toBeInTheDocument();
 	});
 
 	it("switches tabs between personal and work projects", () => {

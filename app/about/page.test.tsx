@@ -8,10 +8,11 @@ describe("AboutPage Route", () => {
 		expect(
 			screen.getByRole("heading", {
 				level: 2,
-				name: /Server-Side Engineering & Cloud Integration/i,
+				name: /Server-Side Engineering, Distributed Systems & Software Craftsmanship/i,
 			}),
 		).toBeInTheDocument();
 		expect(screen.getByText(/01\. ABOUT ME/i)).toBeInTheDocument();
-		expect(screen.getByText(/Backend Architecture/i)).toBeInTheDocument();
+		expect(screen.getByText(/Backend & Cloud Systems/i)).toBeInTheDocument();
+		expect(screen.getByText(/B\.S\. in Computer Science/i)).toBeInTheDocument();
 	});
 });

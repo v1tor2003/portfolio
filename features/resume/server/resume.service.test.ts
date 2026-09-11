@@ -38,7 +38,7 @@ describe("ResumeService", () => {
 
 		expect(result.source).toBe("remote");
 		expect(result.isFallback).toBe(false);
-		expect(result.fileName).toBe("vitor-pires-resume.pdf");
+		expect(result.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(result.contentType).toBe("application/pdf");
 		expect(result.buffer.toString()).toContain("%PDF-1.4 remote pdf content");
 		expect(mockClient.send).toHaveBeenCalledTimes(1);
@@ -57,7 +57,7 @@ describe("ResumeService", () => {
 
 		expect(result.source).toBe("local-fallback");
 		expect(result.isFallback).toBe(true);
-		expect(result.fileName).toBe("vitor-pires-resume.pdf");
+		expect(result.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(result.contentType).toBe("application/pdf");
 		expect(result.buffer).toEqual(mockFallbackBuffer);
 	});
@@ -73,7 +73,22 @@ describe("ResumeService", () => {
 
 		expect(result.source).toBe("local-fallback");
 		expect(result.isFallback).toBe(true);
+		expect(result.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(result.buffer).toEqual(mockFallbackBuffer);
 		expect(mockClient.send).not.toHaveBeenCalled();
+	});
+
+	it("resolves pt-BR locale file name correctly", async () => {
+		const service: IResumeService = new ResumeService({
+			client: mockClient as unknown as ApiClient,
+			readFallback: () => mockFallbackBuffer,
+			token: undefined,
+		});
+
+		const result = await service.getResume("pt-BR");
+
+		expect(result.source).toBe("local-fallback");
+		expect(result.fileName).toBe("vitor-pires-resume-pt-BR.pdf");
+		expect(result.buffer).toEqual(mockFallbackBuffer);
 	});
 });

@@ -9,5 +9,6 @@ export * from "./schemas/project.schema";
 export {
 	getProjectsService,
 	type IProjectsService,
+	type PaginatedProjectsResult,
 	ProjectsService,
 } from "./server/projects.service";

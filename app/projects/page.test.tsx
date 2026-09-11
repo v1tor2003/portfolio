@@ -15,8 +15,8 @@ describe("ProjectsPage Route", () => {
 				name: /Featured Github Repositories/i,
 			}),
 		).toBeInTheDocument();
-		expect(screen.getByText(/02\. FEATURED PROJECTS/i)).toBeInTheDocument();
-		expect(screen.getByText(/ACTIVITY MATRIX/i)).toBeInTheDocument();
+		expect(screen.getByText(/02\. PROJECTS/i)).toBeInTheDocument();
+		expect(screen.getByText(/Personal:/i)).toBeInTheDocument();
 	});
 
 	it("renders immediate loading skeleton on route navigation", () => {
@@ -24,6 +24,6 @@ describe("ProjectsPage Route", () => {
 
 		expect(screen.getByText(/BACK TO HOME/i)).toBeInTheDocument();
 		expect(screen.getByLabelText(/loading projects/i)).toBeInTheDocument();
-		expect(screen.getByText(/02\. FEATURED PROJECTS/i)).toBeInTheDocument();
+		expect(screen.getByText(/02\. PROJECTS/i)).toBeInTheDocument();
 	});
 });

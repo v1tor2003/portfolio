@@ -10,7 +10,7 @@ describe("GET /api/resume Route Handler", () => {
 		expect(response.headers.get("Content-Type")).toBe("application/pdf");
 		expect(response.headers.get("Content-Disposition")).toContain("inline");
 		expect(response.headers.get("Content-Disposition")).toContain(
-			"vitor-pires-resume.pdf",
+			"vitor-pires-resume-en.pdf",
 		);
 
 		const arrayBuffer = await response.arrayBuffer();
@@ -24,7 +24,21 @@ describe("GET /api/resume Route Handler", () => {
 		expect(response.status).toBe(200);
 		expect(response.headers.get("Content-Disposition")).toContain("attachment");
 		expect(response.headers.get("Content-Disposition")).toContain(
-			"vitor-pires-resume.pdf",
+			"vitor-pires-resume-en.pdf",
 		);
+	});
+
+	it("returns pt-BR resume when ?locale=pt-BR is provided", async () => {
+		const request = new Request("https://localhost/api/resume?locale=pt-BR");
+		const response = await GET(request);
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get("Content-Type")).toBe("application/pdf");
+		expect(response.headers.get("Content-Disposition")).toContain(
+			"vitor-pires-resume-pt-BR.pdf",
+		);
+
+		const arrayBuffer = await response.arrayBuffer();
+		expect(arrayBuffer.byteLength).toBeGreaterThan(0);
 	});
 });

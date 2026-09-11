@@ -2,28 +2,47 @@ import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
 import { env } from "@/lib/env";
 import type {
 	GitActivityData,
+	GitActivityDay,
 	Project,
 	ProjectCategory,
 } from "../schemas/project.schema";
+import { GetGitActivityCommand } from "./get-git-activity.command";
 import { GetPinnedProjectsCommand } from "./get-pinned-projects.command";
 import { GetProjectReadmeCommand } from "./get-project-readme.command";
 import {
 	FALLBACK_READMES,
 	generateGitActivityData,
+	HISTORICAL_WORK_CONTRIBUTIONS,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
 } from "./projects-seed.data";
 
+export interface PaginatedProjectsResult {
+	projects: Project[];
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
+}
+
 export interface IProjectsService {
 	getProjects(category?: ProjectCategory): Promise<Project[]>;
+	getPaginatedProjects(options?: {
+		category?: ProjectCategory;
+		page?: number;
+		limit?: number;
+	}): Promise<PaginatedProjectsResult>;
 	getGitActivity(): Promise<GitActivityData>;
 	getReadme(owner: string, repo: string): Promise<string>;
 }
 
 export interface ProjectsServiceDependencies {
 	client?: ApiClient;
+	contributionsClient?: ApiClient;
 	token?: string;
+	workToken?: string;
 	username?: string;
+	workUsername?: string;
 }
 
 function defaultCreateGitHubClient(): ApiClient {
@@ -34,10 +53,21 @@ function defaultCreateGitHubClient(): ApiClient {
 	});
 }
 
+function defaultCreateContributionsClient(): ApiClient {
+	return new ApiClient({
+		transport: new FetchTransport({
+			baseUrl: "https://github-contributions-api.jogruber.de",
+		}),
+	});
+}
+
 export class ProjectsService implements IProjectsService {
 	private readonly client: ApiClient;
+	private readonly contributionsClient: ApiClient;
 	private readonly token?: string;
+	private readonly workToken?: string;
 	private readonly username: string;
+	private readonly workUsername: string;
 
 	// In-memory cache for projects & readmes to minimize external network requests
 	private cachedProjects: { data: Project[]; timestamp: number } | null = null;
@@ -51,14 +81,44 @@ export class ProjectsService implements IProjectsService {
 
 	constructor(deps?: ProjectsServiceDependencies) {
 		this.client = deps?.client ?? defaultCreateGitHubClient();
+		this.contributionsClient =
+			deps?.contributionsClient ?? defaultCreateContributionsClient();
 		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
+		this.workToken = deps?.workToken ?? env.GITHUB_WORK_TOKEN;
 		this.username = deps?.username ?? "v1tor2003";
+		this.workUsername =
+			deps?.workUsername ?? env.GITHUB_WORK_USERNAME ?? "vitor-pires_tecnosul";
 	}
 
 	async getProjects(category?: ProjectCategory): Promise<Project[]> {
 		const allProjects = await this.fetchAllProjects();
 		if (!category) return allProjects;
 		return allProjects.filter((p) => p.category === category);
+	}
+
+	async getPaginatedProjects(options?: {
+		category?: ProjectCategory;
+		page?: number;
+		limit?: number;
+	}): Promise<PaginatedProjectsResult> {
+		const category = options?.category ?? "personal";
+		const page = Math.max(1, options?.page ?? 1);
+		const limit = Math.max(1, Math.min(50, options?.limit ?? 9));
+
+		const allCategoryProjects = await this.getProjects(category);
+		const total = allCategoryProjects.length;
+		const totalPages = Math.ceil(total / limit) || 1;
+		const clampedPage = Math.min(page, totalPages);
+		const start = (clampedPage - 1) * limit;
+		const projects = allCategoryProjects.slice(start, start + limit);
+
+		return {
+			projects,
+			total,
+			page: clampedPage,
+			limit,
+			totalPages,
+		};
 	}
 
 	async getGitActivity(): Promise<GitActivityData> {
@@ -70,11 +130,191 @@ export class ProjectsService implements IProjectsService {
 			return this.cachedActivity.data;
 		}
 
-		// Enterprise activity is not accessible via public GitHub API endpoints.
-		// In accordance with architecture guidelines, generate deterministic structured activity graph.
-		const activity = generateGitActivityData(52);
-		this.cachedActivity = { data: activity, timestamp: now };
-		return activity;
+		try {
+			const command = new GetGitActivityCommand({ username: this.username });
+			const [result, realWorkMap] = await Promise.all([
+				this.contributionsClient.send(command).catch(() => null),
+				this.fetchRealWorkContributions(),
+			]);
+
+			const personalContributions =
+				result && isOk(result) && Array.isArray(result.data?.contributions)
+					? result.data.contributions
+					: [];
+
+			if (personalContributions.length > 0 || realWorkMap) {
+				const merged = this.mergeRealContributionsWithWork(
+					personalContributions,
+					52,
+					realWorkMap,
+				);
+				this.cachedActivity = { data: merged, timestamp: now };
+				return merged;
+			}
+		} catch {
+			// Resilient fallback to deterministic generator
+		}
+
+		const fallbackActivity = generateGitActivityData(52);
+		this.cachedActivity = { data: fallbackActivity, timestamp: now };
+		return fallbackActivity;
+	}
+
+	private async fetchRealWorkContributions(): Promise<Map<string, number>> {
+		const map = new Map<string, number>(
+			Object.entries(HISTORICAL_WORK_CONTRIBUTIONS),
+		);
+		if (!this.workToken) return map;
+		try {
+			const query = `
+				query {
+					viewer {
+						contributionsCollection {
+							contributionCalendar {
+								weeks {
+									contributionDays {
+										date
+										contributionCount
+									}
+								}
+							}
+						}
+					}
+				}
+			`;
+			const res = await fetch("https://api.github.com/graphql", {
+				method: "POST",
+				headers: {
+					Authorization: `bearer ${this.workToken}`,
+					"User-Agent": "vitor-portfolio-app",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ query }),
+			});
+			if (!res.ok) return map;
+			const data = (await res.json()) as {
+				data?: {
+					viewer?: {
+						contributionsCollection?: {
+							contributionCalendar?: {
+								weeks?: Array<{
+									contributionDays?: Array<{
+										date: string;
+										contributionCount: number;
+									}>;
+								}>;
+							};
+						};
+					};
+				};
+			};
+
+			const weeks =
+				data?.data?.viewer?.contributionsCollection?.contributionCalendar
+					?.weeks;
+			if (!weeks) return map;
+
+			for (const week of weeks) {
+				if (week.contributionDays) {
+					for (const day of week.contributionDays) {
+						if (day.contributionCount > 0) {
+							const existing = map.get(day.date) ?? 0;
+							map.set(day.date, Math.max(existing, day.contributionCount));
+						}
+					}
+				}
+			}
+			return map;
+		} catch {
+			return map;
+		}
+	}
+
+	private mergeRealContributionsWithWork(
+		contributions: Array<{ date: string; count: number }>,
+		weeks = 52,
+		realWorkContributionsMap?: Map<string, number> | null,
+	): GitActivityData {
+		const totalDays = weeks * 7;
+		const today = new Date();
+		const contributionMap = new Map<string, number>();
+		for (const item of contributions) {
+			contributionMap.set(item.date, item.count);
+		}
+		const hasPersonal = contributions.length > 0;
+
+		const days: GitActivityDay[] = [];
+		let totalPersonal = 0;
+		let totalWork = 0;
+
+		for (let i = totalDays - 1; i >= 0; i--) {
+			const d = new Date(today);
+			d.setDate(d.getDate() - i);
+			const dateStr = d.toISOString().split("T")[0];
+			const dayOfWeek = d.getDay(); // 0 = Sun, 6 = Sat
+
+			let personalCount = contributionMap.get(dateStr) ?? 0;
+			if (!hasPersonal) {
+				// Deterministic fallback for personal open-source activity when API is offline/mocked
+				const seed = dateStr
+					.split("-")
+					.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 13);
+				const rand = (Math.sin(seed) * 10000) % 1;
+				const absRand = Math.abs(rand);
+				if (dayOfWeek === 0 || dayOfWeek === 6) {
+					if (absRand > 0.4) {
+						personalCount = Math.floor(absRand * 6) + 1;
+					}
+				} else if (absRand > 0.7) {
+					personalCount = Math.floor(absRand * 3) + 1;
+				}
+			}
+			totalPersonal += personalCount;
+
+			let workCount = 0;
+			if (realWorkContributionsMap?.has(dateStr)) {
+				workCount = realWorkContributionsMap.get(dateStr) ?? 0;
+				totalWork += workCount;
+			} else if (realWorkContributionsMap && this.workToken) {
+				workCount = 0;
+			} else {
+				// Deterministic enterprise activity fallback for weekdays
+				if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+					const seed = dateStr
+						.split("-")
+						.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 7);
+					const rand = (Math.sin(seed) * 10000) % 1;
+					const absRand = Math.abs(rand);
+					if (absRand > 0.25) {
+						workCount = Math.floor(absRand * 8) + 2;
+						totalWork += workCount;
+					}
+				}
+			}
+
+			let category: GitActivityDay["category"] = "none";
+			const dayTotal = personalCount + workCount;
+
+			if (personalCount > 0 && workCount > 0) {
+				category = "mixed";
+			} else if (personalCount > 0) {
+				category = "personal";
+			} else if (workCount > 0) {
+				category = "work";
+			}
+
+			days.push({
+				date: dateStr,
+				count: dayTotal,
+				category,
+			});
+		}
+
+		return {
+			days,
+			totalPersonal,
+			totalWork,
+		};
 	}
 
 	async getReadme(owner: string, repo: string): Promise<string> {
@@ -141,7 +381,10 @@ export class ProjectsService implements IProjectsService {
 				token: this.token,
 			});
 
-			const result = await this.client.send(command);
+			const [result, pinnedSet] = await Promise.all([
+				this.client.send(command),
+				this.fetchPinnedRepoNames(),
+			]);
 
 			if (
 				isOk(result) &&
@@ -151,12 +394,19 @@ export class ProjectsService implements IProjectsService {
 				const remoteRepos = result.data;
 				// Merge or map fetched repositories
 				const mapped: Project[] = remoteRepos
-					.filter((repo) => !repo.name.startsWith(".")) // Filter config/hidden repos
-					.slice(0, 10)
+					.filter(
+						(repo) =>
+							!repo.name.startsWith(".") &&
+							repo.name.toLowerCase() !== this.username.toLowerCase(),
+					) // Filter config/hidden/profile repos
 					.map((repo) => {
 						const existing = SEED_PERSONAL_PROJECTS.find(
 							(p) => p.repo.toLowerCase() === repo.name.toLowerCase(),
 						);
+
+						const isPinned =
+							pinnedSet.has(repo.name.toLowerCase()) ||
+							Boolean(existing?.isPinned);
 
 						return {
 							id: repo.name,
@@ -177,14 +427,14 @@ export class ProjectsService implements IProjectsService {
 								repo.topics && repo.topics.length > 0
 									? repo.topics
 									: existing?.topics || ["typescript", "open-source"],
-							isPinned: existing ? existing.isPinned : false,
+							isPinned,
 							hasReadme: true,
 							owner: repo.owner.login,
 							repo: repo.name,
 						};
 					});
 
-				// Keep featured repos like command-api pinned at the top
+				// Sort pinned repositories to the top, then sort by stars descending
 				const pinnedFirst = mapped.sort((a, b) => {
 					if (a.isPinned && !b.isPinned) return -1;
 					if (!a.isPinned && b.isPinned) return 1;
@@ -202,6 +452,91 @@ export class ProjectsService implements IProjectsService {
 		const combined = [...personalProjects, ...SEED_WORK_PROJECTS];
 		this.cachedProjects = { data: combined, timestamp: now };
 		return combined;
+	}
+
+	private async fetchPinnedRepoNames(): Promise<Set<string>> {
+		const pinnedNames = new Set<string>();
+
+		if (this.token) {
+			try {
+				const query = `
+					query($username: String!) {
+						user(login: $username) {
+							pinnedItems(first: 10, types: REPOSITORY) {
+								nodes {
+									... on Repository {
+										name
+									}
+								}
+							}
+						}
+					}
+				`;
+				const res = await fetch("https://api.github.com/graphql", {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${this.token}`,
+						"Content-Type": "application/json",
+						"User-Agent": "vitor-portfolio-app",
+					},
+					body: JSON.stringify({
+						query,
+						variables: { username: this.username },
+					}),
+				});
+
+				if (res.ok) {
+					const json = await res.json();
+					const nodes = json.data?.user?.pinnedItems?.nodes;
+					if (Array.isArray(nodes)) {
+						for (const node of nodes) {
+							if (node?.name) {
+								pinnedNames.add(node.name.toLowerCase());
+							}
+						}
+						if (pinnedNames.size > 0) {
+							return pinnedNames;
+						}
+					}
+				}
+			} catch {
+				// Fallback to scraping
+			}
+		}
+
+		try {
+			const res = await fetch(`https://github.com/${this.username}`, {
+				headers: {
+					"User-Agent": "vitor-portfolio-app",
+				},
+			});
+			if (res.ok) {
+				const html = await res.text();
+				const regex = new RegExp(
+					`class="pinned-item-list-item-content"[\\s\\S]*?href="/${this.username}/([^"/]+)"`,
+					"g",
+				);
+				const matches = Array.from(html.matchAll(regex));
+				for (const m of matches) {
+					if (m[1] && m[1].toLowerCase() !== this.username.toLowerCase()) {
+						pinnedNames.add(m[1].toLowerCase());
+					}
+				}
+				if (pinnedNames.size > 0) {
+					return pinnedNames;
+				}
+			}
+		} catch {
+			// Fallback to seed pinned list
+		}
+
+		for (const p of SEED_PERSONAL_PROJECTS) {
+			if (p.isPinned) {
+				pinnedNames.add(p.repo.toLowerCase());
+			}
+		}
+
+		return pinnedNames;
 	}
 }
 

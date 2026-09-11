@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import type { Project } from "../schemas/project.schema";
 import { ProjectGrid } from "./ProjectGrid";
 
@@ -131,5 +131,71 @@ describe("ProjectGrid Component", () => {
 		// Should reset to page 1
 		expect(screen.getByText("Alt Repository 1")).toBeInTheDocument();
 		expect(screen.queryByText("Alt Repository 10")).not.toBeInTheDocument();
+	});
+
+	it("fetches page 2 on-demand when not available in initial slice", async () => {
+		const initialPage = generateManyProjects(9);
+		const secondPage = generateManyProjects(18).slice(9, 18);
+
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({
+				projects: secondPage,
+				total: 18,
+				page: 2,
+				limit: 9,
+				totalPages: 2,
+			}),
+		});
+		vi.stubGlobal("fetch", fetchMock);
+
+		render(
+			<ProjectGrid
+				projects={initialPage}
+				totalItems={18}
+				onViewReadme={() => {}}
+			/>,
+		);
+
+		expect(screen.getByText("Repository 1")).toBeInTheDocument();
+
+		const nextButton = screen.getByRole("button", { name: /next page/i });
+		fireEvent.click(nextButton);
+
+		await waitFor(() => {
+			expect(fetchMock).toHaveBeenCalledWith(
+				"/api/projects?category=personal&page=2&limit=9",
+			);
+			expect(screen.getByText("Repository 10")).toBeInTheDocument();
+		});
+
+		vi.unstubAllGlobals();
+	});
+
+	it("renders work confidentiality disclaimer card when category is work", () => {
+		render(
+			<ProjectGrid
+				projects={mockProjects}
+				category="work"
+				onViewReadme={() => {}}
+			/>,
+		);
+
+		expect(screen.getByText(/RESTRICTED ACCESS/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(/Enterprise Architecture & Reference Implementations/i),
+		).toBeInTheDocument();
+	});
+
+	it("does not render work disclaimer when category is personal", () => {
+		render(
+			<ProjectGrid
+				projects={mockProjects}
+				category="personal"
+				onViewReadme={() => {}}
+			/>,
+		);
+
+		expect(screen.queryByText(/RESTRICTED ACCESS/i)).not.toBeInTheDocument();
 	});
 });

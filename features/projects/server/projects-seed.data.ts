@@ -191,172 +191,261 @@ export const SEED_PERSONAL_PROJECTS: Project[] = [
 
 export const SEED_WORK_PROJECTS: Project[] = [
 	{
-		id: "enterprise-event-streaming-gateway",
-		name: "enterprise-event-streaming-gateway",
+		id: "nestjs-fleet-telemetry-gateway",
+		name: "nestjs-fleet-telemetry-gateway",
 		description:
-			"High-throughput telemetry ingestion engine processing 10k+ msgs/sec with Kafka, Redis cluster, and event deduplication.",
+			"Enterprise IoT & fleet operations gateway built with NestJS, featuring ABAC/RBAC authorization kernels, AWS EventBridge domain routing, BullMQ/Valkey task processing, and TimescaleDB telemetry partitioning.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
-		language: "Go",
+		language: "TypeScript",
 		topics: [
-			"distributed-systems",
-			"kafka",
-			"redis",
-			"telemetry",
-			"event-driven",
+			"nestjs",
+			"typescript",
+			"aws-eventbridge",
+			"aws-sqs",
+			"timescaledb",
+			"valkey",
+			"clean-architecture",
 		],
 		isPinned: true,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "event-streaming-gateway",
+		repo: "nestjs-fleet-telemetry-gateway",
 	},
 	{
-		id: "distributed-fulfillment-engine",
-		name: "distributed-fulfillment-engine",
+		id: "dotnet-iot-telemetry-engine",
+		name: "dotnet-iot-telemetry-engine",
 		description:
-			"Distributed transactional fulfillment service implementing Saga patterns, idempotent retry policies, and gRPC contracts.",
+			"High-throughput event streaming ingestion engine built on .NET 9 and ASP.NET Core adhering to Vertical Slice Architecture (Sliced Arch), CQRS, AWS IoT Core, Kinesis, Redis distributed caching, and NBomber load testing.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "C#",
-		topics: ["dotnet", "grpc", "saga-pattern", "clean-architecture", "outbox"],
+		topics: [
+			"dotnet",
+			"csharp",
+			"vertical-slice",
+			"cqrs",
+			"aws-kinesis",
+			"aws-iot",
+			"redis",
+			"nbomber",
+		],
 		isPinned: true,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "fulfillment-engine",
+		repo: "dotnet-iot-telemetry-engine",
 	},
 	{
-		id: "enterprise-identity-mesh",
-		name: "enterprise-identity-mesh",
+		id: "enterprise-event-mesh-sqs-sns",
+		name: "enterprise-event-mesh-sqs-sns",
 		description:
-			"OAuth2 / OIDC token exchange proxy and policy enforcement point with sub-5ms caching and distributed OpenTelemetry tracing.",
+			"Decoupled asynchronous event broker leveraging Amazon SNS topic fanout, SQS subscriber queues, exponential backoff DLQs, and CloudWatch backpressure alarms.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "TypeScript",
-		topics: ["oauth2", "oidc", "security", "zero-trust", "open-telemetry"],
-		isPinned: false,
+		topics: [
+			"aws-sqs",
+			"aws-sns",
+			"cloudwatch",
+			"event-driven",
+			"dead-letter-queue",
+		],
+		isPinned: true,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "identity-mesh",
+		repo: "event-mesh-sqs-sns",
 	},
 	{
-		id: "cloud-billing-reconciliation",
-		name: "cloud-billing-reconciliation",
+		id: "kinesis-realtime-telemetry-pipeline",
+		name: "kinesis-realtime-telemetry-pipeline",
 		description:
-			"Idempotent billing reconciliation pipeline matching Stripe and ERP ledgers with automated difference alerts.",
+			"High-throughput real-time streaming ingestion pipeline handling 50k+ records/sec with AWS Kinesis Shards, CloudWatch anomaly detection, and partitioned S3 Parquet batch sink.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
-		stars: 0,
-		forks: 0,
-		language: "C#",
-		topics: ["fintech", "reconciliation", "dotnet", "sql-server"],
-		isPinned: false,
-		hasReadme: true,
-		owner: "enterprise",
-		repo: "billing-reconciliation",
-	},
-	{
-		id: "realtime-asset-tracking-broker",
-		name: "realtime-asset-tracking-broker",
-		description:
-			"WebSocket and MQTT message broker managing 50k+ active device connections with geospatial indexing in Redis.",
-		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "Go",
-		topics: ["iot", "mqtt", "websockets", "geospatial"],
-		isPinned: false,
+		topics: ["aws-kinesis", "aws-s3", "cloudwatch", "streaming", "telemetry"],
+		isPinned: true,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "asset-tracking-broker",
+		repo: "kinesis-telemetry-pipeline",
 	},
 	{
-		id: "enterprise-feature-flag-service",
-		name: "enterprise-feature-flag-service",
+		id: "s3-glacier-compliance-vault",
+		name: "s3-glacier-compliance-vault",
 		description:
-			"Low-latency feature toggling service with client SDKs, canary rollout percentages, and audit trails.",
+			"Tamper-evident document repository with Amazon S3 presigned multipart uploads, KMS envelope encryption, and automated lifecycle transitions to S3 Glacier Flexible Retrieval.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "TypeScript",
-		topics: ["feature-flags", "ab-testing", "caching", "enterprise"],
+		topics: ["aws-s3", "s3-glacier", "kms-encryption", "compliance", "storage"],
 		isPinned: false,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "feature-flag-service",
+		repo: "s3-glacier-compliance-vault",
 	},
 	{
-		id: "document-indexing-worker",
-		name: "document-indexing-worker",
+		id: "rds-aurora-resilience-proxy",
+		name: "rds-aurora-resilience-proxy",
 		description:
-			"Asynchronous OCR and semantic embeddings extraction pipeline processing PDF attachments into OpenSearch.",
+			"Multi-tenant database connection pool manager and tenant router with AWS RDS Aurora PostgreSQL, read replica routing, and CloudWatch automated failover triggers.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
-		stars: 0,
-		forks: 0,
-		language: "Python",
-		topics: ["opensearch", "embeddings", "workers", "celery"],
-		isPinned: false,
-		hasReadme: true,
-		owner: "enterprise",
-		repo: "document-indexing-worker",
-	},
-	{
-		id: "multi-tenant-data-partitioner",
-		name: "multi-tenant-data-partitioner",
-		description:
-			"Dynamic PostgreSQL connection pooling and schema isolation middleware for SOC2 compliant data tenancy.",
-		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "C#",
-		topics: ["postgresql", "multi-tenancy", "ef-core", "security"],
+		topics: ["aws-rds", "aurora", "postgresql", "multi-tenancy", "dotnet"],
 		isPinned: false,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "multi-tenant-partitioner",
+		repo: "rds-aurora-resilience-proxy",
 	},
 	{
-		id: "enterprise-audit-vault",
-		name: "enterprise-audit-vault",
+		id: "ses-transactional-notification-gateway",
+		name: "ses-transactional-notification-gateway",
 		description:
-			"Tamper-evident cryptographically signed immutable audit event log with cold-storage archiving to S3 Glacier.",
+			"High-deliverability transactional email and alert dispatcher via AWS SES with SNS webhook feedback loop for real-time bounce, complaint, and delivery tracking.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
+		stars: 0,
+		forks: 0,
+		language: "TypeScript",
+		topics: [
+			"aws-ses",
+			"aws-sns",
+			"aws-sqs",
+			"notifications",
+			"email-infrastructure",
+		],
+		isPinned: false,
+		hasReadme: true,
+		owner: "enterprise",
+		repo: "ses-notification-gateway",
+	},
+	{
+		id: "cloudwatch-anomaly-observability-mesh",
+		name: "cloudwatch-anomaly-observability-mesh",
+		description:
+			"Unified telemetry collector aggregating distributed logs, custom CloudWatch EMF metrics, Composite Alarms, and automated SNS pager alerts across AWS microservices.",
+		category: "work",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
 		language: "Go",
-		topics: ["cryptography", "audit-logs", "compliance", "aws-s3"],
+		topics: ["cloudwatch", "aws-sns", "observability", "metrics", "monitoring"],
 		isPinned: false,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "audit-vault",
+		repo: "cloudwatch-observability-mesh",
 	},
 	{
-		id: "api-rate-limiting-sidecar",
-		name: "api-rate-limiting-sidecar",
+		id: "s3-event-driven-media-transcoder",
+		name: "s3-event-driven-media-transcoder",
 		description:
-			"Envoy WASM filter implementing token bucket and sliding log rate limiting across Kubernetes pods.",
+			"Automated media processing pipeline triggered by S3 ObjectCreated events via SNS/SQS, processing high-resolution assets and storing derived artifacts.",
 		category: "work",
-		htmlUrl: "https://github.com/v1tor2003",
+		htmlUrl: "https://github.com/vitor-pires_tecnosul",
 		stars: 0,
 		forks: 0,
-		language: "Rust",
-		topics: ["rust", "wasm", "envoy", "rate-limiting"],
+		language: "TypeScript",
+		topics: ["aws-s3", "aws-sns", "aws-sqs", "serverless", "transcoding"],
 		isPinned: false,
 		hasReadme: true,
 		owner: "enterprise",
-		repo: "rate-limiting-sidecar",
+		repo: "s3-media-transcoder",
 	},
 ];
+
+export const HISTORICAL_WORK_CONTRIBUTIONS: Readonly<Record<string, number>> = {
+	"2025-11-04": 1,
+	"2025-11-06": 1,
+	"2025-11-07": 1,
+	"2025-11-11": 2,
+	"2025-11-19": 1,
+	"2025-11-24": 1,
+	"2025-11-27": 1,
+	"2025-11-28": 1,
+	"2025-12-08": 1,
+	"2025-12-10": 1,
+	"2026-01-12": 1,
+	"2026-01-22": 2,
+	"2026-01-26": 1,
+	"2026-02-04": 1,
+	"2026-02-05": 1,
+	"2026-02-06": 2,
+	"2026-02-11": 2,
+	"2026-02-12": 1,
+	"2026-02-20": 1,
+	"2026-02-23": 2,
+	"2026-03-11": 1,
+	"2026-03-23": 1,
+	"2026-03-25": 2,
+	"2026-03-30": 3,
+	"2026-04-06": 2,
+	"2026-04-10": 1,
+	"2026-04-13": 1,
+	"2026-04-14": 1,
+	"2026-04-15": 3,
+	"2026-04-20": 1,
+	"2026-04-22": 1,
+	"2026-04-23": 4,
+	"2026-04-27": 2,
+	"2026-04-29": 3,
+	"2026-04-30": 1,
+	"2026-05-05": 4,
+	"2026-05-06": 3,
+	"2026-05-07": 1,
+	"2026-05-11": 1,
+	"2026-05-12": 3,
+	"2026-05-14": 6,
+	"2026-05-15": 5,
+	"2026-05-18": 1,
+	"2026-05-19": 5,
+	"2026-05-20": 6,
+	"2026-05-21": 4,
+	"2026-05-22": 4,
+	"2026-05-25": 2,
+	"2026-05-26": 8,
+	"2026-05-27": 5,
+	"2026-05-28": 5,
+	"2026-05-29": 10,
+	"2026-06-01": 2,
+	"2026-06-02": 3,
+	"2026-06-03": 10,
+	"2026-06-04": 2,
+	"2026-06-05": 11,
+	"2026-06-08": 1,
+	"2026-06-09": 10,
+	"2026-06-10": 1,
+	"2026-06-12": 10,
+	"2026-06-15": 5,
+	"2026-06-16": 8,
+	"2026-06-18": 1,
+	"2026-06-19": 2,
+	"2026-06-22": 6,
+	"2026-06-23": 3,
+	"2026-06-25": 15,
+	"2026-06-26": 6,
+	"2026-06-27": 1,
+	"2026-06-30": 14,
+	"2026-07-01": 21,
+	"2026-07-02": 9,
+	"2026-07-03": 7,
+	"2026-07-06": 8,
+	"2026-07-07": 7,
+	"2026-07-09": 15,
+	"2026-07-10": 7,
+	"2026-07-13": 2,
+};
 
 export function generateGitActivityData(weeks = 52): GitActivityData {
 	const days: GitActivityDay[] = [];
@@ -371,6 +460,18 @@ export function generateGitActivityData(weeks = 52): GitActivityData {
 		d.setDate(d.getDate() - i);
 		const dateStr = d.toISOString().split("T")[0];
 		const dayOfWeek = d.getDay(); // 0 = Sun, 6 = Sat
+
+		// Check verified historical enterprise contributions first
+		const historicalCount = HISTORICAL_WORK_CONTRIBUTIONS[dateStr];
+		if (historicalCount !== undefined) {
+			totalWork += historicalCount;
+			days.push({
+				date: dateStr,
+				count: historicalCount,
+				category: historicalCount > 0 ? "work" : "none",
+			});
+			continue;
+		}
 
 		// Deterministic seed value from date string
 		const seed = dateStr
@@ -469,33 +570,126 @@ Vítor Pires - Full Stack / Distributed Systems Engineer portfolio.
 
 Built with Next.js 16 (App Router), Tailwind CSS, Framer Motion, and Lucide Icons. Features an interactive terminal contact interface and dynamic GitHub integration.
 `,
-	"enterprise/event-streaming-gateway": `# Enterprise Event Streaming Gateway
+	"enterprise/event-mesh-sqs-sns": `# Enterprise Event Mesh (AWS SNS + SQS)
 
-High-throughput telemetry ingestion engine processing 10,000+ msgs/second.
+Decoupled, event-driven pub/sub distribution mesh built with Amazon SNS and Amazon SQS.
 
-## Architecture Highlights
-- Kafka partition consumer groups with parallel worker pools
-- Redis deduplication with sliding TTL windows
-- Dead-letter queues (DLQ) with automated replay policies
-- Distributed OpenTelemetry metrics and traces
+## Architectural Problem Solved
+Synchronously coupled microservices suffer from cascading latency, retry storms, and downtime under peak loads. This architecture provides guaranteed asynchronous message delivery, service isolation, and automated poisoned-message handling.
+
+## Architecture & Data Flow
+1. **Event Producers**: Dispatch structured JSON domain events to an **Amazon SNS Topic**.
+2. **Topic Fanout**: Amazon SNS replicates messages concurrently to isolated subscriber **Amazon SQS Queues** using filter policies.
+3. **Dead-Letter Queues (DLQ)**: Failed worker executions automatically transfer messages to a Dead-Letter Queue after 5 failed attempts (Exponential Backoff + Jitter).
+4. **CloudWatch Monitoring**: Triggers alarms when \`ApproximateNumberOfMessagesVisible\` in DLQ exceeds 0 or when queue processing latency spikes.
+
+## Key Capabilities
+- **SNS Message Filtering**: Consumer queues only receive events matching their attribute filter policies (e.g. \`event_type: "ORDER_COMPLETED"\`).
+- **At-Least-Once Delivery**: Strict idempotency keys stored in Redis ensure duplicate deliveries are safely ignored.
+- **Auto-Recovery Redrive**: Automated scriptable redrive tasks replay DLQ items back to main queue once root cause is remediated.
 `,
-	"enterprise/fulfillment-engine": `# Distributed Order Fulfillment Engine
+	"enterprise/kinesis-telemetry-pipeline": `# High-Throughput Real-Time Telemetry Pipeline (AWS Kinesis)
 
-Distributed transactional fulfillment service implementing Saga patterns and idempotent retry policies.
+Real-time streaming ingestion engine processing 50,000+ telemetry events/second using AWS Kinesis Data Streams.
 
-## Architectural Patterns
-- Clean Architecture / Hexagonal structure
-- Outbox pattern for at-least-once message dispatch
-- Compensation actions for multi-step transaction rollbacks
-- gRPC internal service mesh communication
+## Architectural Problem Solved
+Batch ETL approaches cannot deliver immediate operational insights. This streaming architecture ingests, partitions, and aggregates flight and device telemetry in real-time with sub-second latencies.
+
+## Architecture & Components
+- **Kinesis Data Streams**: Dynamic shard allocation auto-scaling based on incoming bytes throughput.
+- **Enhanced Fan-Out (EFO)**: Dedicated 2MB/sec read throughput per shard for consumer worker pools.
+- **Batch Parquet Sink to S3**: Kinesis Firehose micro-batches stream records into Snappy-compressed Apache Parquet format on Amazon S3.
+- **CloudWatch Real-Time Alarms**: Monitored via \`GetRecords.IteratorAgeMilliseconds\` to prevent consumer lag from building up.
 `,
-	"enterprise/identity-mesh": `# Enterprise Identity Mesh
+	"enterprise/s3-glacier-compliance-vault": `# Secure Compliance Document Vault (AWS S3 & Glacier)
 
-OAuth2 / OIDC token exchange proxy and policy enforcement point with sub-5ms caching.
+Tamper-evident, zero-trust document storage vault with automated lifecycle tiering.
 
-## Features
-- JWT verification & token exchange (RFC 8693)
-- Distributed role-based access control (RBAC)
-- Multi-region edge token verification cache
+## Architectural Problem Solved
+Storing millions of compliance records and attachments in standard storage is cost-prohibitive, and ensuring regulatory immutability (WORM) requires strict cryptographic guarantees.
+
+## Solution Architecture
+- **Presigned Multipart Uploads**: Direct client-to-S3 uploads with sub-100ms URL generation, bypassing backend server bandwidth bottlenecks.
+- **KMS Envelope Encryption**: All objects encrypted at rest using dedicated AWS KMS Customer Managed Keys (CMK) with automated key rotation.
+- **Lifecycle Tiering Rules**: Objects automatically transition from S3 Standard -> S3 Infrequent Access (30 days) -> S3 Glacier Flexible Retrieval (90 days).
+- **S3 Object Lock**: Legal hold and compliance retention modes prevent deletion or modification throughout mandatory regulatory audit windows.
+`,
+	"enterprise/nestjs-fleet-telemetry-gateway": `# Enterprise Fleet Telemetry Gateway (NestJS & AWS)
+
+High-performance IoT telemetry ingestion and fleet operations gateway built with NestJS, TypeScript, and AWS EventBridge.
+
+## Architectural Problem Solved
+Managing high-velocity drone and IoT device telemetry concurrently with enterprise administrative operations requires strict decoupling of fast-path telemetry streams from transactional domain flows, alongside rigorous multi-tenant role/attribute-based authorization.
+
+## Architecture & Components
+- **ABAC/RBAC Policy Kernel**: Dynamic CASL and CTE-backed scope resolution for dealership hierarchies, technicians, and customer accounts.
+- **AWS EventBridge & SQS**: Publishes asynchronous domain events (device activations, warranty claims, maintenance alerts) into decoupled worker queues.
+- **Valkey / Redis In-Memory Cache**: High-throughput distributed caching of drone configurations, geofencing rules, and recent telemetry traces.
+- **TimescaleDB Partitioning**: Hypertable telemetry persistence for mission time-series analysis and spatial flight tracking.
+- **OpenAPI & Scalar Documentation**: Real-time contract-first API schemas served via OpenAPI and interactive Scalar UI.
+`,
+	"enterprise/dotnet-iot-telemetry-engine": `# High-Throughput IoT Telemetry Ingestion Engine (.NET 9 & AWS)
+
+High-throughput distributed ingestion and command processing engine engineered on .NET 9 and ASP.NET Core.
+
+## Architectural Problem Solved
+Streaming high-volume IoT device payloads directly to databases degrades ingestion throughput. This architecture processes high-throughput telemetry streams using non-blocking asynchronous pipelines, Vertical Slice isolation, and load-tested resilience.
+
+## Architecture & Components
+- **Vertical Slice Architecture (Sliced Arch)**: Endpoints, commands, queries, and validators encapsulated per feature slice rather than traditional layer soup.
+- **AWS IoT Core & Kinesis Streaming**: High-throughput message ingestion with partitioned shard processing and Snappy compression.
+- **CQRS & MediatR Pipeline**: Distinct read and write paths with validation behaviors, circuit breakers, and distributed tracing.
+- **Distributed Caching with Redis**: Hot-state device cache with optimistic concurrency locks preventing split-brain telemetry state.
+- **NBomber & xUnit Resilience**: Automated load stress test suites verifying sub-15ms p99 response times under peak ingestion traffic.
+`,
+	"enterprise/rds-aurora-resilience-proxy": `# Enterprise Multi-Tenant RDS Aurora Proxy
+
+Connection pool manager and tenant router with AWS RDS Aurora PostgreSQL.
+
+## Architectural Problem Solved
+High concurrency workloads can exhaust PostgreSQL connection limits, causing connection starvation and unpredictable query response times.
+
+## Solution Architecture
+- **RDS Aurora Read Replicas**: Distributes read-heavy traffic across up to 15 Aurora replicas with auto-scaling replica pools.
+- **PgBouncer Connection Pooling**: Keeps connection overhead sub-millisecond and prevents connection thrashing.
+- **Tenant Schema Isolation**: Dynamic schema routing per customer tenant ensuring complete multi-tenant SOC2 data boundaries.
+- **CloudWatch Health Automation**: Monitors replica lag (\`AuroraReplicaLag\`) and disk IOPS, triggering automatic failover if the primary node degrades.
+`,
+	"enterprise/ses-notification-gateway": `# Transactional Email & Notification Gateway (AWS SES)
+
+High-deliverability transactional messaging gateway with real-time feedback loops.
+
+## Architectural Problem Solved
+Email deliverability can be jeopardized by bounced addresses, spam complaints, and ISP throttling, resulting in critical transactional messages failing silently.
+
+## Solution Architecture
+- **AWS SES Configuration Sets**: Dedicated IP pools for transactional vs. marketing communications to protect sender reputation.
+- **SNS Webhook Feedback Loop**: SES publishes bounce, complaint, and delivery events directly to an **Amazon SNS Topic**.
+- **Automated Suppression List**: SQS consumer processes SNS bounce notifications, updating suppression records in PostgreSQL in real-time.
+- **CloudWatch Reputation Metrics**: Composite alarms on \`Reputation.BounceRate\` (> 2.5%) and \`Reputation.ComplaintRate\` (> 0.05%) alert DevOps before ISP penalties occur.
+`,
+	"enterprise/cloudwatch-observability-mesh": `# Unified Observability & Telemetry Mesh (AWS CloudWatch)
+
+Unified observability architecture aggregating metrics, distributed traces, and automated alarms.
+
+## Architectural Problem Solved
+Disparate logs and metrics across dozens of serverless and containerized services make incident detection slow and root cause analysis painful.
+
+## Solution Architecture
+- **Embedded Metric Format (EMF)**: Emits structured JSON logs containing custom business metrics directly to CloudWatch without requiring extra API calls.
+- **Composite Alarms**: Groups multiple metric alarms (e.g., High Latency AND Elevated Error Rate) to reduce notification fatigue and avoid false alarms.
+- **SNS Incident Escalation**: Dispatches critical alerts to on-call engineers with deep links to CloudWatch Log Insights queries.
+`,
+	"enterprise/s3-media-transcoder": `# Event-Driven Media Transcoding Pipeline (AWS S3, SNS, SQS)
+
+Asynchronous asset processing pipeline triggered automatically on media ingestion.
+
+## Architectural Problem Solved
+Processing large media files synchronously during user uploads creates timeouts and starves application HTTP threads.
+
+## Solution Architecture
+- **S3 ObjectCreated Event**: Bucket event notifications publish to an **Amazon SNS Topic** when new raw assets land in the ingress bucket.
+- **SQS Queue Fanout**: Worker queues ingest notifications and scale containerized workers proportionally to queue length.
+- **Derived Asset Storage**: Processed, compressed, and web-optimized assets are uploaded to a public egress bucket with CloudFront CDN distribution.
 `,
 };

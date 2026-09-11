@@ -1,4 +1,11 @@
-import { ArrowRight, BookOpen, Code2, Cpu, FileText, Mail } from "lucide-react";
+import {
+	ArrowRight,
+	BookOpen,
+	BookUser,
+	FileText,
+	GitBranch,
+	Mail,
+} from "lucide-react";
 import Link from "next/link";
 import { HeroSection } from "@/features/hero";
 
@@ -8,16 +15,14 @@ const NAVIGATION_CARDS = [
 		description:
 			"Server-side engineering, cloud infrastructure, and technical background.",
 		href: "/about",
-		icon: Cpu,
-		badge: "BACKGROUND",
+		icon: BookUser,
 	},
 	{
 		title: "02. PROJECTS",
 		description:
 			"Enterprise microservices, command-api, and open-source backend tools.",
 		href: "/projects",
-		icon: Code2,
-		badge: "OPEN SOURCE",
+		icon: GitBranch,
 	},
 	{
 		title: "03. RESUME",
@@ -25,15 +30,13 @@ const NAVIGATION_CARDS = [
 			"Curriculum Vitae synchronized from dedicated repository with PDF download.",
 		href: "/resume",
 		icon: FileText,
-		badge: "SYNCED PDF",
 	},
 	{
 		title: "04. MIGRATION",
 		description:
-			"Architectural evolution benchmarks: Vite to Next.js and Node to .NET.",
+			"Architectural evolution from a legacy Create React App to a modern Next.js application.",
 		href: "/migration",
 		icon: BookOpen,
-		badge: "BENCHMARKS",
 	},
 	{
 		title: "05. CONTACT",
@@ -41,7 +44,6 @@ const NAVIGATION_CARDS = [
 			"Direct communication channels and interactive CLI terminal interface.",
 		href: "/contact",
 		icon: Mail,
-		badge: "CONNECT",
 	},
 ];
 
@@ -56,11 +58,9 @@ export default function Home() {
 				className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-8 font-mono"
 			>
 				<div className="space-y-2 border-l-2 border-zinc-800 pl-6">
-					<div className="text-xs text-zinc-500 font-semibold tracking-wider">
-						[ ARCHITECTURE & SECTIONS ]
-					</div>
+					<div className="text-xs text-zinc-500 font-semibold tracking-wider"></div>
 					<h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-						Explore The Architecture
+						Explore!
 					</h2>
 					<p className="text-zinc-400 max-w-2xl text-sm leading-relaxed">
 						Navigate through dedicated system dossiers covering cloud
@@ -83,15 +83,11 @@ export default function Home() {
 										<div className="flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-900 text-zinc-400 group-hover:border-zinc-600 group-hover:text-white transition-colors">
 											<Icon className="h-5 w-5" />
 										</div>
-										<span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded border border-zinc-800 bg-zinc-900/80 text-zinc-400">
-											{card.badge}
-										</span>
 									</div>
-
 									<div className="space-y-1">
-										<h3 className="font-bold text-white text-base group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+										<h3 className="font-bold text-white text-base group-hover:text-white transition-colors flex items-center justify-between">
 											<span>{card.title}</span>
-											<ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-emerald-400" />
+											<ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-white" />
 										</h3>
 										<p className="text-xs text-zinc-400 leading-relaxed font-sans">
 											{card.description}
@@ -100,8 +96,6 @@ export default function Home() {
 								</div>
 
 								<div className="pt-2 text-[11px] text-zinc-500 font-mono flex items-center gap-1 group-hover:text-zinc-400 transition-colors">
-									<span>OPEN_VIEW</span>
-									<span className="text-emerald-500">→</span>
 									<span className="text-zinc-600">{card.href}</span>
 								</div>
 							</Link>

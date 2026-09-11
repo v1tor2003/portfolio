@@ -9,6 +9,7 @@ export interface ProjectPaginationProps {
 	totalItems: number;
 	itemsPerPage: number;
 	onPageChange: (page: number) => void;
+	className?: string;
 }
 
 export function ProjectPagination({
@@ -17,6 +18,7 @@ export function ProjectPagination({
 	totalItems,
 	itemsPerPage,
 	onPageChange,
+	className,
 }: ProjectPaginationProps) {
 	if (totalPages <= 1) return null;
 
@@ -24,16 +26,16 @@ export function ProjectPagination({
 	const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
 	return (
-		<div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-zinc-800/80 font-mono">
+		<div
+			className={cn(
+				"flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-zinc-800/80 font-mono",
+				className,
+			)}
+		>
 			{/* Metadata line */}
 			<div className="text-xs text-zinc-500 flex items-center gap-2">
-				<span className="text-emerald-500/80">{"//"}</span>
 				<span>
 					SHOWING {startItem}–{endItem} OF {totalItems} REPOSITORIES
-				</span>
-				<span className="text-zinc-700">|</span>
-				<span className="text-zinc-400">
-					PAGE {currentPage} OF {totalPages}
 				</span>
 			</div>
 

@@ -17,9 +17,6 @@ describe("ContactSection Component", () => {
 	it("renders both channels and interactive terminal transmitter subcomponents", () => {
 		render(<ContactSection />);
 
-		expect(
-			screen.getByText("[ DIRECT_COMMUNICATION_CHANNELS ]"),
-		).toBeInTheDocument();
 		expect(screen.getByText(/SYSTEM TERMINAL OS/i)).toBeInTheDocument();
 		expect(screen.getByText("root@vitor-server:~#")).toBeInTheDocument();
 		expect(screen.getByLabelText("Terminal Input")).toBeInTheDocument();
