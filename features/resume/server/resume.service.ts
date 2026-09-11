@@ -57,7 +57,7 @@ function defaultCreateGitHubClient(): ApiClient {
 
 export class ResumeService implements IResumeService {
 	private readonly client: ApiClient;
-	private readonly readFallback: () => Buffer;
+	private readonly readFallback: (locale?: ResumeLocale) => Buffer;
 	private readonly token?: string;
 	private readonly owner: string;
 	private readonly repo: string;
