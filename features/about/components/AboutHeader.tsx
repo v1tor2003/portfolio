@@ -1,10 +1,10 @@
-import { User } from "lucide-react";
+import { BookUser } from "lucide-react";
 
 export function AboutHeader() {
 	return (
 		<div className="space-y-6 border-l-2 border-zinc-800 pl-6 font-mono">
 			<div className="flex items-center space-x-2 text-zinc-500 text-sm">
-				<User className="h-4 w-4" />
+				<BookUser className="h-4 w-4" />
 				<span>01. ABOUT ME</span>
 			</div>
 

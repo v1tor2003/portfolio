@@ -12,7 +12,7 @@ export function ProjectsSkeleton() {
 			<div className="space-y-4 border-l-2 border-zinc-800 pl-6">
 				<div className="flex items-center space-x-2 text-zinc-500 text-sm">
 					<GitBranch className="h-4 w-4 text-zinc-600" />
-					<span>02. FEATURED PROJECTS</span>
+					<span>02. PROJECTS</span>
 				</div>
 				<div className="h-9 sm:h-10 bg-zinc-800/80 rounded w-3/4 max-w-md" />
 				<div className="space-y-2">

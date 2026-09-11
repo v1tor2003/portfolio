@@ -7,7 +7,7 @@ describe("ProjectsSkeleton Component", () => {
 		render(<ProjectsSkeleton />);
 
 		expect(screen.getByLabelText(/loading projects/i)).toBeInTheDocument();
-		expect(screen.getByText(/02\. FEATURED PROJECTS/i)).toBeInTheDocument();
+		expect(screen.getByText(/02\. PROJECTS/i)).toBeInTheDocument();
 		expect(screen.getByText(/SYNCHRONIZING/i)).toBeInTheDocument();
 	});
 });
