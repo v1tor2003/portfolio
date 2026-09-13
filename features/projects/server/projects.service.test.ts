@@ -1,9 +1,35 @@
 import { describe, expect, it, vi } from "vitest";
+import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
+import { GitHubService } from "@/lib/github/github.service";
+import { GitActivityService } from "./git-activity.service";
+import { ProjectsCatalogService } from "./projects-catalog.service";
 import { ProjectsService } from "./projects.service";
+import type { IProjectsService } from "./projects.service.interface";
+
+function createTestProjectsService(options?: {
+	token?: string;
+	workToken?: string;
+}): IProjectsService {
+	const gitHubService = new GitHubService({
+		token: options?.token,
+		workToken: options?.workToken,
+	});
+	const catalogService = new ProjectsCatalogService(gitHubService);
+	const activityService = new GitActivityService(gitHubService);
+	return new ProjectsService(catalogService, activityService);
+}
 
 describe("ProjectsService", () => {
+	it("resolves from DI container cleanly", () => {
+		const service = resolveService<IProjectsService>(DI_TYPES.IProjectsService);
+		expect(service).toBeDefined();
+		expect(typeof service.getProjects).toBe("function");
+		expect(typeof service.getGitActivity).toBe("function");
+	});
+
 	it("returns fallback personal and work projects when github client is not provided or fails", async () => {
-		const service = new ProjectsService({
+		const service = createTestProjectsService({
 			token: undefined,
 		});
 
@@ -17,7 +43,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("returns git activity data with personal and work activity days", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const activity = await service.getGitActivity();
 
 		expect(activity.days.length).toBeGreaterThanOrEqual(100);
@@ -26,7 +52,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("fetches readme from remote or falls back to simulated/cached readme", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const readme = await service.getReadme("v1tor2003", "command-api");
 
 		expect(readme).toBeDefined();
@@ -35,7 +61,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("returns paginated projects with correct metadata and bounds", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const page1 = await service.getPaginatedProjects({
 			category: "personal",
 			page: 1,
@@ -63,7 +89,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("prioritizes and sorts pinned repositories first", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const projects = await service.getProjects("personal");
 
 		expect(projects.length).toBeGreaterThan(0);
@@ -112,7 +138,7 @@ describe("ProjectsService", () => {
 		});
 
 		try {
-			const service = new ProjectsService({
+			const service = createTestProjectsService({
 				workToken: "mock-work-token",
 			});
 			const activity = await service.getGitActivity();
@@ -126,7 +152,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("returns realistic AWS, NestJS, and .NET architecture mock projects for work category", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const workProjects = await service.getProjects("work");
 
 		// Exactly 9 projects so they fit on a single page without pagination
@@ -146,7 +172,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("retrieves architecture README documentation for enterprise projects", async () => {
-		const service = new ProjectsService();
+		const service = createTestProjectsService();
 		const readme = await service.getReadme("enterprise", "event-mesh-sqs-sns");
 		const nestReadme = await service.getReadme(
 			"enterprise",
@@ -170,7 +196,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("incorporates historical enterprise activity as a static initial baseline", async () => {
-		const service = new ProjectsService({
+		const service = createTestProjectsService({
 			token: undefined,
 			workToken: undefined,
 		});

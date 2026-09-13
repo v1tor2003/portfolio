@@ -9,6 +9,11 @@ export const DI_TYPES = {
 	IEmailService: Symbol.for("IEmailService"),
 	IRateLimiter: Symbol.for("IRateLimiter"),
 	IGitHubService: Symbol.for("IGitHubService"),
+	IGitActivityService: Symbol.for("IGitActivityService"),
+	IProjectsCatalogService: Symbol.for("IProjectsCatalogService"),
+	GitHubApiClient: Symbol.for("GitHubApiClient"),
+	GitHubContributionsApiClient: Symbol.for("GitHubContributionsApiClient"),
+	ResendApiClient: Symbol.for("ResendApiClient"),
 } as const;
 
 export type DiTypes = typeof DI_TYPES;

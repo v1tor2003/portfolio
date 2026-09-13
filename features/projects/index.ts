@@ -12,4 +12,11 @@ export {
 	type PaginatedProjectsResult,
 	ProjectsService,
 } from "./server/projects.service";
+export * from "./server/commands/get-git-activity/get-git-activity.command";
+export * from "./server/commands/get-pinned-projects/get-pinned-projects.command";
+export * from "./server/commands/get-project-readme/get-project-readme.command";
+export * from "./server/git-activity.service";
+export * from "./server/git-activity.service.interface";
+export * from "./server/projects-catalog.service";
+export * from "./server/projects-catalog.service.interface";
 export * from "./server/projects.service.interface";

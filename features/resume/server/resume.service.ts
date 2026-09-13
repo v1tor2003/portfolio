@@ -3,7 +3,6 @@ import path from "node:path";
 import { inject, injectable } from "inversify";
 import { env } from "@/lib/env";
 import { DI_TYPES } from "@/lib/di/types";
-import { GitHubService } from "@/lib/github/github.service";
 import type { IGitHubService } from "@/lib/github/github.service.interface";
 import type {
 	IResumeService,
@@ -13,13 +12,6 @@ import type {
 
 export type { IResumeService, ResumeFileResult, ResumeLocale };
 
-export interface ResumeServiceDependencies {
-	gitHubService?: IGitHubService;
-	readFallback?: (locale?: ResumeLocale) => Buffer;
-	owner?: string;
-	repo?: string;
-	filePath?: string;
-}
 
 function defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
 	const specificPath = path.join(
@@ -42,34 +34,35 @@ function defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
 
 @injectable()
 export class ResumeService implements IResumeService {
-	private readonly gitHubService: IGitHubService;
-	private readonly readFallback: (locale?: ResumeLocale) => Buffer;
-	private readonly owner: string;
-	private readonly repo: string;
-	private readonly filePath: string;
-
 	constructor(
 		@inject(DI_TYPES.IGitHubService)
-		gitHubServiceOrDeps?: IGitHubService | ResumeServiceDependencies,
-		maybeDeps?: ResumeServiceDependencies,
+		private readonly gitHubService: IGitHubService,
+		readFallbackOrDeps?:
+			| ((locale?: ResumeLocale) => Buffer)
+			| {
+					readFallback?: (locale?: ResumeLocale) => Buffer;
+					owner?: string;
+					repo?: string;
+					filePath?: string;
+			  },
+		private readonly owner: string = env.RESUME_REPO_OWNER,
+		private readonly repo: string = env.RESUME_REPO_NAME,
+		private readonly filePath: string = env.RESUME_FILE_PATH,
 	) {
-		let gitHubService: IGitHubService | undefined;
-		let deps: ResumeServiceDependencies | undefined;
-
-		if (gitHubServiceOrDeps && "getFile" in gitHubServiceOrDeps) {
-			gitHubService = gitHubServiceOrDeps as IGitHubService;
-			deps = maybeDeps;
+		if (typeof readFallbackOrDeps === "function") {
+			this.readFallback = readFallbackOrDeps;
+		} else if (readFallbackOrDeps && typeof readFallbackOrDeps === "object") {
+			this.readFallback =
+				readFallbackOrDeps.readFallback ?? defaultReadFallbackFile;
+			if (readFallbackOrDeps.owner) this.owner = readFallbackOrDeps.owner;
+			if (readFallbackOrDeps.repo) this.repo = readFallbackOrDeps.repo;
+			if (readFallbackOrDeps.filePath)
+				this.filePath = readFallbackOrDeps.filePath;
 		} else {
-			deps = gitHubServiceOrDeps as ResumeServiceDependencies;
+			this.readFallback = defaultReadFallbackFile;
 		}
-
-		this.gitHubService =
-			deps?.gitHubService ?? gitHubService ?? new GitHubService();
-		this.readFallback = deps?.readFallback ?? defaultReadFallbackFile;
-		this.owner = deps?.owner ?? env.RESUME_REPO_OWNER;
-		this.repo = deps?.repo ?? env.RESUME_REPO_NAME;
-		this.filePath = deps?.filePath ?? env.RESUME_FILE_PATH;
 	}
+	private readonly readFallback: (locale?: ResumeLocale) => Buffer;
 
 	async getResume(locale: ResumeLocale = "en"): Promise<ResumeFileResult> {
 		const targetFileName = `vitor-pires-resume-${locale}.pdf`;

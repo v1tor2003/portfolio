@@ -1,11 +1,11 @@
 import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
 import { injectable } from "inversify";
 import { env } from "@/lib/env";
-import { GetGitActivityCommand } from "@/features/projects/server/get-git-activity.command";
-import { GetPinnedProjectsCommand } from "@/features/projects/server/get-pinned-projects.command";
-import { GetProjectReadmeCommand } from "@/features/projects/server/get-project-readme.command";
+import { GetGitActivityCommand } from "@/features/projects/server/commands/get-git-activity/get-git-activity.command";
+import { GetPinnedProjectsCommand } from "@/features/projects/server/commands/get-pinned-projects/get-pinned-projects.command";
+import { GetProjectReadmeCommand } from "@/features/projects/server/commands/get-project-readme/get-project-readme.command";
 import { HISTORICAL_WORK_CONTRIBUTIONS } from "@/features/projects/server/projects-seed.data";
-import { FetchResumeCommand } from "@/features/resume/server/fetch-resume.command";
+import { FetchResumeCommand } from "@/features/resume/server/commands/fetch-resume/fetch-resume.command";
 import type {
 	GitHubContributionDay,
 	GitHubRepository,
@@ -56,9 +56,8 @@ export class GitHubService implements IGitHubService {
 			deps?.contributionsClient ?? defaultCreateContributionsClient();
 		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
 		this.workToken = deps?.workToken ?? env.GITHUB_WORK_TOKEN;
-		this.username = deps?.username ?? "v1tor2003";
-		this.workUsername =
-			deps?.workUsername ?? env.GITHUB_WORK_USERNAME ?? "vitor-pires_tecnosul";
+		this.username = deps?.username ?? env.RESUME_REPO_OWNER;
+		this.workUsername = deps?.workUsername ?? env.GITHUB_WORK_USERNAME;
 	}
 
 	async getPinnedRepositories(

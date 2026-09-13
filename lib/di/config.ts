@@ -1,11 +1,19 @@
 import "reflect-metadata";
+import { ApiClient, FetchTransport } from "@v1tor2003/command-api";
 import { Container } from "inversify";
 import { DI_TYPES } from "./types";
+import { env } from "@/lib/env";
 
 import type { IEmailService, IRateLimiter } from "@/features/contact";
 import { InMemoryRateLimiter } from "@/features/contact/server/rate-limiter";
 import { ResendEmailService } from "@/features/contact/server/resend-email.service";
-import type { IProjectsService } from "@/features/projects";
+import type {
+	IGitActivityService,
+	IProjectsCatalogService,
+	IProjectsService,
+} from "@/features/projects";
+import { GitActivityService } from "@/features/projects/server/git-activity.service";
+import { ProjectsCatalogService } from "@/features/projects/server/projects-catalog.service";
 import { ProjectsService } from "@/features/projects/server/projects.service";
 import type { IResumeService } from "@/features/resume";
 import { ResumeService } from "@/features/resume/server/resume.service";
@@ -14,9 +22,82 @@ import { GitHubService } from "@/lib/github/github.service";
 
 const container = new Container();
 
+// --- API Clients ---
+container
+	.bind<ApiClient>(DI_TYPES.GitHubApiClient)
+	.toDynamicValue(
+		() =>
+			new ApiClient({
+				transport: new FetchTransport({
+					baseUrl: "https://api.github.com",
+					headers: {
+						Accept: "application/vnd.github.v3+json",
+						"User-Agent": "vitor-portfolio-app",
+					},
+				}),
+			}),
+	)
+	.inSingletonScope();
+
+container
+	.bind<ApiClient>(DI_TYPES.GitHubContributionsApiClient)
+	.toDynamicValue(
+		() =>
+			new ApiClient({
+				transport: new FetchTransport({
+					baseUrl: "https://github-contributions-api.jogruber.de",
+				}),
+			}),
+	)
+	.inSingletonScope();
+
+container
+	.bind<ApiClient>(DI_TYPES.ResendApiClient)
+	.toDynamicValue(
+		() =>
+			new ApiClient({
+				transport: new FetchTransport({
+					baseUrl: "https://api.resend.com",
+					headers: {
+						Authorization: `Bearer ${env.RESEND_API_KEY}`,
+					},
+				}),
+				logging: env.RESEND_API_LOGGING ?? true,
+			}),
+	);
+
+// --- Infrastructure & Domain Services ---
 container
 	.bind<IGitHubService>(DI_TYPES.IGitHubService)
-	.toDynamicValue(() => new GitHubService())
+	.toDynamicValue(
+		() =>
+			new GitHubService({
+				client: container.get<ApiClient>(DI_TYPES.GitHubApiClient),
+				contributionsClient: container.get<ApiClient>(
+					DI_TYPES.GitHubContributionsApiClient,
+				),
+			}),
+	)
+	.inSingletonScope();
+
+container
+	.bind<IProjectsCatalogService>(DI_TYPES.IProjectsCatalogService)
+	.toDynamicValue(
+		() =>
+			new ProjectsCatalogService(
+				container.get<IGitHubService>(DI_TYPES.IGitHubService),
+			),
+	)
+	.inSingletonScope();
+
+container
+	.bind<IGitActivityService>(DI_TYPES.IGitActivityService)
+	.toDynamicValue(
+		() =>
+			new GitActivityService(
+				container.get<IGitHubService>(DI_TYPES.IGitHubService),
+			),
+	)
 	.inSingletonScope();
 
 container
@@ -24,7 +105,8 @@ container
 	.toDynamicValue(
 		() =>
 			new ProjectsService(
-				container.get<IGitHubService>(DI_TYPES.IGitHubService),
+				container.get<IProjectsCatalogService>(DI_TYPES.IProjectsCatalogService),
+				container.get<IGitActivityService>(DI_TYPES.IGitActivityService),
 			),
 	)
 	.inSingletonScope();
@@ -41,7 +123,12 @@ container
 
 container
 	.bind<IEmailService>(DI_TYPES.IEmailService)
-	.toDynamicValue(() => new ResendEmailService())
+	.toDynamicValue(
+		() =>
+			new ResendEmailService(
+				() => container.get<ApiClient>(DI_TYPES.ResendApiClient),
+			),
+	)
 	.inSingletonScope();
 
 container

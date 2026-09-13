@@ -88,9 +88,15 @@ export class ResendEmailService implements IEmailService {
 	private readonly getClient: () => ApiClient;
 
 	constructor(
-		clientProvider: () => ApiClient = () => ResendClientFactory.getInstance(),
+		clientOrProvider?: ApiClient | (() => ApiClient),
 	) {
-		this.getClient = clientProvider;
+		if (typeof clientOrProvider === "function") {
+			this.getClient = clientOrProvider;
+		} else if (clientOrProvider) {
+			this.getClient = () => clientOrProvider;
+		} else {
+			this.getClient = () => ResendClientFactory.getInstance();
+		}
 	}
 
 	async send(data: ContactFormData): Promise<EmailDispatchResult> {
