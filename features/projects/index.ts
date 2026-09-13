@@ -11,12 +11,12 @@ export {
 	type PaginatedProjectsOptions,
 	type PaginatedProjectsResult,
 	ProjectsService,
-} from "./server/projects.service";
+} from "./server/services/projects.service";
 export * from "./server/commands/get-git-activity/get-git-activity.command";
 export * from "./server/commands/get-pinned-projects/get-pinned-projects.command";
 export * from "./server/commands/get-project-readme/get-project-readme.command";
-export * from "./server/git-activity.service";
-export * from "./server/git-activity.service.interface";
-export * from "./server/projects-catalog.service";
-export * from "./server/projects-catalog.service.interface";
-export * from "./server/projects.service.interface";
+export * from "./server/services/git-activity.service";
+export * from "./server/services/git-activity.service.interface";
+export * from "./server/services/projects-catalog.service";
+export * from "./server/services/projects-catalog.service.interface";
+export * from "./server/services/projects.service.interface";

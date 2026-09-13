@@ -4,7 +4,7 @@ import type {
 	GitActivityData,
 	Project,
 	ProjectCategory,
-} from "../schemas/project.schema";
+} from "../../schemas/project.schema";
 import type {
 	IProjectsService,
 	PaginatedProjectsOptions,

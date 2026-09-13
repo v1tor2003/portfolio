@@ -143,7 +143,9 @@ describe("ProjectsService", () => {
 			});
 			const activity = await service.getGitActivity();
 			expect(activity.totalWork).toBeGreaterThan(0);
-			const targetDay = activity.days.find((d) => d.date === "2026-08-05");
+			const targetDay = activity.days.find(
+				(d: { date: string; count: number }) => d.date === "2026-08-05",
+			);
 			expect(targetDay).toBeDefined();
 			expect(targetDay?.count).toBeGreaterThanOrEqual(16);
 		} finally {
@@ -203,8 +205,12 @@ describe("ProjectsService", () => {
 		const activity = await service.getGitActivity();
 
 		// Check for presence of verified historical dates from the 2025-2026 enterprise records
-		const novCommit = activity.days.find((d) => d.date === "2025-11-04");
-		const julCommit = activity.days.find((d) => d.date === "2026-07-01");
+		const novCommit = activity.days.find(
+			(d: { date: string; count: number }) => d.date === "2025-11-04",
+		);
+		const julCommit = activity.days.find(
+			(d: { date: string; count: number }) => d.date === "2026-07-01",
+		);
 
 		expect(novCommit).toBeDefined();
 		expect(novCommit?.count).toBeGreaterThanOrEqual(1);

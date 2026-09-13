@@ -7,12 +7,12 @@ import type {
 import type {
 	Project,
 	ProjectCategory,
-} from "../schemas/project.schema";
+} from "../../schemas/project.schema";
 import {
 	FALLBACK_READMES,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
-} from "./projects-seed.data";
+} from "../../data/projects-seed.data";
 import type {
 	PaginatedProjectsOptions,
 	PaginatedProjectsResult,

@@ -4,7 +4,10 @@ import { env } from "@/lib/env";
 import { GetGitActivityCommand } from "@/features/projects/server/commands/get-git-activity/get-git-activity.command";
 import { GetPinnedProjectsCommand } from "@/features/projects/server/commands/get-pinned-projects/get-pinned-projects.command";
 import { GetProjectReadmeCommand } from "@/features/projects/server/commands/get-project-readme/get-project-readme.command";
-import { HISTORICAL_WORK_CONTRIBUTIONS } from "@/features/projects/server/projects-seed.data";
+import {
+	FALLBACK_READMES,
+	HISTORICAL_WORK_CONTRIBUTIONS,
+} from "@/features/projects/data/projects-seed.data";
 import { FetchResumeCommand } from "@/features/resume/server/commands/fetch-resume/fetch-resume.command";
 import type {
 	GitHubContributionDay,
@@ -133,7 +136,11 @@ export class GitHubService implements IGitHubService {
 			}
 		}
 
-		return `# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`;
+		return (
+			HISTORICAL_WORK_CONTRIBUTIONS &&
+			(FALLBACK_READMES[`${owner}/${repo}`] ||
+				`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`)
+		);
 	}
 
 	async getFile(

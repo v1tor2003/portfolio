@@ -6,8 +6,8 @@ import {
 } from "@v1tor2003/command-api";
 import { injectable } from "inversify";
 import { env } from "@/lib/env";
-import type { ContactFormData } from "../schemas/contact.schema";
-import { buildContactEmailHtml, buildContactEmailText } from "./email-template";
+import type { ContactFormData } from "../../schemas/contact.schema";
+import { buildContactEmailHtml, buildContactEmailText } from "../templates/email-template";
 
 import type {
 	EmailDispatchResult,

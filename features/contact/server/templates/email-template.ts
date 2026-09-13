@@ -1,4 +1,4 @@
-import type { ContactFormData } from "../schemas/contact.schema";
+import type { ContactFormData } from "../../schemas/contact.schema";
 
 function escapeHtml(unsafe: string): string {
 	return unsafe

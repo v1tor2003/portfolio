@@ -3,11 +3,11 @@ import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTerminal } from "./useTerminal";
 
-vi.mock("../../server/send-contact-email", () => ({
+vi.mock("../../server/actions/send-contact-email", () => ({
 	sendContactEmail: vi.fn(),
 }));
 
-import { sendContactEmail } from "../../server/send-contact-email";
+import { sendContactEmail } from "../../server/actions/send-contact-email";
 
 describe("useTerminal hook", () => {
 	beforeEach(() => {

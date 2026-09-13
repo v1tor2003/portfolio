@@ -12,7 +12,7 @@ import {
 	generateGitActivityData,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
-} from "../server/projects-seed.data";
+} from "../data/projects-seed.data";
 import { GitActivityGraph } from "./GitActivityGraph";
 import { ProjectGrid } from "./ProjectGrid";
 import { ProjectReadmeModal } from "./ProjectReadmeModal";

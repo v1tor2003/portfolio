@@ -5,18 +5,18 @@ import { DI_TYPES } from "./types";
 import { env } from "@/lib/env";
 
 import type { IEmailService, IRateLimiter } from "@/features/contact";
-import { InMemoryRateLimiter } from "@/features/contact/server/rate-limiter";
-import { ResendEmailService } from "@/features/contact/server/resend-email.service";
+import { InMemoryRateLimiter } from "@/features/contact/server/services/rate-limiter";
+import { ResendEmailService } from "@/features/contact/server/services/resend-email.service";
 import type {
 	IGitActivityService,
 	IProjectsCatalogService,
 	IProjectsService,
 } from "@/features/projects";
-import { GitActivityService } from "@/features/projects/server/git-activity.service";
-import { ProjectsCatalogService } from "@/features/projects/server/projects-catalog.service";
-import { ProjectsService } from "@/features/projects/server/projects.service";
+import { GitActivityService } from "@/features/projects/server/services/git-activity.service";
+import { ProjectsCatalogService } from "@/features/projects/server/services/projects-catalog.service";
+import { ProjectsService } from "@/features/projects/server/services/projects.service";
 import type { IResumeService } from "@/features/resume";
-import { ResumeService } from "@/features/resume/server/resume.service";
+import { ResumeService } from "@/features/resume/server/services/resume.service";
 import type { IGitHubService } from "@/lib/github";
 import { GitHubService } from "@/lib/github/github.service";
 

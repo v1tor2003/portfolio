@@ -4,7 +4,7 @@ import type {
 	IResumeService,
 	ResumeFileResult,
 	ResumeLocale,
-} from "../../resume.service.interface";
+} from "../../services/resume.service.interface";
 
 export async function getResume(
 	locale?: ResumeLocale,

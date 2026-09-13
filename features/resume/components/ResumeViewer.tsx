@@ -2,7 +2,7 @@
 
 import { Eye, FileText, X } from "lucide-react";
 import { useState } from "react";
-import type { ResumeLocale } from "../server/resume.service";
+import type { ResumeLocale } from "../server/services/resume.service";
 import { ResumeDownloadButton } from "./ResumeDownloadButton";
 import { ResumeOpenExternalButton } from "./ResumeOpenExternalButton";
 

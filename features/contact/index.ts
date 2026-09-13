@@ -10,7 +10,6 @@ export { useTerminal } from "./components/terminal/useTerminal";
 export * from "./data/contact-links";
 export { useEmailSender } from "./hooks/useEmailSender";
 export * from "./schemas/contact.schema";
-export * from "./server/send-contact-email";
-export * from "./server/email.service.interface";
-export * from "./server/rate-limiter.interface";
-
+export * from "./server/actions/send-contact-email";
+export * from "./server/services/email.service.interface";
+export * from "./server/services/rate-limiter.interface";

@@ -2,7 +2,7 @@ import type {
 	GitActivityData,
 	Project,
 	ProjectCategory,
-} from "../schemas/project.schema";
+} from "../../schemas/project.schema";
 
 export interface PaginatedProjectsResult {
 	projects: Project[];

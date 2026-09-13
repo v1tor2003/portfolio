@@ -13,8 +13,8 @@ vi.mock("@/lib/env", () => ({
 import { env } from "@/lib/env";
 import { DI_TYPES } from "@/lib/di/types";
 import { resolveService } from "@/lib/di/config";
-import type { IRateLimiter } from "./rate-limiter.interface";
-import { ResendClientFactory } from "./resend-email.service";
+import type { IRateLimiter } from "../services/rate-limiter.interface";
+import { ResendClientFactory } from "../services/resend-email.service";
 import { sendContactEmail } from "./send-contact-email";
 
 describe("sendContactEmail Server Action", () => {

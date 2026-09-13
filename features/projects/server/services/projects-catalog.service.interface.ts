@@ -1,7 +1,7 @@
 import type {
 	Project,
 	ProjectCategory,
-} from "../schemas/project.schema";
+} from "../../schemas/project.schema";
 import type {
 	PaginatedProjectsOptions,
 	PaginatedProjectsResult,
