@@ -11,3 +11,6 @@ export * from "./data/contact-links";
 export { useEmailSender } from "./hooks/useEmailSender";
 export * from "./schemas/contact.schema";
 export * from "./server/send-contact-email";
+export * from "./server/email.service.interface";
+export * from "./server/rate-limiter.interface";
+

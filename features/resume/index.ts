@@ -5,3 +5,5 @@ export { ResumeViewer } from "./components/ResumeViewer";
 export * from "./server/fetch-resume.command";
 export * from "./server/get-resume";
 export * from "./server/resume.service";
+export * from "./server/resume.service.interface";
+

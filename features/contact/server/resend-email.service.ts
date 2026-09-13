@@ -8,13 +8,12 @@ import { env } from "@/lib/env";
 import type { ContactFormData } from "../schemas/contact.schema";
 import { buildContactEmailHtml, buildContactEmailText } from "./email-template";
 
-export type EmailDispatchResult =
-	| { success: true; simulated?: boolean; messageId?: string }
-	| { success: false; error: string; details?: unknown };
+import type {
+	EmailDispatchResult,
+	IEmailService,
+} from "./email.service.interface";
 
-export interface IEmailService {
-	send(data: ContactFormData): Promise<EmailDispatchResult>;
-}
+export type { EmailDispatchResult, IEmailService };
 
 export interface SendResendEmailInput {
 	from: string;

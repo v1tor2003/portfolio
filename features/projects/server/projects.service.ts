@@ -17,24 +17,17 @@ import {
 	SEED_WORK_PROJECTS,
 } from "./projects-seed.data";
 
-export interface PaginatedProjectsResult {
-	projects: Project[];
-	total: number;
-	page: number;
-	limit: number;
-	totalPages: number;
-}
+import type {
+	IProjectsService,
+	PaginatedProjectsOptions,
+	PaginatedProjectsResult,
+} from "./projects.service.interface";
 
-export interface IProjectsService {
-	getProjects(category?: ProjectCategory): Promise<Project[]>;
-	getPaginatedProjects(options?: {
-		category?: ProjectCategory;
-		page?: number;
-		limit?: number;
-	}): Promise<PaginatedProjectsResult>;
-	getGitActivity(): Promise<GitActivityData>;
-	getReadme(owner: string, repo: string): Promise<string>;
-}
+export type {
+	IProjectsService,
+	PaginatedProjectsOptions,
+	PaginatedProjectsResult,
+};
 
 export interface ProjectsServiceDependencies {
 	client?: ApiClient;

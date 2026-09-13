@@ -4,20 +4,13 @@ import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
 import { env } from "@/lib/env";
 import { FetchResumeCommand } from "./fetch-resume.command";
 
-export type ResumeLocale = "en" | "pt-BR";
+import type {
+	IResumeService,
+	ResumeFileResult,
+	ResumeLocale,
+} from "./resume.service.interface";
 
-export interface ResumeFileResult {
-	buffer: Buffer;
-	fileName: string;
-	contentType: string;
-	size: number;
-	isFallback: boolean;
-	source: "remote" | "local-fallback";
-}
-
-export interface IResumeService {
-	getResume(locale?: ResumeLocale): Promise<ResumeFileResult>;
-}
+export type { IResumeService, ResumeFileResult, ResumeLocale };
 
 export interface ResumeServiceDependencies {
 	client?: ApiClient;

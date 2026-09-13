@@ -1,11 +1,9 @@
-export interface RateLimiterOptions {
-	windowMs: number;
-	maxRequests: number;
-}
+import type {
+	IRateLimiter,
+	RateLimiterOptions,
+} from "./rate-limiter.interface";
 
-export interface IRateLimiter {
-	isRateLimited(key: string): boolean;
-}
+export type { IRateLimiter, RateLimiterOptions };
 
 interface RateLimitEntry {
 	count: number;
