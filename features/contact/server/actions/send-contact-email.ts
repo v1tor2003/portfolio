@@ -1,10 +1,13 @@
 "use server";
 
 import { z } from "zod";
-import { type ContactFormData, contactSchema } from "../../schemas/contact.schema";
-import { DI_TYPES } from "@/lib/di/types";
 import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 import type { IEmailService, IRateLimiter } from "../../index";
+import {
+	type ContactFormData,
+	contactSchema,
+} from "../../schemas/contact.schema";
 
 export interface ContactActionResult {
 	success: boolean;

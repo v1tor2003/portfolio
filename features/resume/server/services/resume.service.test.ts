@@ -18,9 +18,7 @@ describe("ResumeService", () => {
 
 		const service: IResumeService = new ResumeService(
 			mockGitHubService as unknown as IGitHubService,
-			{
-				readFallback: () => mockFallbackBuffer,
-			},
+			() => mockFallbackBuffer,
 		);
 
 		const result = await service.getResume();
@@ -42,9 +40,7 @@ describe("ResumeService", () => {
 
 		const service: IResumeService = new ResumeService(
 			mockGitHubService as unknown as IGitHubService,
-			{
-				readFallback: () => mockFallbackBuffer,
-			},
+			() => mockFallbackBuffer,
 		);
 
 		const result = await service.getResume();
@@ -61,9 +57,7 @@ describe("ResumeService", () => {
 
 		const service: IResumeService = new ResumeService(
 			mockGitHubService as unknown as IGitHubService,
-			{
-				readFallback: () => mockFallbackBuffer,
-			},
+			() => mockFallbackBuffer,
 		);
 
 		const result = await service.getResume();
@@ -79,9 +73,7 @@ describe("ResumeService", () => {
 
 		const service: IResumeService = new ResumeService(
 			mockGitHubService as unknown as IGitHubService,
-			{
-				readFallback: () => mockFallbackBuffer,
-			},
+			() => mockFallbackBuffer,
 		);
 
 		const result = await service.getResume("pt-BR");

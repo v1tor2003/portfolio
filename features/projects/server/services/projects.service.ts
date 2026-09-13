@@ -5,12 +5,12 @@ import type {
 	Project,
 	ProjectCategory,
 } from "../../schemas/project.schema";
+import type { IGitActivityService } from "./git-activity.service.interface";
 import type {
 	IProjectsService,
 	PaginatedProjectsOptions,
 	PaginatedProjectsResult,
 } from "./projects.service.interface";
-import type { IGitActivityService } from "./git-activity.service.interface";
 import type { IProjectsCatalogService } from "./projects-catalog.service.interface";
 
 export type {

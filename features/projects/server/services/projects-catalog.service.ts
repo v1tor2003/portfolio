@@ -1,23 +1,21 @@
 import { inject, injectable } from "inversify";
 import { DI_TYPES } from "@/lib/di/types";
-import type { IGitHubService } from "@/lib/github/github.service.interface";
-import type {
-	GitHubRepository,
-} from "@/lib/github/github.service.interface";
-import type {
-	Project,
-	ProjectCategory,
-} from "../../schemas/project.schema";
+import { env } from "@/lib/env";
+import type { 
+	GitHubRepository,IGitHubService, } from "@/lib/github/github.service.interface";
 import {
 	FALLBACK_READMES,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
 } from "../../data/projects-seed.data";
 import type {
+	Project,
+	ProjectCategory,
+} from "../../schemas/project.schema";
+import type {
 	PaginatedProjectsOptions,
 	PaginatedProjectsResult,
 } from "./projects.service.interface";
-import { env } from "@/lib/env";
 import type { IProjectsCatalogService } from "./projects-catalog.service.interface";
 
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutes

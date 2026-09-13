@@ -37,7 +37,7 @@ export class InMemoryRateLimiter implements IRateLimiter {
 		}
 
 		if (entry.count >= this.maxRequests) return true;
-	
+
 		entry.count += 1;
 		return false;
 	}

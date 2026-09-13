@@ -3,16 +3,16 @@
 import { ExternalLink, GitBranch } from "lucide-react";
 import { useMemo, useState } from "react";
 import { GithubIcon } from "@/components/ui/icons";
-import type {
-	GitActivityData,
-	Project,
-	ProjectCategory,
-} from "../schemas/project.schema";
 import {
 	generateGitActivityData,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
 } from "../data/projects-seed.data";
+import type {
+	GitActivityData,
+	Project,
+	ProjectCategory,
+} from "../schemas/project.schema";
 import { GitActivityGraph } from "./GitActivityGraph";
 import { ProjectGrid } from "./ProjectGrid";
 import { ProjectReadmeModal } from "./ProjectReadmeModal";

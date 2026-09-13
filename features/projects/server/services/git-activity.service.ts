@@ -2,8 +2,8 @@ import { inject, injectable } from "inversify";
 import { DI_TYPES } from "@/lib/di/types";
 import { env } from "@/lib/env";
 import type { IGitHubService } from "@/lib/github/github.service.interface";
-import type { GitActivityData, GitActivityDay } from "../../schemas/project.schema";
 import { generateGitActivityData } from "../../data/projects-seed.data";
+import type { GitActivityData, GitActivityDay } from "../../schemas/project.schema";
 import type { IGitActivityService } from "./git-activity.service.interface";
 
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutes

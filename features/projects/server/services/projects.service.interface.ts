@@ -26,4 +26,3 @@ export interface IProjectsService {
 	getGitActivity(): Promise<GitActivityData>;
 	getReadme(owner: string, repo: string): Promise<string>;
 }
-

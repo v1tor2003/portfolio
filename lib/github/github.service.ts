@@ -1,14 +1,21 @@
 import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
 import { injectable } from "inversify";
-import { env } from "@/lib/env";
-import { GetGitActivityCommand } from "@/features/projects/server/commands/get-git-activity/get-git-activity.command";
-import { GetPinnedProjectsCommand } from "@/features/projects/server/commands/get-pinned-projects/get-pinned-projects.command";
-import { GetProjectReadmeCommand } from "@/features/projects/server/commands/get-project-readme/get-project-readme.command";
 import {
 	FALLBACK_READMES,
 	HISTORICAL_WORK_CONTRIBUTIONS,
 } from "@/features/projects/data/projects-seed.data";
+import { GetGitActivityCommand } from "@/features/projects/server/commands/get-git-activity/get-git-activity.command";
+import { GetPinnedProjectsCommand } from "@/features/projects/server/commands/get-pinned-projects/get-pinned-projects.command";
+import { GetProjectReadmeCommand } from "@/features/projects/server/commands/get-project-readme/get-project-readme.command";
 import { FetchResumeCommand } from "@/features/resume/server/commands/fetch-resume/fetch-resume.command";
+import { env } from "@/lib/env";
+import {
+	decodeBase64Buffer,
+	decodeBase64Result,
+	fetchGraphQLWorkContributions,
+	fetchPinnedRepoNamesFromGraphQL,
+	fetchPinnedRepoNamesFromScraping,
+} from "./github.helpers";
 import type {
 	GitHubContributionDay,
 	GitHubRepository,
@@ -77,38 +84,33 @@ export class GitHubService implements IGitHubService {
 				this.fetchPinnedRepoNames(username),
 			]);
 
-			if (
-				isOk(result) &&
-				Array.isArray(result.data) &&
-				result.data.length > 0
-			) {
-				return result.data
-					.filter(
-						(repo) =>
-							!repo.name.startsWith(".") &&
-							repo.name.toLowerCase() !== username.toLowerCase(),
-					)
-					.map((repo) => ({
-						id: repo.id,
-						name: repo.name,
-						fullName: repo.full_name,
-						description: repo.description,
-						htmlUrl: repo.html_url,
-						stars: repo.stargazers_count,
-						forks: repo.forks_count,
-						language: repo.language,
-						topics: repo.topics ?? [],
-						isPinned: pinnedSet.has(repo.name.toLowerCase()),
-						owner: {
-							login: repo.owner.login,
-							avatarUrl: repo.owner.avatar_url,
-						},
-					}));
-			}
+			if (!isOk(result) || !Array.isArray(result.data)) return [];
+
+			return result.data
+				.filter(
+					(repo) =>
+						!repo.name.startsWith(".") &&
+						repo.name.toLowerCase() !== username.toLowerCase(),
+				)
+				.map((repo) => ({
+					id: repo.id,
+					name: repo.name,
+					fullName: repo.full_name,
+					description: repo.description,
+					htmlUrl: repo.html_url,
+					stars: repo.stargazers_count,
+					forks: repo.forks_count,
+					language: repo.language,
+					topics: repo.topics ?? [],
+					isPinned: pinnedSet.has(repo.name.toLowerCase()),
+					owner: {
+						login: repo.owner.login,
+						avatarUrl: repo.owner.avatar_url,
+					},
+				}));
 		} catch {
-			// Resilient fallback: return empty array on failure
+			return [];
 		}
-		return [];
 	}
 
 	async getProjectReadme(owner: string, repo: string): Promise<string> {
@@ -121,25 +123,16 @@ export class GitHubService implements IGitHubService {
 				});
 
 				const result = await this.client.send(command);
-
-				if (isOk(result) && result.data) {
-					const data = result.data;
-					if (data.content && data.encoding === "base64") {
-						return Buffer.from(
-							data.content.replace(/\s+/g, ""),
-							"base64",
-						).toString("utf-8");
-					}
-				}
+				const decoded = decodeBase64Result(result);
+				if (decoded) return decoded;
 			} catch {
-				// Resilient fallback on error
+				// Resilient fallback
 			}
 		}
 
 		return (
-			HISTORICAL_WORK_CONTRIBUTIONS &&
-			(FALLBACK_READMES[`${owner}/${repo}`] ||
-				`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`)
+			FALLBACK_READMES[`${owner}/${repo}`] ||
+			`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`
 		);
 	}
 
@@ -159,19 +152,10 @@ export class GitHubService implements IGitHubService {
 			});
 
 			const result = await this.client.send(command);
-
-			if (isOk(result) && result.data) {
-				const response = result.data;
-				if (response.content && response.encoding === "base64") {
-					const cleanBase64 = response.content.replace(/\s+/g, "");
-					return Buffer.from(cleanBase64, "base64");
-				}
-			}
+			return decodeBase64Buffer(result);
 		} catch {
-			// Silently return null on network / response error
+			return null;
 		}
-
-		return null;
 	}
 
 	async getPersonalContributions(
@@ -183,11 +167,7 @@ export class GitHubService implements IGitHubService {
 				.send(command)
 				.catch(() => null);
 
-			if (
-				result &&
-				isOk(result) &&
-				Array.isArray(result.data?.contributions)
-			) {
+			if (result && isOk(result) && Array.isArray(result.data?.contributions)) {
 				return result.data.contributions;
 			}
 		} catch {
@@ -206,62 +186,18 @@ export class GitHubService implements IGitHubService {
 		if (!this.workToken) return map;
 
 		try {
-			const query = `
-				query {
-					viewer {
-						contributionsCollection {
-							contributionCalendar {
-								weeks {
-									contributionDays {
-										date
-										contributionCount
-									}
-								}
-							}
-						}
-					}
-				}
-			`;
-			const res = await fetch("https://api.github.com/graphql", {
-				method: "POST",
-				headers: {
-					Authorization: `bearer ${this.workToken}`,
-					"User-Agent": "vitor-portfolio-app",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ query }),
-			});
-
-			if (!res.ok) return map;
-			const data = (await res.json()) as {
-				data?: {
-					viewer?: {
-						contributionsCollection?: {
-							contributionCalendar?: {
-								weeks?: Array<{
-									contributionDays?: Array<{
-										date: string;
-										contributionCount: number;
-									}>;
-								}>;
-							};
-						};
-					};
-				};
-			};
-
+			const response = await fetchGraphQLWorkContributions(this.workToken);
 			const weeks =
-				data?.data?.viewer?.contributionsCollection?.contributionCalendar
+				response?.data?.viewer?.contributionsCollection?.contributionCalendar
 					?.weeks;
 			if (!weeks) return map;
 
 			for (const week of weeks) {
-				if (week.contributionDays) {
-					for (const day of week.contributionDays) {
-						if (day.contributionCount > 0) {
-							const existing = map.get(day.date) ?? 0;
-							map.set(day.date, Math.max(existing, day.contributionCount));
-						}
+				if (!week.contributionDays) continue;
+				for (const day of week.contributionDays) {
+					if (day.contributionCount > 0) {
+						const existing = map.get(day.date) ?? 0;
+						map.set(day.date, Math.max(existing, day.contributionCount));
 					}
 				}
 			}
@@ -273,79 +209,22 @@ export class GitHubService implements IGitHubService {
 	}
 
 	private async fetchPinnedRepoNames(username: string): Promise<Set<string>> {
-		const pinnedNames = new Set<string>();
-
 		if (this.token) {
 			try {
-				const query = `
-					query($username: String!) {
-						user(login: $username) {
-							pinnedItems(first: 10, types: REPOSITORY) {
-								nodes {
-									... on Repository {
-										name
-									}
-								}
-							}
-						}
-					}
-				`;
-				const res = await fetch("https://api.github.com/graphql", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${this.token}`,
-						"Content-Type": "application/json",
-						"User-Agent": "vitor-portfolio-app",
-					},
-					body: JSON.stringify({
-						query,
-						variables: { username },
-					}),
-				});
-
-				if (res.ok) {
-					const json = await res.json();
-					const nodes = json.data?.user?.pinnedItems?.nodes;
-					if (Array.isArray(nodes)) {
-						for (const node of nodes) {
-							if (node?.name) {
-								pinnedNames.add(node.name.toLowerCase());
-							}
-						}
-						if (pinnedNames.size > 0) {
-							return pinnedNames;
-						}
-					}
-				}
+				const names = await fetchPinnedRepoNamesFromGraphQL(
+					username,
+					this.token,
+				);
+				if (names.size > 0) return names;
 			} catch {
 				// Fallback to scraping
 			}
 		}
 
 		try {
-			const res = await fetch(`https://github.com/${username}`, {
-				headers: {
-					"User-Agent": "vitor-portfolio-app",
-				},
-			});
-			if (res.ok) {
-				const html = await res.text();
-				const regex = new RegExp(
-					`class="pinned-item-list-item-content"[\\s\\S]*?href="/${username}/([^"/]+)"`,
-					"g",
-				);
-				const matches = Array.from(html.matchAll(regex));
-				for (const m of matches) {
-					if (m[1] && m[1].toLowerCase() !== username.toLowerCase()) {
-						pinnedNames.add(m[1].toLowerCase());
-					}
-				}
-			}
+			return await fetchPinnedRepoNamesFromScraping(username);
 		} catch {
-			// Fallback
+			return new Set<string>();
 		}
-
-		return pinnedNames;
 	}
 }
-

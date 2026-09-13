@@ -1,9 +1,6 @@
 import "reflect-metadata";
 import { ApiClient, FetchTransport } from "@v1tor2003/command-api";
 import { Container } from "inversify";
-import { DI_TYPES } from "./types";
-import { env } from "@/lib/env";
-
 import type { IEmailService, IRateLimiter } from "@/features/contact";
 import { InMemoryRateLimiter } from "@/features/contact/server/services/rate-limiter";
 import { ResendEmailService } from "@/features/contact/server/services/resend-email.service";
@@ -13,12 +10,14 @@ import type {
 	IProjectsService,
 } from "@/features/projects";
 import { GitActivityService } from "@/features/projects/server/services/git-activity.service";
-import { ProjectsCatalogService } from "@/features/projects/server/services/projects-catalog.service";
 import { ProjectsService } from "@/features/projects/server/services/projects.service";
+import { ProjectsCatalogService } from "@/features/projects/server/services/projects-catalog.service";
 import type { IResumeService } from "@/features/resume";
 import { ResumeService } from "@/features/resume/server/services/resume.service";
+import { env } from "@/lib/env";
 import type { IGitHubService } from "@/lib/github";
 import { GitHubService } from "@/lib/github/github.service";
+import { DI_TYPES } from "./types";
 
 const container = new Container();
 
@@ -51,20 +50,18 @@ container
 	)
 	.inSingletonScope();
 
-container
-	.bind<ApiClient>(DI_TYPES.ResendApiClient)
-	.toDynamicValue(
-		() =>
-			new ApiClient({
-				transport: new FetchTransport({
-					baseUrl: "https://api.resend.com",
-					headers: {
-						Authorization: `Bearer ${env.RESEND_API_KEY}`,
-					},
-				}),
-				logging: env.RESEND_API_LOGGING ?? true,
+container.bind<ApiClient>(DI_TYPES.ResendApiClient).toDynamicValue(
+	() =>
+		new ApiClient({
+			transport: new FetchTransport({
+				baseUrl: "https://api.resend.com",
+				headers: {
+					Authorization: `Bearer ${env.RESEND_API_KEY}`,
+				},
 			}),
-	);
+			logging: env.RESEND_API_LOGGING ?? true,
+		}),
+);
 
 // --- Infrastructure & Domain Services ---
 container
@@ -105,7 +102,9 @@ container
 	.toDynamicValue(
 		() =>
 			new ProjectsService(
-				container.get<IProjectsCatalogService>(DI_TYPES.IProjectsCatalogService),
+				container.get<IProjectsCatalogService>(
+					DI_TYPES.IProjectsCatalogService,
+				),
 				container.get<IGitActivityService>(DI_TYPES.IGitActivityService),
 			),
 	)
@@ -115,9 +114,7 @@ container
 	.bind<IResumeService>(DI_TYPES.IResumeService)
 	.toDynamicValue(
 		() =>
-			new ResumeService(
-				container.get<IGitHubService>(DI_TYPES.IGitHubService),
-			),
+			new ResumeService(container.get<IGitHubService>(DI_TYPES.IGitHubService)),
 	)
 	.inSingletonScope();
 
@@ -125,8 +122,8 @@ container
 	.bind<IEmailService>(DI_TYPES.IEmailService)
 	.toDynamicValue(
 		() =>
-			new ResendEmailService(
-				() => container.get<ApiClient>(DI_TYPES.ResendApiClient),
+			new ResendEmailService(() =>
+				container.get<ApiClient>(DI_TYPES.ResendApiClient),
 			),
 	)
 	.inSingletonScope();

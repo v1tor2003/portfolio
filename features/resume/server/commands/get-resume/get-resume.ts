@@ -1,5 +1,5 @@
-import { DI_TYPES } from "@/lib/di/types";
 import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 import type {
 	IResumeService,
 	ResumeFileResult,

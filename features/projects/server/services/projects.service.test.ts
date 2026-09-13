@@ -3,9 +3,9 @@ import { resolveService } from "@/lib/di/config";
 import { DI_TYPES } from "@/lib/di/types";
 import { GitHubService } from "@/lib/github/github.service";
 import { GitActivityService } from "./git-activity.service";
-import { ProjectsCatalogService } from "./projects-catalog.service";
 import { ProjectsService } from "./projects.service";
 import type { IProjectsService } from "./projects.service.interface";
+import { ProjectsCatalogService } from "./projects-catalog.service";
 
 function createTestProjectsService(options?: {
 	token?: string;

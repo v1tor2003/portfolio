@@ -12,4 +12,3 @@ export interface ResumeFileResult {
 export interface IResumeService {
 	getResume(locale?: ResumeLocale): Promise<ResumeFileResult>;
 }
-

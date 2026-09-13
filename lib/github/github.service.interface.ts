@@ -27,4 +27,3 @@ export interface IGitHubService {
 	getPersonalContributions(username?: string): Promise<GitHubContributionDay[]>;
 	getWorkContributions(username?: string): Promise<Map<string, number>>;
 }
-

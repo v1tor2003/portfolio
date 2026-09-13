@@ -7,4 +7,3 @@ export type EmailDispatchResult =
 export interface IEmailService {
 	send(data: ContactFormData): Promise<EmailDispatchResult>;
 }
-

@@ -6,4 +6,3 @@ export interface RateLimiterOptions {
 export interface IRateLimiter {
 	isRateLimited(key: string): boolean;
 }
-

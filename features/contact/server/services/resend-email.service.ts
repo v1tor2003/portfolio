@@ -1,74 +1,19 @@
-import {
-	ApiClient,
-	BaseRequest,
-	FetchTransport,
-	type HttpRequestContext,
-} from "@v1tor2003/command-api";
-import { injectable } from "inversify";
+import type { ApiClient } from "@v1tor2003/command-api";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "@/lib/di/types";
 import { env } from "@/lib/env";
 import type { ContactFormData } from "../../schemas/contact.schema";
-import { buildContactEmailHtml, buildContactEmailText } from "../templates/email-template";
-
+import { SendResendEmailCommand } from "../commands/send-resend-email/send-resend-email.command";
+import {
+	buildContactEmailHtml,
+	buildContactEmailText,
+} from "../templates/email-template";
 import type {
 	EmailDispatchResult,
 	IEmailService,
 } from "./email.service.interface";
 
 export type { EmailDispatchResult, IEmailService };
-
-export interface SendResendEmailInput {
-	from: string;
-	to: string;
-	reply_to: string;
-	subject: string;
-	text: string;
-	html?: string;
-}
-
-export interface SendResendEmailOutput {
-	id: string;
-}
-
-export class SendResendEmailCommand extends BaseRequest<
-	SendResendEmailInput,
-	SendResendEmailOutput
-> {
-	toHttp(): HttpRequestContext {
-		return {
-			method: "POST",
-			path: "/emails",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: this.input,
-		};
-	}
-}
-
-let cachedClient: ApiClient | null = null;
-
-export const ResendClientFactory = {
-	getInstance(): ApiClient {
-		if (!cachedClient) {
-			cachedClient = new ApiClient({
-				transport: new FetchTransport({
-					baseUrl: "https://api.resend.com",
-					headers: {
-						Authorization: `Bearer ${env.RESEND_API_KEY}`,
-					},
-				}),
-				logging: env.RESEND_API_LOGGING ?? true,
-			});
-		}
-		return cachedClient;
-	},
-	create(): ApiClient {
-		return this.getInstance();
-	},
-	_resetInstance(): void {
-		cachedClient = null;
-	},
-};
 
 interface ApiErrorDetail {
 	status?: number;
@@ -88,15 +33,13 @@ export class ResendEmailService implements IEmailService {
 	private readonly getClient: () => ApiClient;
 
 	constructor(
-		clientOrProvider?: ApiClient | (() => ApiClient),
+		@inject(DI_TYPES.ResendApiClient)
+		clientOrProvider: ApiClient | (() => ApiClient),
 	) {
-		if (typeof clientOrProvider === "function") {
-			this.getClient = clientOrProvider;
-		} else if (clientOrProvider) {
-			this.getClient = () => clientOrProvider;
-		} else {
-			this.getClient = () => ResendClientFactory.getInstance();
-		}
+		this.getClient =
+			typeof clientOrProvider === "function"
+				? clientOrProvider
+				: () => clientOrProvider;
 	}
 
 	async send(data: ContactFormData): Promise<EmailDispatchResult> {
@@ -107,9 +50,9 @@ export class ResendEmailService implements IEmailService {
 			};
 		}
 
-		const client = this.getClient();
 		const text = buildContactEmailText(data);
 		const html = buildContactEmailHtml(data);
+		const client = this.getClient();
 
 		const result = await client.send(
 			new SendResendEmailCommand({

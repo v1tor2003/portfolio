@@ -1,15 +1,15 @@
-import { describe, expect, it } from "vitest";
 import type { ApiClient } from "@v1tor2003/command-api";
-import { DI_TYPES } from "./types";
-import { resolveService } from "./config";
+import { describe, expect, it } from "vitest";
+import type { IEmailService, IRateLimiter } from "@/features/contact";
 import type {
 	IGitActivityService,
 	IProjectsCatalogService,
 	IProjectsService,
 } from "@/features/projects";
 import type { IResumeService } from "@/features/resume";
-import type { IEmailService, IRateLimiter } from "@/features/contact";
 import type { IGitHubService } from "@/lib/github";
+import { resolveService } from "./config";
+import { DI_TYPES } from "./types";
 
 describe("Dependency Injection Container", () => {
 	it("defines symbols for all core service interfaces and clients", () => {
@@ -26,38 +26,48 @@ describe("Dependency Injection Container", () => {
 	});
 
 	it("resolves all core services as singletons from the container", () => {
-		const gitHubService1 =
-			resolveService<IGitHubService>(DI_TYPES.IGitHubService);
-		const gitHubService2 =
-			resolveService<IGitHubService>(DI_TYPES.IGitHubService);
+		const gitHubService1 = resolveService<IGitHubService>(
+			DI_TYPES.IGitHubService,
+		);
+		const gitHubService2 = resolveService<IGitHubService>(
+			DI_TYPES.IGitHubService,
+		);
 		expect(gitHubService1).toBeDefined();
 		expect(gitHubService1).toBe(gitHubService2);
 
-		const catalogService1 =
-			resolveService<IProjectsCatalogService>(DI_TYPES.IProjectsCatalogService);
-		const catalogService2 =
-			resolveService<IProjectsCatalogService>(DI_TYPES.IProjectsCatalogService);
+		const catalogService1 = resolveService<IProjectsCatalogService>(
+			DI_TYPES.IProjectsCatalogService,
+		);
+		const catalogService2 = resolveService<IProjectsCatalogService>(
+			DI_TYPES.IProjectsCatalogService,
+		);
 		expect(catalogService1).toBeDefined();
 		expect(catalogService1).toBe(catalogService2);
 
-		const activityService1 =
-			resolveService<IGitActivityService>(DI_TYPES.IGitActivityService);
-		const activityService2 =
-			resolveService<IGitActivityService>(DI_TYPES.IGitActivityService);
+		const activityService1 = resolveService<IGitActivityService>(
+			DI_TYPES.IGitActivityService,
+		);
+		const activityService2 = resolveService<IGitActivityService>(
+			DI_TYPES.IGitActivityService,
+		);
 		expect(activityService1).toBeDefined();
 		expect(activityService1).toBe(activityService2);
 
-		const projectsService1 =
-			resolveService<IProjectsService>(DI_TYPES.IProjectsService);
-		const projectsService2 =
-			resolveService<IProjectsService>(DI_TYPES.IProjectsService);
+		const projectsService1 = resolveService<IProjectsService>(
+			DI_TYPES.IProjectsService,
+		);
+		const projectsService2 = resolveService<IProjectsService>(
+			DI_TYPES.IProjectsService,
+		);
 		expect(projectsService1).toBeDefined();
 		expect(projectsService1).toBe(projectsService2);
 
-		const resumeService1 =
-			resolveService<IResumeService>(DI_TYPES.IResumeService);
-		const resumeService2 =
-			resolveService<IResumeService>(DI_TYPES.IResumeService);
+		const resumeService1 = resolveService<IResumeService>(
+			DI_TYPES.IResumeService,
+		);
+		const resumeService2 = resolveService<IResumeService>(
+			DI_TYPES.IResumeService,
+		);
 		expect(resumeService1).toBeDefined();
 		expect(resumeService1).toBe(resumeService2);
 

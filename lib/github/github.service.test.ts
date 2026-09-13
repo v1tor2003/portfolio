@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import { ApiClient, FetchTransport } from "@v1tor2003/command-api";
+import { describe, expect, it, vi } from "vitest";
 import { GitHubService } from "./github.service";
 
 describe("GitHubService", () => {
@@ -89,4 +89,3 @@ describe("GitHubService", () => {
 		expect(result).toEqual(sampleContributions);
 	});
 });
-

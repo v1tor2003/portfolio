@@ -17,4 +17,3 @@ export const DI_TYPES = {
 } as const;
 
 export type DiTypes = typeof DI_TYPES;
-

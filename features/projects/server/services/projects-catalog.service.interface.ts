@@ -1,7 +1,4 @@
-import type {
-	Project,
-	ProjectCategory,
-} from "../../schemas/project.schema";
+import type { Project, ProjectCategory } from "../../schemas/project.schema";
 import type {
 	PaginatedProjectsOptions,
 	PaginatedProjectsResult,
@@ -14,4 +11,3 @@ export interface IProjectsCatalogService {
 	): Promise<PaginatedProjectsResult>;
 	getReadme(owner: string, repo: string): Promise<string>;
 }
-

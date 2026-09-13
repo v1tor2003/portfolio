@@ -10,17 +10,15 @@ vi.mock("@/lib/env", () => ({
 	},
 }));
 
-import { env } from "@/lib/env";
-import { DI_TYPES } from "@/lib/di/types";
 import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
+import { env } from "@/lib/env";
 import type { IRateLimiter } from "../services/rate-limiter.interface";
-import { ResendClientFactory } from "../services/resend-email.service";
 import { sendContactEmail } from "./send-contact-email";
 
 describe("sendContactEmail Server Action", () => {
 	beforeEach(() => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = undefined;
-		ResendClientFactory._resetInstance();
 		vi.clearAllMocks();
 	});
 
@@ -73,7 +71,6 @@ describe("sendContactEmail Server Action", () => {
 
 	it("calls Resend API via command-api when RESEND_API_KEY is provided", async () => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
-		ResendClientFactory._resetInstance();
 
 		const fetchMock = vi.fn().mockResolvedValue(
 			new Response(JSON.stringify({ id: "mock_resend_id" }), {
@@ -107,7 +104,6 @@ describe("sendContactEmail Server Action", () => {
 
 	it("handles Resend API error cleanly", async () => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_123456";
-		ResendClientFactory._resetInstance();
 
 		vi.spyOn(console, "error").mockImplementation(() => {});
 
