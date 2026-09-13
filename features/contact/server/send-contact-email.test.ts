@@ -11,7 +11,9 @@ vi.mock("@/lib/env", () => ({
 }));
 
 import { env } from "@/lib/env";
-import { contactRateLimiter } from "./rate-limiter";
+import { DI_TYPES } from "@/lib/di/types";
+import { resolveService } from "@/lib/di/config";
+import type { IRateLimiter } from "./rate-limiter.interface";
 import { ResendClientFactory } from "./resend-email.service";
 import { sendContactEmail } from "./send-contact-email";
 
@@ -130,7 +132,8 @@ describe("sendContactEmail Server Action", () => {
 	});
 
 	it("returns rate limit error when client exceeds quota", async () => {
-		vi.spyOn(contactRateLimiter, "isRateLimited").mockReturnValueOnce(true);
+		const rateLimiter = resolveService<IRateLimiter>(DI_TYPES.IRateLimiter);
+		vi.spyOn(rateLimiter, "isRateLimited").mockReturnValueOnce(true);
 
 		const result = await sendContactEmail({
 			name: "Spammy Spammer",

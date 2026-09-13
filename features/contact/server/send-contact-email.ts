@@ -2,8 +2,9 @@
 
 import { z } from "zod";
 import { type ContactFormData, contactSchema } from "../schemas/contact.schema";
-import { contactRateLimiter } from "./rate-limiter";
-import { resendEmailService } from "./resend-email.service";
+import { DI_TYPES } from "@/lib/di/types";
+import { resolveService } from "@/lib/di/config";
+import type { IEmailService, IRateLimiter } from "../index";
 
 export interface ContactActionResult {
 	success: boolean;
@@ -31,7 +32,8 @@ export async function sendContactEmail(
 ): Promise<ContactActionResult> {
 	const clientIp = await getClientIp();
 
-	if (contactRateLimiter.isRateLimited(clientIp)) {
+	const rateLimiter = resolveService<IRateLimiter>(DI_TYPES.IRateLimiter);
+	if (rateLimiter.isRateLimited(clientIp)) {
 		return {
 			success: false,
 			message:
@@ -62,7 +64,8 @@ export async function sendContactEmail(
 		};
 	}
 
-	const dispatchResult = await resendEmailService.send(parsed.data);
+	const emailService = resolveService<IEmailService>(DI_TYPES.IEmailService);
+	const dispatchResult = await emailService.send(parsed.data);
 
 	if (!dispatchResult.success) {
 		return {

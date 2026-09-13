@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
+import { inject, injectable } from "inversify";
 import { env } from "@/lib/env";
-import { FetchResumeCommand } from "./fetch-resume.command";
-
+import { DI_TYPES } from "@/lib/di/types";
+import { GitHubService } from "@/lib/github/github.service";
+import type { IGitHubService } from "@/lib/github/github.service.interface";
 import type {
 	IResumeService,
 	ResumeFileResult,
@@ -13,9 +14,8 @@ import type {
 export type { IResumeService, ResumeFileResult, ResumeLocale };
 
 export interface ResumeServiceDependencies {
-	client?: ApiClient;
+	gitHubService?: IGitHubService;
 	readFallback?: (locale?: ResumeLocale) => Buffer;
-	token?: string;
 	owner?: string;
 	repo?: string;
 	filePath?: string;
@@ -40,26 +40,32 @@ function defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
 	return fs.readFileSync(fallbackPath);
 }
 
-function defaultCreateGitHubClient(): ApiClient {
-	return new ApiClient({
-		transport: new FetchTransport({
-			baseUrl: "https://api.github.com",
-		}),
-	});
-}
-
+@injectable()
 export class ResumeService implements IResumeService {
-	private readonly client: ApiClient;
+	private readonly gitHubService: IGitHubService;
 	private readonly readFallback: (locale?: ResumeLocale) => Buffer;
-	private readonly token?: string;
 	private readonly owner: string;
 	private readonly repo: string;
 	private readonly filePath: string;
 
-	constructor(deps?: ResumeServiceDependencies) {
-		this.client = deps?.client ?? defaultCreateGitHubClient();
+	constructor(
+		@inject(DI_TYPES.IGitHubService)
+		gitHubServiceOrDeps?: IGitHubService | ResumeServiceDependencies,
+		maybeDeps?: ResumeServiceDependencies,
+	) {
+		let gitHubService: IGitHubService | undefined;
+		let deps: ResumeServiceDependencies | undefined;
+
+		if (gitHubServiceOrDeps && "getFile" in gitHubServiceOrDeps) {
+			gitHubService = gitHubServiceOrDeps as IGitHubService;
+			deps = maybeDeps;
+		} else {
+			deps = gitHubServiceOrDeps as ResumeServiceDependencies;
+		}
+
+		this.gitHubService =
+			deps?.gitHubService ?? gitHubService ?? new GitHubService();
 		this.readFallback = deps?.readFallback ?? defaultReadFallbackFile;
-		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
 		this.owner = deps?.owner ?? env.RESUME_REPO_OWNER;
 		this.repo = deps?.repo ?? env.RESUME_REPO_NAME;
 		this.filePath = deps?.filePath ?? env.RESUME_FILE_PATH;
@@ -68,36 +74,25 @@ export class ResumeService implements IResumeService {
 	async getResume(locale: ResumeLocale = "en"): Promise<ResumeFileResult> {
 		const targetFileName = `vitor-pires-resume-${locale}.pdf`;
 
-		if (this.token) {
-			try {
-				const command = new FetchResumeCommand({
-					owner: this.owner,
-					repo: this.repo,
-					path: targetFileName,
-					token: this.token,
-				});
+		try {
+			const remoteBuffer = await this.gitHubService.getFile(
+				this.owner,
+				this.repo,
+				targetFileName,
+			);
 
-				const result = await this.client.send(command);
-
-				if (isOk(result) && result.data) {
-					const response = result.data;
-					if (response.content && response.encoding === "base64") {
-						const cleanBase64 = response.content.replace(/\s+/g, "");
-						const buffer = Buffer.from(cleanBase64, "base64");
-
-						return {
-							buffer,
-							fileName: targetFileName,
-							contentType: "application/pdf",
-							size: buffer.length,
-							isFallback: false,
-							source: "remote",
-						};
-					}
-				}
-			} catch {
-				// Silently fall back to bundled PDF if remote fetch encounters any issue
+			if (remoteBuffer) {
+				return {
+					buffer: remoteBuffer,
+					fileName: targetFileName,
+					contentType: "application/pdf",
+					size: remoteBuffer.length,
+					isFallback: false,
+					source: "remote",
+				};
 			}
+		} catch {
+			// Silently fall back to bundled PDF
 		}
 
 		const fallbackBuffer = this.readFallback(locale);
@@ -110,13 +105,4 @@ export class ResumeService implements IResumeService {
 			source: "local-fallback",
 		};
 	}
-}
-
-let cachedResumeService: IResumeService | null = null;
-
-export function getResumeService(): IResumeService {
-	if (!cachedResumeService) {
-		cachedResumeService = new ResumeService();
-	}
-	return cachedResumeService;
 }

@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import type {
 	IRateLimiter,
 	RateLimiterOptions,
@@ -10,6 +11,7 @@ interface RateLimitEntry {
 	resetAt: number;
 }
 
+@injectable()
 export class InMemoryRateLimiter implements IRateLimiter {
 	private readonly records = new Map<string, RateLimitEntry>();
 	private readonly windowMs: number;
@@ -42,5 +44,3 @@ export class InMemoryRateLimiter implements IRateLimiter {
 		return false;
 	}
 }
-
-export const contactRateLimiter = new InMemoryRateLimiter();

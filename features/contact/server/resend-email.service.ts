@@ -4,6 +4,7 @@ import {
 	FetchTransport,
 	type HttpRequestContext,
 } from "@v1tor2003/command-api";
+import { injectable } from "inversify";
 import { env } from "@/lib/env";
 import type { ContactFormData } from "../schemas/contact.schema";
 import { buildContactEmailHtml, buildContactEmailText } from "./email-template";
@@ -82,6 +83,7 @@ function getErrorDetails(error: Error): ApiErrorDetail {
 	};
 }
 
+@injectable()
 export class ResendEmailService implements IEmailService {
 	private readonly getClient: () => ApiClient;
 
@@ -146,5 +148,3 @@ export class ResendEmailService implements IEmailService {
 		};
 	}
 }
-
-export const resendEmailService = new ResendEmailService();

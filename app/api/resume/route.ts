@@ -1,4 +1,6 @@
-import { getResume } from "@/features/resume/server/get-resume";
+import type { IResumeService } from "@/features/resume";
+import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 
 export async function GET(request: Request): Promise<Response> {
 	try {
@@ -7,7 +9,10 @@ export async function GET(request: Request): Promise<Response> {
 		const rawLocale = searchParams.get("locale");
 		const locale = rawLocale === "pt-BR" ? "pt-BR" : "en";
 
-		const resume = await getResume(locale);
+		const resumeService = resolveService<IResumeService>(
+			DI_TYPES.IResumeService,
+		);
+		const resume = await resumeService.getResume(locale);
 		const dispositionType = isDownload ? "attachment" : "inline";
 
 		return new Response(new Uint8Array(resume.buffer), {

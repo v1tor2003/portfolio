@@ -7,7 +7,6 @@ export { ProjectsSkeleton } from "./components/ProjectsSkeleton";
 export { ProjectTabs } from "./components/ProjectTabs";
 export * from "./schemas/project.schema";
 export {
-	getProjectsService,
 	type IProjectsService,
 	type PaginatedProjectsOptions,
 	type PaginatedProjectsResult,

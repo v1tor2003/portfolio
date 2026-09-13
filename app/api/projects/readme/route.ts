@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { getProjectsService } from "@/features/projects/server/projects.service";
+import type { IProjectsService } from "@/features/projects";
+import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
 	}
 
 	try {
-		const service = getProjectsService();
+		const service = resolveService<IProjectsService>(DI_TYPES.IProjectsService);
 		const content = await service.getReadme(owner, repo);
 
 		return NextResponse.json(

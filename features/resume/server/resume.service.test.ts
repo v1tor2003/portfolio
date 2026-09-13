@@ -1,38 +1,27 @@
-import type { ApiClient } from "@v1tor2003/command-api";
-import { err, ok } from "@v1tor2003/command-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { IGitHubService } from "@/lib/github/github.service.interface";
 import { type IResumeService, ResumeService } from "./resume.service";
 
 describe("ResumeService", () => {
 	const mockFallbackBuffer = Buffer.from("%PDF-1.4 fallback mock");
-	let mockClient: { send: ReturnType<typeof vi.fn> };
+	let mockGitHubService: { getFile: ReturnType<typeof vi.fn> };
 
 	beforeEach(() => {
-		mockClient = {
-			send: vi.fn(),
+		mockGitHubService = {
+			getFile: vi.fn(),
 		};
 	});
 
-	it("returns remote PDF buffer when GitHub API succeeds with base64 content", async () => {
-		const samplePdfContent = Buffer.from(
-			"%PDF-1.4 remote pdf content",
-		).toString("base64");
-		mockClient.send.mockResolvedValue(
-			ok({
-				name: "vitor-pires-resume.pdf",
-				path: "vitor-pires-resume.pdf",
-				sha: "abc123sha",
-				size: 100,
-				encoding: "base64",
-				content: samplePdfContent,
-			}),
-		);
+	it("returns remote PDF buffer when GitHubService returns a buffer", async () => {
+		const samplePdfBuffer = Buffer.from("%PDF-1.4 remote pdf content");
+		mockGitHubService.getFile.mockResolvedValue(samplePdfBuffer);
 
-		const service: IResumeService = new ResumeService({
-			client: mockClient as unknown as ApiClient,
-			readFallback: () => mockFallbackBuffer,
-			token: "test-token",
-		});
+		const service: IResumeService = new ResumeService(
+			mockGitHubService as unknown as IGitHubService,
+			{
+				readFallback: () => mockFallbackBuffer,
+			},
+		);
 
 		const result = await service.getResume();
 
@@ -41,17 +30,22 @@ describe("ResumeService", () => {
 		expect(result.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(result.contentType).toBe("application/pdf");
 		expect(result.buffer.toString()).toContain("%PDF-1.4 remote pdf content");
-		expect(mockClient.send).toHaveBeenCalledTimes(1);
+		expect(mockGitHubService.getFile).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.any(String),
+			"vitor-pires-resume-en.pdf",
+		);
 	});
 
-	it("falls back to local bundled PDF when remote API call fails", async () => {
-		mockClient.send.mockResolvedValue(err(new Error("GitHub 404 Not Found")));
+	it("falls back to local bundled PDF when GitHubService returns null", async () => {
+		mockGitHubService.getFile.mockResolvedValue(null);
 
-		const service: IResumeService = new ResumeService({
-			client: mockClient as unknown as ApiClient,
-			readFallback: () => mockFallbackBuffer,
-			token: "test-token",
-		});
+		const service: IResumeService = new ResumeService(
+			mockGitHubService as unknown as IGitHubService,
+			{
+				readFallback: () => mockFallbackBuffer,
+			},
+		);
 
 		const result = await service.getResume();
 
@@ -62,12 +56,15 @@ describe("ResumeService", () => {
 		expect(result.buffer).toEqual(mockFallbackBuffer);
 	});
 
-	it("uses local fallback directly without remote call when token is missing", async () => {
-		const service: IResumeService = new ResumeService({
-			client: mockClient as unknown as ApiClient,
-			readFallback: () => mockFallbackBuffer,
-			token: undefined,
-		});
+	it("uses local fallback directly when GitHubService throws an error", async () => {
+		mockGitHubService.getFile.mockRejectedValue(new Error("Network failure"));
+
+		const service: IResumeService = new ResumeService(
+			mockGitHubService as unknown as IGitHubService,
+			{
+				readFallback: () => mockFallbackBuffer,
+			},
+		);
 
 		const result = await service.getResume();
 
@@ -75,15 +72,17 @@ describe("ResumeService", () => {
 		expect(result.isFallback).toBe(true);
 		expect(result.fileName).toBe("vitor-pires-resume-en.pdf");
 		expect(result.buffer).toEqual(mockFallbackBuffer);
-		expect(mockClient.send).not.toHaveBeenCalled();
 	});
 
 	it("resolves pt-BR locale file name correctly", async () => {
-		const service: IResumeService = new ResumeService({
-			client: mockClient as unknown as ApiClient,
-			readFallback: () => mockFallbackBuffer,
-			token: undefined,
-		});
+		mockGitHubService.getFile.mockResolvedValue(null);
+
+		const service: IResumeService = new ResumeService(
+			mockGitHubService as unknown as IGitHubService,
+			{
+				readFallback: () => mockFallbackBuffer,
+			},
+		);
 
 		const result = await service.getResume("pt-BR");
 

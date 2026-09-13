@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getProjectsService } from "@/features/projects/server/projects.service";
+import type { IProjectsService } from "@/features/projects";
+import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 
 const ProjectsQuerySchema = z.object({
 	category: z.enum(["personal", "work"]).default("personal"),
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
 	}
 
 	try {
-		const service = getProjectsService();
+		const service = resolveService<IProjectsService>(DI_TYPES.IProjectsService);
 		const result = await service.getPaginatedProjects(parsedQuery.data);
 
 		return NextResponse.json(result, {

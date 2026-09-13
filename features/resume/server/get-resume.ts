@@ -1,11 +1,14 @@
-import {
-	getResumeService,
-	type ResumeFileResult,
-	type ResumeLocale,
-} from "./resume.service";
+import { DI_TYPES } from "@/lib/di/types";
+import { resolveService } from "@/lib/di/config";
+import type {
+	IResumeService,
+	ResumeFileResult,
+	ResumeLocale,
+} from "./resume.service.interface";
 
 export async function getResume(
 	locale?: ResumeLocale,
 ): Promise<ResumeFileResult> {
-	return getResumeService().getResume(locale);
+	const service = resolveService<IResumeService>(DI_TYPES.IResumeService);
+	return service.getResume(locale);
 }

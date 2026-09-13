@@ -1,22 +1,20 @@
-import { ApiClient, FetchTransport, isOk } from "@v1tor2003/command-api";
+import { inject, injectable } from "inversify";
 import { env } from "@/lib/env";
+import { DI_TYPES } from "@/lib/di/types";
+import { GitHubService } from "@/lib/github/github.service";
+import type { IGitHubService } from "@/lib/github/github.service.interface";
 import type {
 	GitActivityData,
 	GitActivityDay,
 	Project,
 	ProjectCategory,
 } from "../schemas/project.schema";
-import { GetGitActivityCommand } from "./get-git-activity.command";
-import { GetPinnedProjectsCommand } from "./get-pinned-projects.command";
-import { GetProjectReadmeCommand } from "./get-project-readme.command";
 import {
 	FALLBACK_READMES,
 	generateGitActivityData,
-	HISTORICAL_WORK_CONTRIBUTIONS,
 	SEED_PERSONAL_PROJECTS,
 	SEED_WORK_PROJECTS,
 } from "./projects-seed.data";
-
 import type {
 	IProjectsService,
 	PaginatedProjectsOptions,
@@ -30,39 +28,20 @@ export type {
 };
 
 export interface ProjectsServiceDependencies {
-	client?: ApiClient;
-	contributionsClient?: ApiClient;
+	gitHubService?: IGitHubService;
 	token?: string;
 	workToken?: string;
 	username?: string;
 	workUsername?: string;
 }
 
-function defaultCreateGitHubClient(): ApiClient {
-	return new ApiClient({
-		transport: new FetchTransport({
-			baseUrl: "https://api.github.com",
-		}),
-	});
-}
-
-function defaultCreateContributionsClient(): ApiClient {
-	return new ApiClient({
-		transport: new FetchTransport({
-			baseUrl: "https://github-contributions-api.jogruber.de",
-		}),
-	});
-}
-
+@injectable()
 export class ProjectsService implements IProjectsService {
-	private readonly client: ApiClient;
-	private readonly contributionsClient: ApiClient;
-	private readonly token?: string;
-	private readonly workToken?: string;
+	private readonly gitHubService: IGitHubService;
 	private readonly username: string;
 	private readonly workUsername: string;
 
-	// In-memory cache for projects & readmes to minimize external network requests
+	// In-memory cache for projects & readmes to minimize external requests
 	private cachedProjects: { data: Project[]; timestamp: number } | null = null;
 	private cachedActivity: { data: GitActivityData; timestamp: number } | null =
 		null;
@@ -72,12 +51,33 @@ export class ProjectsService implements IProjectsService {
 	>();
 	private readonly CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutes
 
-	constructor(deps?: ProjectsServiceDependencies) {
-		this.client = deps?.client ?? defaultCreateGitHubClient();
-		this.contributionsClient =
-			deps?.contributionsClient ?? defaultCreateContributionsClient();
-		this.token = deps?.token ?? env.GITHUB_TOKEN ?? env.GITHUB_RESUME_TOKEN;
-		this.workToken = deps?.workToken ?? env.GITHUB_WORK_TOKEN;
+	constructor(
+		@inject(DI_TYPES.IGitHubService)
+		gitHubServiceOrDeps?: IGitHubService | ProjectsServiceDependencies,
+		maybeDeps?: ProjectsServiceDependencies,
+	) {
+		let gitHubService: IGitHubService | undefined;
+		let deps: ProjectsServiceDependencies | undefined;
+
+		if (
+			gitHubServiceOrDeps &&
+			"getPinnedRepositories" in gitHubServiceOrDeps
+		) {
+			gitHubService = gitHubServiceOrDeps as IGitHubService;
+			deps = maybeDeps;
+		} else {
+			deps = gitHubServiceOrDeps as ProjectsServiceDependencies;
+		}
+
+		this.gitHubService =
+			deps?.gitHubService ??
+			gitHubService ??
+			new GitHubService({
+				token: deps?.token,
+				workToken: deps?.workToken,
+				username: deps?.username,
+				workUsername: deps?.workUsername,
+			});
 		this.username = deps?.username ?? "v1tor2003";
 		this.workUsername =
 			deps?.workUsername ?? env.GITHUB_WORK_USERNAME ?? "vitor-pires_tecnosul";
@@ -89,11 +89,9 @@ export class ProjectsService implements IProjectsService {
 		return allProjects.filter((p) => p.category === category);
 	}
 
-	async getPaginatedProjects(options?: {
-		category?: ProjectCategory;
-		page?: number;
-		limit?: number;
-	}): Promise<PaginatedProjectsResult> {
+	async getPaginatedProjects(
+		options?: PaginatedProjectsOptions,
+	): Promise<PaginatedProjectsResult> {
 		const category = options?.category ?? "personal";
 		const page = Math.max(1, options?.page ?? 1);
 		const limit = Math.max(1, Math.min(50, options?.limit ?? 9));
@@ -124,18 +122,12 @@ export class ProjectsService implements IProjectsService {
 		}
 
 		try {
-			const command = new GetGitActivityCommand({ username: this.username });
-			const [result, realWorkMap] = await Promise.all([
-				this.contributionsClient.send(command).catch(() => null),
-				this.fetchRealWorkContributions(),
+			const [personalContributions, realWorkMap] = await Promise.all([
+				this.gitHubService.getPersonalContributions(this.username),
+				this.gitHubService.getWorkContributions(this.workUsername),
 			]);
 
-			const personalContributions =
-				result && isOk(result) && Array.isArray(result.data?.contributions)
-					? result.data.contributions
-					: [];
-
-			if (personalContributions.length > 0 || realWorkMap) {
+			if (personalContributions.length > 0 || realWorkMap.size > 0) {
 				const merged = this.mergeRealContributionsWithWork(
 					personalContributions,
 					52,
@@ -153,74 +145,98 @@ export class ProjectsService implements IProjectsService {
 		return fallbackActivity;
 	}
 
-	private async fetchRealWorkContributions(): Promise<Map<string, number>> {
-		const map = new Map<string, number>(
-			Object.entries(HISTORICAL_WORK_CONTRIBUTIONS),
-		);
-		if (!this.workToken) return map;
+	async getReadme(owner: string, repo: string): Promise<string> {
+		const cacheKey = `${owner}/${repo}`;
+		const now = Date.now();
+		const cached = this.readmeCache.get(cacheKey);
+		if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
+			return cached.content;
+		}
+
+		if (owner === "enterprise" && FALLBACK_READMES[cacheKey]) {
+			const fallback = FALLBACK_READMES[cacheKey];
+			this.readmeCache.set(cacheKey, { content: fallback, timestamp: now });
+			return fallback;
+		}
+
+		let content: string;
 		try {
-			const query = `
-				query {
-					viewer {
-						contributionsCollection {
-							contributionCalendar {
-								weeks {
-									contributionDays {
-										date
-										contributionCount
-									}
-								}
-							}
-						}
-					}
-				}
-			`;
-			const res = await fetch("https://api.github.com/graphql", {
-				method: "POST",
-				headers: {
-					Authorization: `bearer ${this.workToken}`,
-					"User-Agent": "vitor-portfolio-app",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ query }),
-			});
-			if (!res.ok) return map;
-			const data = (await res.json()) as {
-				data?: {
-					viewer?: {
-						contributionsCollection?: {
-							contributionCalendar?: {
-								weeks?: Array<{
-									contributionDays?: Array<{
-										date: string;
-										contributionCount: number;
-									}>;
-								}>;
-							};
-						};
+			content = await this.gitHubService.getProjectReadme(owner, repo);
+		} catch {
+			content =
+				FALLBACK_READMES[cacheKey] ||
+				`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`;
+		}
+
+		this.readmeCache.set(cacheKey, { content, timestamp: now });
+		return content;
+	}
+
+	private async fetchAllProjects(): Promise<Project[]> {
+		const now = Date.now();
+		if (
+			this.cachedProjects &&
+			now - this.cachedProjects.timestamp < this.CACHE_TTL_MS
+		) {
+			return this.cachedProjects.data;
+		}
+
+		let personalProjects = [...SEED_PERSONAL_PROJECTS];
+
+		try {
+			const remoteRepos = await this.gitHubService.getPinnedRepositories(
+				this.username,
+			);
+
+			if (remoteRepos.length > 0) {
+				const mapped: Project[] = remoteRepos.map((repo) => {
+					const existing = SEED_PERSONAL_PROJECTS.find(
+						(p) => p.repo.toLowerCase() === repo.name.toLowerCase(),
+					);
+
+					return {
+						id: repo.name,
+						name:
+							repo.name === "command-api"
+								? "@v1tor2003/command-api"
+								: repo.name,
+						description:
+							repo.description ||
+							existing?.description ||
+							"Open source project by Vítor Pires",
+						category: "personal" as const,
+						htmlUrl: repo.htmlUrl,
+						stars: repo.stars,
+						forks: repo.forks,
+						language: repo.language || existing?.language || "TypeScript",
+						topics:
+							repo.topics && repo.topics.length > 0
+								? repo.topics
+								: existing?.topics || ["typescript", "open-source"],
+						isPinned: Boolean(repo.isPinned || existing?.isPinned),
+						hasReadme: true,
+						owner: repo.owner.login,
+						repo: repo.name,
 					};
-				};
-			};
+				});
 
-			const weeks =
-				data?.data?.viewer?.contributionsCollection?.contributionCalendar
-					?.weeks;
-			if (!weeks) return map;
+				const pinnedFirst = mapped.sort((a, b) => {
+					if (a.isPinned && !b.isPinned) return -1;
+					if (!a.isPinned && b.isPinned) return 1;
+					return b.stars - a.stars;
+				});
 
-			for (const week of weeks) {
-				if (week.contributionDays) {
-					for (const day of week.contributionDays) {
-						if (day.contributionCount > 0) {
-							const existing = map.get(day.date) ?? 0;
-							map.set(day.date, Math.max(existing, day.contributionCount));
-						}
-					}
+				if (pinnedFirst.length > 0) {
+					personalProjects = pinnedFirst;
 				}
 			}
-			return map;
 		} catch {
-			return map;
+			// Resilient fallback to seed projects
 		}
+
+		const combined = [...personalProjects, ...SEED_WORK_PROJECTS];
+		this.cachedProjects = { data: combined, timestamp: now };
+		return combined;
 	}
 
 	private mergeRealContributionsWithWork(
@@ -248,7 +264,6 @@ export class ProjectsService implements IProjectsService {
 
 			let personalCount = contributionMap.get(dateStr) ?? 0;
 			if (!hasPersonal) {
-				// Deterministic fallback for personal open-source activity when API is offline/mocked
 				const seed = dateStr
 					.split("-")
 					.reduce((acc, part) => acc * 31 + Number.parseInt(part, 10), 13);
@@ -268,10 +283,7 @@ export class ProjectsService implements IProjectsService {
 			if (realWorkContributionsMap?.has(dateStr)) {
 				workCount = realWorkContributionsMap.get(dateStr) ?? 0;
 				totalWork += workCount;
-			} else if (realWorkContributionsMap && this.workToken) {
-				workCount = 0;
 			} else {
-				// Deterministic enterprise activity fallback for weekdays
 				if (dayOfWeek !== 0 && dayOfWeek !== 6) {
 					const seed = dateStr
 						.split("-")
@@ -309,235 +321,4 @@ export class ProjectsService implements IProjectsService {
 			totalWork,
 		};
 	}
-
-	async getReadme(owner: string, repo: string): Promise<string> {
-		const cacheKey = `${owner}/${repo}`;
-		const now = Date.now();
-		const cached = this.readmeCache.get(cacheKey);
-		if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
-			return cached.content;
-		}
-
-		// Try fetching from GitHub API if owner is not enterprise
-		if (owner !== "enterprise") {
-			try {
-				const command = new GetProjectReadmeCommand({
-					owner,
-					repo,
-					token: this.token,
-				});
-
-				const result = await this.client.send(command);
-
-				if (isOk(result) && result.data) {
-					const data = result.data;
-					if (data.content && data.encoding === "base64") {
-						const decoded = Buffer.from(
-							data.content.replace(/\s+/g, ""),
-							"base64",
-						).toString("utf-8");
-						this.readmeCache.set(cacheKey, {
-							content: decoded,
-							timestamp: now,
-						});
-						return decoded;
-					}
-				}
-			} catch {
-				// Silently fallback on network or parsing error
-			}
-		}
-
-		// Fallback to embedded readme
-		const fallback =
-			FALLBACK_READMES[cacheKey] ||
-			`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`;
-		this.readmeCache.set(cacheKey, { content: fallback, timestamp: now });
-		return fallback;
-	}
-
-	private async fetchAllProjects(): Promise<Project[]> {
-		const now = Date.now();
-		if (
-			this.cachedProjects &&
-			now - this.cachedProjects.timestamp < this.CACHE_TTL_MS
-		) {
-			return this.cachedProjects.data;
-		}
-
-		let personalProjects = [...SEED_PERSONAL_PROJECTS];
-
-		// Attempt remote GitHub fetch if client/token exists or public fetch is allowed
-		try {
-			const command = new GetPinnedProjectsCommand({
-				username: this.username,
-				token: this.token,
-			});
-
-			const [result, pinnedSet] = await Promise.all([
-				this.client.send(command),
-				this.fetchPinnedRepoNames(),
-			]);
-
-			if (
-				isOk(result) &&
-				Array.isArray(result.data) &&
-				result.data.length > 0
-			) {
-				const remoteRepos = result.data;
-				// Merge or map fetched repositories
-				const mapped: Project[] = remoteRepos
-					.filter(
-						(repo) =>
-							!repo.name.startsWith(".") &&
-							repo.name.toLowerCase() !== this.username.toLowerCase(),
-					) // Filter config/hidden/profile repos
-					.map((repo) => {
-						const existing = SEED_PERSONAL_PROJECTS.find(
-							(p) => p.repo.toLowerCase() === repo.name.toLowerCase(),
-						);
-
-						const isPinned =
-							pinnedSet.has(repo.name.toLowerCase()) ||
-							Boolean(existing?.isPinned);
-
-						return {
-							id: repo.name,
-							name:
-								repo.name === "command-api"
-									? "@v1tor2003/command-api"
-									: repo.name,
-							description:
-								repo.description ||
-								existing?.description ||
-								"Open source project by Vítor Pires",
-							category: "personal" as const,
-							htmlUrl: repo.html_url,
-							stars: repo.stargazers_count,
-							forks: repo.forks_count,
-							language: repo.language || existing?.language || "TypeScript",
-							topics:
-								repo.topics && repo.topics.length > 0
-									? repo.topics
-									: existing?.topics || ["typescript", "open-source"],
-							isPinned,
-							hasReadme: true,
-							owner: repo.owner.login,
-							repo: repo.name,
-						};
-					});
-
-				// Sort pinned repositories to the top, then sort by stars descending
-				const pinnedFirst = mapped.sort((a, b) => {
-					if (a.isPinned && !b.isPinned) return -1;
-					if (!a.isPinned && b.isPinned) return 1;
-					return b.stars - a.stars;
-				});
-
-				if (pinnedFirst.length > 0) {
-					personalProjects = pinnedFirst;
-				}
-			}
-		} catch {
-			// Resilient fallback to seed projects
-		}
-
-		const combined = [...personalProjects, ...SEED_WORK_PROJECTS];
-		this.cachedProjects = { data: combined, timestamp: now };
-		return combined;
-	}
-
-	private async fetchPinnedRepoNames(): Promise<Set<string>> {
-		const pinnedNames = new Set<string>();
-
-		if (this.token) {
-			try {
-				const query = `
-					query($username: String!) {
-						user(login: $username) {
-							pinnedItems(first: 10, types: REPOSITORY) {
-								nodes {
-									... on Repository {
-										name
-									}
-								}
-							}
-						}
-					}
-				`;
-				const res = await fetch("https://api.github.com/graphql", {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${this.token}`,
-						"Content-Type": "application/json",
-						"User-Agent": "vitor-portfolio-app",
-					},
-					body: JSON.stringify({
-						query,
-						variables: { username: this.username },
-					}),
-				});
-
-				if (res.ok) {
-					const json = await res.json();
-					const nodes = json.data?.user?.pinnedItems?.nodes;
-					if (Array.isArray(nodes)) {
-						for (const node of nodes) {
-							if (node?.name) {
-								pinnedNames.add(node.name.toLowerCase());
-							}
-						}
-						if (pinnedNames.size > 0) {
-							return pinnedNames;
-						}
-					}
-				}
-			} catch {
-				// Fallback to scraping
-			}
-		}
-
-		try {
-			const res = await fetch(`https://github.com/${this.username}`, {
-				headers: {
-					"User-Agent": "vitor-portfolio-app",
-				},
-			});
-			if (res.ok) {
-				const html = await res.text();
-				const regex = new RegExp(
-					`class="pinned-item-list-item-content"[\\s\\S]*?href="/${this.username}/([^"/]+)"`,
-					"g",
-				);
-				const matches = Array.from(html.matchAll(regex));
-				for (const m of matches) {
-					if (m[1] && m[1].toLowerCase() !== this.username.toLowerCase()) {
-						pinnedNames.add(m[1].toLowerCase());
-					}
-				}
-				if (pinnedNames.size > 0) {
-					return pinnedNames;
-				}
-			}
-		} catch {
-			// Fallback to seed pinned list
-		}
-
-		for (const p of SEED_PERSONAL_PROJECTS) {
-			if (p.isPinned) {
-				pinnedNames.add(p.repo.toLowerCase());
-			}
-		}
-
-		return pinnedNames;
-	}
-}
-
-let cachedProjectsService: IProjectsService | null = null;
-
-export function getProjectsService(): IProjectsService {
-	if (!cachedProjectsService) {
-		cachedProjectsService = new ProjectsService();
-	}
-	return cachedProjectsService;
 }
