@@ -22,20 +22,11 @@ export class GitActivityService implements IGitActivityService {
 
 	async getGitActivity(): Promise<GitActivityData> {
 		if (this.isCacheValid()) return this.cachedActivity!.data;
-		
-		try {
-			const activity = await this.fetchLiveActivity();
-			if (activity) {
-				this.updateCache(activity);
-				return activity;
-			}
-		} catch {
-			// Resilient fallback to deterministic generator
-		}
 
-		const fallback = generateGitActivityData(ACTIVITY_WEEKS);
-		this.updateCache(fallback);
-		return fallback;
+		const activity = await this.fetchLiveActivity();
+		const result = activity ?? generateGitActivityData(ACTIVITY_WEEKS);
+		this.updateCache(result);
+		return result;
 	}
 
 	private isCacheValid(): boolean {

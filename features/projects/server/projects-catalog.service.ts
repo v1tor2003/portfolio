@@ -100,19 +100,16 @@ export class ProjectsCatalogService implements IProjectsCatalogService {
 		repo: string,
 		cacheKey: string,
 	): Promise<string> {
-		try {
-			return await this.gitHubService.getProjectReadme(owner, repo);
-		} catch {
-			return (
-				FALLBACK_READMES[cacheKey] ||
-				`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`
-			);
-		}
+		const readme = await this.gitHubService.getProjectReadme(owner, repo);
+		return (
+			readme ||
+			FALLBACK_READMES[cacheKey] ||
+			`# ${repo}\n\nDocumentation is being synchronized. Explore details at [GitHub Repository](https://github.com/${owner}/${repo}).`
+		);
 	}
 
 	private async fetchAllProjects(): Promise<Project[]> {
-		if (this.isProjectsCacheValid()) 	return this.cachedProjects!.data;
-		
+		if (this.isProjectsCacheValid()) return this.cachedProjects!.data;
 
 		const personalProjects = await this.resolvePersonalProjects();
 		const combined = [...personalProjects, ...SEED_WORK_PROJECTS];
@@ -126,16 +123,12 @@ export class ProjectsCatalogService implements IProjectsCatalogService {
 	}
 
 	private async resolvePersonalProjects(): Promise<Project[]> {
-		try {
-			const remoteRepos = await this.gitHubService.getPinnedRepositories(this.username);
-			if (remoteRepos.length === 0) return [...SEED_PERSONAL_PROJECTS];
+		const remoteRepos = await this.gitHubService.getPinnedRepositories(this.username);
+		if (remoteRepos.length === 0) return [...SEED_PERSONAL_PROJECTS];
 
-			const mapped = remoteRepos.map((repo) => this.mapRepoToProject(repo));
-			const sorted = this.sortPinnedFirst(mapped);
-			return sorted.length > 0 ? sorted : [...SEED_PERSONAL_PROJECTS];
-		} catch {
-			return [...SEED_PERSONAL_PROJECTS];
-		}
+		const mapped = remoteRepos.map((repo) => this.mapRepoToProject(repo));
+		const sorted = this.sortPinnedFirst(mapped);
+		return sorted.length > 0 ? sorted : [...SEED_PERSONAL_PROJECTS];
 	}
 
 	private mapRepoToProject(repo: GitHubRepository): Project {
