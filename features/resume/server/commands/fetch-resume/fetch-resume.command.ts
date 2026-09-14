@@ -4,7 +4,6 @@ export interface FetchResumeInput {
 	owner: string;
 	repo: string;
 	path: string;
-	token?: string;
 }
 
 export interface GitHubContentFileResponse {
@@ -22,17 +21,13 @@ export class FetchResumeCommand extends BaseRequest<
 	GitHubContentFileResponse
 > {
 	toHttp(): HttpRequestContext {
-		const headers: Record<string, string> = {
-			Accept: "application/vnd.github.v3+json",
-			"User-Agent": "vitor-portfolio-app",
-		};
-
-		if (this.input.token) headers.Authorization = `Bearer ${this.input.token}`;
-
 		return {
 			method: "GET",
 			path: `/repos/${this.input.owner}/${this.input.repo}/contents/${this.input.path}`,
-			headers,
+			headers: {
+				Accept: "application/vnd.github.v3+json",
+				"User-Agent": "vitor-portfolio-app",
+			},
 		};
 	}
 }

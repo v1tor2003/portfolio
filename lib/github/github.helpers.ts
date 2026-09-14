@@ -27,48 +27,6 @@ export function decodeBase64Buffer(
 	return Buffer.from(clean, "base64");
 }
 
-export async function fetchPinnedRepoNamesFromGraphQL(
-	username: string,
-	token: string,
-): Promise<Set<string>> {
-	const names = new Set<string>();
-	const query = `
-		query($username: String!) {
-			user(login: $username) {
-				pinnedItems(first: 10, types: REPOSITORY) {
-					nodes {
-						... on Repository {
-							name
-						}
-					}
-				}
-			}
-		}
-	`;
-
-	const res = await fetch("https://api.github.com/graphql", {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${token}`,
-			"Content-Type": "application/json",
-			"User-Agent": "vitor-portfolio-app",
-		},
-		body: JSON.stringify({ query, variables: { username } }),
-	});
-
-	if (!res.ok) return names;
-	const json = await res.json();
-	const nodes = json.data?.user?.pinnedItems?.nodes;
-	if (Array.isArray(nodes)) {
-		for (const node of nodes) {
-			if (node?.name) {
-				names.add(node.name.toLowerCase());
-			}
-		}
-	}
-	return names;
-}
-
 export async function fetchPinnedRepoNamesFromScraping(
 	username: string,
 ): Promise<Set<string>> {
@@ -89,54 +47,4 @@ export async function fetchPinnedRepoNamesFromScraping(
 		}
 	}
 	return names;
-}
-
-export interface GraphQLWorkContributionsResponse {
-	data?: {
-		viewer?: {
-			contributionsCollection?: {
-				contributionCalendar?: {
-					weeks?: Array<{
-						contributionDays?: Array<{
-							date: string;
-							contributionCount: number;
-						}>;
-					}>;
-				};
-			};
-		};
-	};
-}
-
-export async function fetchGraphQLWorkContributions(
-	workToken: string,
-): Promise<GraphQLWorkContributionsResponse | null> {
-	const query = `
-		query {
-			viewer {
-				contributionsCollection {
-					contributionCalendar {
-						weeks {
-							contributionDays {
-								date
-								contributionCount
-							}
-						}
-					}
-				}
-			}
-		}
-	`;
-	const res = await fetch("https://api.github.com/graphql", {
-		method: "POST",
-		headers: {
-			Authorization: `bearer ${workToken}`,
-			"User-Agent": "vitor-portfolio-app",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({ query }),
-	});
-
-	if (!res.ok) return null;
-	return (await res.json()) as GraphQLWorkContributionsResponse;
 }

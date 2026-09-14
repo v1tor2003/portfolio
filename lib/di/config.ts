@@ -15,7 +15,8 @@ import { ProjectsCatalogService } from "@/features/projects/server/services/proj
 import type { IResumeService } from "@/features/resume";
 import { ResumeService } from "@/features/resume/server/services/resume.service";
 import { env } from "@/lib/env";
-import type { IGitHubService } from "@/lib/github";
+import { createAuthMiddleware } from "@/lib/github/auth.middleware";
+import type { IGitHubService } from "@/lib/github/github.service.interface";
 import { GitHubService } from "@/lib/github/github.service";
 import { DI_TYPES } from "./types";
 
@@ -23,7 +24,7 @@ const container = new Container();
 
 // --- API Clients ---
 container
-	.bind<ApiClient>(DI_TYPES.GitHubApiClient)
+	.bind<ApiClient>(DI_TYPES.GitHubPersonalClient)
 	.toDynamicValue(
 		() =>
 			new ApiClient({
@@ -34,6 +35,24 @@ container
 						"User-Agent": "vitor-portfolio-app",
 					},
 				}),
+				middleware: [createAuthMiddleware(() => env.GITHUB_PERSONAL_TOKEN)],
+			}),
+	)
+	.inSingletonScope();
+
+container
+	.bind<ApiClient>(DI_TYPES.GitHubWorkClient)
+	.toDynamicValue(
+		() =>
+			new ApiClient({
+				transport: new FetchTransport({
+					baseUrl: "https://api.github.com",
+					headers: {
+						Accept: "application/vnd.github.v3+json",
+						"User-Agent": "vitor-portfolio-app",
+					},
+				}),
+				middleware: [createAuthMiddleware(() => env.GITHUB_WORK_TOKEN)],
 			}),
 	)
 	.inSingletonScope();
@@ -69,8 +88,9 @@ container
 	.toDynamicValue(
 		() =>
 			new GitHubService(
-				container.get<ApiClient>(DI_TYPES.GitHubApiClient),
+				container.get<ApiClient>(DI_TYPES.GitHubPersonalClient),
 				container.get<ApiClient>(DI_TYPES.GitHubContributionsApiClient),
+				container.get<ApiClient>(DI_TYPES.GitHubWorkClient),
 			),
 	)
 	.inSingletonScope();

@@ -83,8 +83,13 @@ describe("Dependency Injection Container", () => {
 	});
 
 	it("resolves API clients from the container", () => {
-		const ghClient = resolveService<ApiClient>(DI_TYPES.GitHubApiClient);
-		expect(ghClient).toBeDefined();
+		const personalClient = resolveService<ApiClient>(
+			DI_TYPES.GitHubPersonalClient,
+		);
+		expect(personalClient).toBeDefined();
+
+		const workClient = resolveService<ApiClient>(DI_TYPES.GitHubWorkClient);
+		expect(workClient).toBeDefined();
 
 		const contribClient = resolveService<ApiClient>(
 			DI_TYPES.GitHubContributionsApiClient,

@@ -1,6 +1,8 @@
+import { ApiClient, FetchTransport } from "@v1tor2003/command-api";
 import { describe, expect, it, vi } from "vitest";
 import { resolveService } from "@/lib/di/config";
 import { DI_TYPES } from "@/lib/di/types";
+import { env } from "@/lib/env";
 import { GitHubService } from "@/lib/github/github.service";
 import { GitActivityService } from "./git-activity.service";
 import { ProjectsService } from "./projects.service";
@@ -8,14 +10,12 @@ import type { IProjectsService } from "./projects.service.interface";
 import { ProjectsCatalogService } from "./projects-catalog.service";
 
 function createTestProjectsService(options?: {
-	token?: string;
-	workToken?: string;
+	workClient?: ApiClient;
 }): IProjectsService {
 	const gitHubService = new GitHubService(
-		resolveService(DI_TYPES.GitHubApiClient),
+		resolveService(DI_TYPES.GitHubPersonalClient),
 		resolveService(DI_TYPES.GitHubContributionsApiClient),
-		options?.token,
-		options?.workToken,
+		options?.workClient ?? resolveService(DI_TYPES.GitHubWorkClient),
 	);
 	const catalogService = new ProjectsCatalogService(gitHubService);
 	const activityService = new GitActivityService(gitHubService);
@@ -31,9 +31,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("returns fallback personal and work projects when github client is not provided or fails", async () => {
-		const service = createTestProjectsService({
-			token: undefined,
-		});
+		const service = createTestProjectsService();
 
 		const personalProjects = await service.getProjects("personal");
 		expect(personalProjects.length).toBeGreaterThan(0);
@@ -107,7 +105,6 @@ describe("ProjectsService", () => {
 	});
 
 	it("merges real enterprise contributions from GraphQL when workToken is supplied", async () => {
-		const originalFetch = globalThis.fetch;
 		const mockGraphQLResponse = {
 			data: {
 				viewer: {
@@ -129,20 +126,18 @@ describe("ProjectsService", () => {
 			},
 		};
 
-		globalThis.fetch = vi.fn().mockImplementation((url) => {
-			if (typeof url === "string" && url.includes("/graphql")) {
-				return Promise.resolve({
-					ok: true,
-					json: () => Promise.resolve(mockGraphQLResponse),
-				});
-			}
-			return originalFetch(url);
+		const mockWorkClient = new ApiClient({
+			transport: new FetchTransport({ baseUrl: "https://api.github.com" }),
+		});
+		vi.spyOn(mockWorkClient, "send").mockResolvedValue({
+			data: mockGraphQLResponse,
+			error: null,
 		});
 
+		const prevToken = env.GITHUB_WORK_TOKEN;
+		(env as { GITHUB_WORK_TOKEN?: string }).GITHUB_WORK_TOKEN = "mock-work-token";
 		try {
-			const service = createTestProjectsService({
-				workToken: "mock-work-token",
-			});
+			const service = createTestProjectsService({ workClient: mockWorkClient });
 			const activity = await service.getGitActivity();
 			expect(activity.totalWork).toBeGreaterThan(0);
 			const targetDay = activity.days.find(
@@ -151,7 +146,7 @@ describe("ProjectsService", () => {
 			expect(targetDay).toBeDefined();
 			expect(targetDay?.count).toBeGreaterThanOrEqual(16);
 		} finally {
-			globalThis.fetch = originalFetch;
+			(env as { GITHUB_WORK_TOKEN?: string }).GITHUB_WORK_TOKEN = prevToken;
 		}
 	});
 
@@ -200,10 +195,7 @@ describe("ProjectsService", () => {
 	});
 
 	it("incorporates historical enterprise activity as a static initial baseline", async () => {
-		const service = createTestProjectsService({
-			token: undefined,
-			workToken: undefined,
-		});
+		const service = createTestProjectsService();
 		const activity = await service.getGitActivity();
 
 		// Check for presence of verified historical dates from the 2025-2026 enterprise records

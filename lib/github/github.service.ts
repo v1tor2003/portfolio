@@ -6,15 +6,15 @@ import {
 } from "@/features/projects/data/projects-seed.data";
 import { GetGitActivityCommand } from "@/features/projects/server/commands/get-git-activity/get-git-activity.command";
 import { GetPinnedProjectsCommand } from "@/features/projects/server/commands/get-pinned-projects/get-pinned-projects.command";
+import { GetPinnedRepoNamesCommand } from "@/features/projects/server/commands/get-pinned-repo-names/get-pinned-repo-names.command";
 import { GetProjectReadmeCommand } from "@/features/projects/server/commands/get-project-readme/get-project-readme.command";
+import { GetWorkContributionsCommand } from "@/features/projects/server/commands/get-work-contributions/get-work-contributions.command";
 import { FetchResumeCommand } from "@/features/resume/server/commands/fetch-resume/fetch-resume.command";
 import { DI_TYPES } from "@/lib/di/types";
 import { env } from "@/lib/env";
 import {
 	decodeBase64Buffer,
 	decodeBase64Result,
-	fetchGraphQLWorkContributions,
-	fetchPinnedRepoNamesFromGraphQL,
 	fetchPinnedRepoNamesFromScraping,
 } from "./github.helpers";
 import type {
@@ -26,12 +26,12 @@ import type {
 @injectable()
 export class GitHubService implements IGitHubService {
 	constructor(
-		@inject(DI_TYPES.GitHubApiClient)
+		@inject(DI_TYPES.GitHubPersonalClient)
 		private readonly client: ApiClient,
 		@inject(DI_TYPES.GitHubContributionsApiClient)
 		private readonly contributionsClient: ApiClient,
-		private readonly token = env.GITHUB_PERSONAL_TOKEN,
-		private readonly workToken = env.GITHUB_WORK_TOKEN,
+		@inject(DI_TYPES.GitHubWorkClient)
+		private readonly workClient: ApiClient,
 		private readonly username = env.GITHUB_PERSONAL_USERNAME,
 		private readonly workUsername = env.GITHUB_WORK_USERNAME,
 	) {}
@@ -39,10 +39,7 @@ export class GitHubService implements IGitHubService {
 	async getPinnedRepositories(
 		username = this.username,
 	): Promise<GitHubRepository[]> {
-		const command = new GetPinnedProjectsCommand({
-			username,
-			token: this.token,
-		});
+		const command = new GetPinnedProjectsCommand({ username });
 
 		const [result, pinnedSet] = await Promise.all([
 			this.client.send(command),
@@ -77,11 +74,7 @@ export class GitHubService implements IGitHubService {
 
 	async getProjectReadme(owner: string, repo: string): Promise<string> {
 		if (owner !== "enterprise") {
-			const command = new GetProjectReadmeCommand({
-				owner,
-				repo,
-				token: this.token,
-			});
+			const command = new GetProjectReadmeCommand({ owner, repo });
 
 			const result = await this.client.send(command);
 			const decoded = decodeBase64Result(result);
@@ -99,13 +92,12 @@ export class GitHubService implements IGitHubService {
 		repo: string,
 		filePath: string,
 	): Promise<Buffer | null> {
-		if (!this.token) return null;
+		if (!env.GITHUB_PERSONAL_TOKEN) return null;
 
 		const command = new FetchResumeCommand({
 			owner,
 			repo,
 			path: filePath,
-			token: this.token,
 		});
 
 		const result = await this.client.send(command);
@@ -131,41 +123,43 @@ export class GitHubService implements IGitHubService {
 		const map = new Map<string, number>(
 			Object.entries(HISTORICAL_WORK_CONTRIBUTIONS),
 		);
-		if (!this.workToken) return map;
+		if (!env.GITHUB_WORK_TOKEN) return map;
 
-		try {
-			const response = await fetchGraphQLWorkContributions(this.workToken);
-			const weeks =
-				response?.data?.viewer?.contributionsCollection?.contributionCalendar
-					?.weeks;
-			if (!weeks) return map;
+		const result = await this.workClient.send(
+			new GetWorkContributionsCommand(),
+		);
 
-			for (const week of weeks) {
-				if (!week.contributionDays) continue;
-				for (const day of week.contributionDays) {
-					if (day.contributionCount > 0) {
-						const existing = map.get(day.date) ?? 0;
-						map.set(day.date, Math.max(existing, day.contributionCount));
-					}
+		if (!isOk(result) || !result.data) return map;
+
+		const weeks =
+			result.data.data?.viewer?.contributionsCollection?.contributionCalendar
+				?.weeks;
+		if (!weeks) return map;
+
+		for (const week of weeks) {
+			if (!week.contributionDays) continue;
+			for (const day of week.contributionDays) {
+				if (day.contributionCount > 0) {
+					const existing = map.get(day.date) ?? 0;
+					map.set(day.date, Math.max(existing, day.contributionCount));
 				}
 			}
-		} catch {
-			// Fallback on network/auth error
 		}
 
 		return map;
 	}
 
 	private async fetchPinnedRepoNames(username: string): Promise<Set<string>> {
-		if (this.token) {
-			try {
-				const names = await fetchPinnedRepoNamesFromGraphQL(
-					username,
-					this.token,
-				);
+		if (env.GITHUB_PERSONAL_TOKEN) {
+			const result = await this.client.send(
+				new GetPinnedRepoNamesCommand({ username }),
+			);
+			if (isOk(result) && result.data?.data?.user?.pinnedItems?.nodes) {
+				const names = new Set<string>();
+				for (const node of result.data.data.user.pinnedItems.nodes) {
+					if (node?.name) names.add(node.name.toLowerCase());
+				}
 				if (names.size > 0) return names;
-			} catch {
-				// Fallback to scraping
 			}
 		}
 

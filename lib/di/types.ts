@@ -11,7 +11,9 @@ export const DI_TYPES = {
 	IGitHubService: Symbol.for("IGitHubService"),
 	IGitActivityService: Symbol.for("IGitActivityService"),
 	IProjectsCatalogService: Symbol.for("IProjectsCatalogService"),
-	GitHubApiClient: Symbol.for("GitHubApiClient"),
+	GitHubApiClient: Symbol.for("GitHubPersonalClient"),
+	GitHubPersonalClient: Symbol.for("GitHubPersonalClient"),
+	GitHubWorkClient: Symbol.for("GitHubWorkClient"),
 	GitHubContributionsApiClient: Symbol.for("GitHubContributionsApiClient"),
 	ResendApiClient: Symbol.for("ResendApiClient"),
 } as const;
