@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 		"Backend systems, open-source libraries, and cloud architecture projects by Vítor Pires.",
 };
 
+export const revalidate = 900; // Revalidate every 15 minutes
+
 export default async function ProjectsPage() {
 	const projectsService = resolveService<IProjectsService>(
 		DI_TYPES.IProjectsService,

@@ -25,6 +25,8 @@ export const GitActivityDaySchema = z.object({
 	date: z.string(), // YYYY-MM-DD
 	count: z.number().int().nonnegative(),
 	category: z.enum(["personal", "work", "mixed", "none"]),
+	personalCount: z.number().int().nonnegative().optional(),
+	workCount: z.number().int().nonnegative().optional(),
 });
 
 export type GitActivityDay = z.infer<typeof GitActivityDaySchema>;

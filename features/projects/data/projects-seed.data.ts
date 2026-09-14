@@ -469,6 +469,8 @@ export function generateGitActivityData(weeks = 52): GitActivityData {
 				date: dateStr,
 				count: historicalCount,
 				category: historicalCount > 0 ? "work" : "none",
+				personalCount: 0,
+				workCount: historicalCount,
 			});
 			continue;
 		}
@@ -481,25 +483,28 @@ export function generateGitActivityData(weeks = 52): GitActivityData {
 		const absRand = Math.abs(rand);
 
 		let count = 0;
+		let personalCount = 0;
+		let workCount = 0;
 		let category: "personal" | "work" | "mixed" | "none" = "none";
 
 		if (dayOfWeek === 0 || dayOfWeek === 6) {
 			// Weekends: predominantly personal open-source
 			if (absRand > 0.45) {
-				count = Math.floor(absRand * 8) + 1;
+				personalCount = Math.floor(absRand * 8) + 1;
+				count = personalCount;
 				category = "personal";
 				totalPersonal += count;
 			}
 		} else {
 			// Weekdays: enterprise work with occasional personal evening commits
 			if (absRand > 0.2) {
-				const workCount = Math.floor(absRand * 10) + 2;
+				workCount = Math.floor(absRand * 10) + 2;
 				totalWork += workCount;
 				count = workCount;
 
 				if (absRand > 0.75) {
 					// Mixed commit day
-					const personalCount = Math.floor(absRand * 4) + 1;
+					personalCount = Math.floor(absRand * 4) + 1;
 					totalPersonal += personalCount;
 					count += personalCount;
 					category = "mixed";
@@ -507,7 +512,8 @@ export function generateGitActivityData(weeks = 52): GitActivityData {
 					category = "work";
 				}
 			} else if (absRand > 0.1) {
-				count = Math.floor(absRand * 4) + 1;
+				personalCount = Math.floor(absRand * 4) + 1;
+				count = personalCount;
 				category = "personal";
 				totalPersonal += count;
 			}
@@ -517,6 +523,8 @@ export function generateGitActivityData(weeks = 52): GitActivityData {
 			date: dateStr,
 			count,
 			category,
+			personalCount,
+			workCount,
 		});
 	}
 

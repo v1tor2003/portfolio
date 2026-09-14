@@ -40,8 +40,15 @@ export function GitActivityGraph({
 
 	const getCellAppearance = (day: GitActivityDay) => {
 		const isPersonalActive = activeCategory === "personal";
+		const count = isPersonalActive
+			? (day.personalCount ??
+				(day.category === "personal" || day.category === "mixed"
+					? day.count
+					: 0))
+			: (day.workCount ??
+				(day.category === "work" || day.category === "mixed" ? day.count : 0));
 
-		if (day.count === 0 || day.category === "none") {
+		if (count === 0) {
 			return {
 				bg: "bg-zinc-900 border-zinc-800/60",
 				highlight: "none",
@@ -49,56 +56,41 @@ export function GitActivityGraph({
 		}
 
 		if (isPersonalActive) {
-			if (day.category === "personal" || day.category === "mixed") {
-				// Cyberpunk Emerald Green
-				if (day.count > 6) {
-					return {
-						bg: "bg-emerald-400 border-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.5)]",
-						highlight: "personal",
-					};
-				}
-				if (day.count > 3) {
-					return {
-						bg: "bg-emerald-500 border-emerald-400",
-						highlight: "personal",
-					};
-				}
+			// Cyberpunk Emerald Green
+			if (count > 6) {
 				return {
-					bg: "bg-emerald-600/80 border-emerald-500/60",
+					bg: "bg-emerald-400 border-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.5)]",
 					highlight: "personal",
 				};
 			}
-			// Dimmed work activity in personal mode
+			if (count > 3) {
+				return {
+					bg: "bg-emerald-500 border-emerald-400",
+					highlight: "personal",
+				};
+			}
 			return {
-				bg: "bg-zinc-800 border-zinc-700/50",
-				highlight: "dimmed",
+				bg: "bg-emerald-600/80 border-emerald-500/60",
+				highlight: "personal",
 			};
 		}
 
-		// isWorkActive
-		if (day.category === "work" || day.category === "mixed") {
-			// Electric Purple
-			if (day.count > 8) {
-				return {
-					bg: "bg-purple-400 border-purple-300 shadow-[0_0_8px_rgba(192,132,252,0.5)]",
-					highlight: "work",
-				};
-			}
-			if (day.count > 4) {
-				return {
-					bg: "bg-purple-500 border-purple-400",
-					highlight: "work",
-				};
-			}
+		// isWorkActive - Electric Purple
+		if (count > 8) {
 			return {
-				bg: "bg-purple-600/80 border-purple-500/60",
+				bg: "bg-purple-400 border-purple-300 shadow-[0_0_8px_rgba(192,132,252,0.5)]",
 				highlight: "work",
 			};
 		}
-		// Dimmed personal activity in work mode
+		if (count > 4) {
+			return {
+				bg: "bg-purple-500 border-purple-400",
+				highlight: "work",
+			};
+		}
 		return {
-			bg: "bg-zinc-800 border-zinc-700/50",
-			highlight: "dimmed",
+			bg: "bg-purple-600/80 border-purple-500/60",
+			highlight: "work",
 		};
 	};
 
@@ -138,11 +130,21 @@ export function GitActivityGraph({
 						<div key={`week-${wIdx}`} className="flex flex-col gap-1">
 							{week.map((day) => {
 								const { bg, highlight } = getCellAppearance(day);
+								const activeCount =
+									activeCategory === "personal"
+										? (day.personalCount ??
+											(day.category === "personal" || day.category === "mixed"
+												? day.count
+												: 0))
+										: (day.workCount ??
+											(day.category === "work" || day.category === "mixed"
+												? day.count
+												: 0));
 								return (
 									<button
 										key={day.date}
 										type="button"
-										aria-label={`${day.date}: ${day.count} commits`}
+										aria-label={`${day.date}: ${activeCount} ${activeCategory === "personal" ? "personal" : "enterprise"} commits`}
 										data-highlight={highlight}
 										onMouseEnter={() => setHoveredDay(day)}
 										onMouseLeave={() => setHoveredDay(null)}
@@ -161,19 +163,41 @@ export function GitActivityGraph({
 					{hoveredDay ? (
 						<span>
 							<strong className="text-zinc-300">{hoveredDay.date}</strong>:{" "}
-							{hoveredDay.count} commits (
-							<span
-								className={
-									hoveredDay.category === "personal"
-										? "text-emerald-400"
-										: hoveredDay.category === "work"
-											? "text-purple-400"
-											: "text-zinc-400"
-								}
-							>
-								{hoveredDay.category}
-							</span>
-							)
+							{activeCategory === "personal" ? (
+								<>
+									<span className="text-emerald-400 font-semibold">
+										{hoveredDay.personalCount ??
+											(hoveredDay.category === "personal" ||
+											hoveredDay.category === "mixed"
+												? hoveredDay.count
+												: 0)}{" "}
+										personal commits
+									</span>
+									{(hoveredDay.workCount ?? 0) > 0 && (
+										<span className="text-zinc-500">
+											{" "}
+											({hoveredDay.workCount} enterprise)
+										</span>
+									)}
+								</>
+							) : (
+								<>
+									<span className="text-purple-400 font-semibold">
+										{hoveredDay.workCount ??
+											(hoveredDay.category === "work" ||
+											hoveredDay.category === "mixed"
+												? hoveredDay.count
+												: 0)}{" "}
+										enterprise commits
+									</span>
+									{(hoveredDay.personalCount ?? 0) > 0 && (
+										<span className="text-zinc-500">
+											{" "}
+											({hoveredDay.personalCount} personal)
+										</span>
+									)}
+								</>
+							)}
 						</span>
 					) : (
 						<span>Hover over grid cells for commit details</span>

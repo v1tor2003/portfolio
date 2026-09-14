@@ -62,7 +62,11 @@ export class GitActivityService implements IGitActivityService {
 		let totalPersonal = 0;
 		let totalWork = 0;
 
-		for (let i = weeks * 7 - 1; i >= 0; i--) {
+		// Align start date to Sunday so each column in the grid represents Sun..Sat
+		const todayDayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+		const totalDays = weeks * 7 + todayDayOfWeek;
+
+		for (let i = totalDays; i >= 0; i--) {
 			const date = new Date(today);
 			date.setDate(date.getDate() - i);
 			const dateStr = date.toISOString().split("T")[0];
@@ -78,6 +82,8 @@ export class GitActivityService implements IGitActivityService {
 				date: dateStr,
 				count: personalCount + workCount,
 				category: this.resolveCategory(personalCount, workCount),
+				personalCount,
+				workCount,
 			});
 		}
 
@@ -113,8 +119,9 @@ export class GitActivityService implements IGitActivityService {
 		dayOfWeek: number,
 		realWorkContributionsMap?: Map<string, number> | null,
 	): number {
-		if (realWorkContributionsMap?.has(dateStr))
+		if (realWorkContributionsMap) {
 			return realWorkContributionsMap.get(dateStr) ?? 0;
+		}
 
 		const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 		if (isWeekend) return 0;
