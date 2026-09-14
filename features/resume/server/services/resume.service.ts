@@ -12,26 +12,6 @@ import type {
 
 export type { IResumeService, ResumeFileResult, ResumeLocale };
 
-
-function defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
-	const specificPath = path.join(
-		process.cwd(),
-		"public",
-		"resumes",
-		`vitor-pires-resume-${locale}.pdf`,
-	);
-	if (fs.existsSync(specificPath)) {
-		return fs.readFileSync(specificPath);
-	}
-	const fallbackPath = path.join(
-		process.cwd(),
-		"public",
-		"resumes",
-		"vitor-pires-resume.pdf",
-	);
-	return fs.readFileSync(fallbackPath);
-}
-
 @injectable()
 export class ResumeService implements IResumeService {
 	private readonly readFallback: (locale?: ResumeLocale) => Buffer;
@@ -39,7 +19,7 @@ export class ResumeService implements IResumeService {
 	constructor(
 		@inject(DI_TYPES.IGitHubService)
 		private readonly gitHubService: IGitHubService,
-		readFallback: (locale?: ResumeLocale) => Buffer = defaultReadFallbackFile,
+		readFallback: (locale?: ResumeLocale) => Buffer = ResumeService.defaultReadFallbackFile,
 		private readonly owner: string = env.RESUME_REPO_OWNER,
 		private readonly repo: string = env.RESUME_REPO_NAME,
 	) {
@@ -80,4 +60,25 @@ export class ResumeService implements IResumeService {
 			source: "local-fallback",
 		};
 	}
+
+  private static defaultReadFallbackFile(locale: ResumeLocale = "en"): Buffer {
+	const specificPath = path.join(
+		process.cwd(),
+		"public",
+		"resumes",
+		`vitor-pires-resume-${locale}.pdf`,
+	);
+
+	if (fs.existsSync(specificPath))
+		return fs.readFileSync(specificPath);
+	
+	const fallbackPath = path.join(
+		process.cwd(),
+		"public",
+		"resumes",
+		"vitor-pires-resume.pdf",
+	);
+
+	return fs.readFileSync(fallbackPath);
+}
 }

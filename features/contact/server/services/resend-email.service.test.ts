@@ -88,10 +88,8 @@ describe("ResendEmailService", () => {
 		expect(sentPayload.html).toContain("Nanoseconds count");
 	});
 
-	it("logs structured error and returns failure when API call fails", async () => {
+	it("returns failure with error message and details when API call fails", async () => {
 		(env as { RESEND_API_KEY?: string }).RESEND_API_KEY = "re_test_key_123";
-
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		const fetchMock = vi.fn().mockResolvedValue(
 			new Response(JSON.stringify({ message: "Rate limit exceeded" }), {
@@ -107,15 +105,7 @@ describe("ResendEmailService", () => {
 		expect(result.success).toBe(false);
 		if (!result.success) {
 			expect(result.error).toContain("Rate limit exceeded");
+			expect(result.details).toBeDefined();
 		}
-
-		expect(consoleSpy).toHaveBeenCalledWith(
-			expect.stringContaining(
-				"[ResendEmailService] Failed to dispatch transmission:",
-			),
-			expect.objectContaining({
-				status: 429,
-			}),
-		);
 	});
 });

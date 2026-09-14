@@ -1,4 +1,4 @@
-import type { ApiClient } from "@v1tor2003/command-api";
+import { isOk, type ApiClient } from "@v1tor2003/command-api";
 import { inject, injectable } from "inversify";
 import { DI_TYPES } from "@/lib/di/types";
 import { env } from "@/lib/env";
@@ -20,14 +20,6 @@ interface ApiErrorDetail {
 	data?: unknown;
 }
 
-function getErrorDetails(error: Error): ApiErrorDetail {
-	const maybeHttp = error as Error & ApiErrorDetail;
-	return {
-		status: maybeHttp.status,
-		data: maybeHttp.data,
-	};
-}
-
 @injectable()
 export class ResendEmailService implements IEmailService {
 	private readonly getClient: () => ApiClient;
@@ -43,12 +35,11 @@ export class ResendEmailService implements IEmailService {
 	}
 
 	async send(data: ContactFormData): Promise<EmailDispatchResult> {
-		if (!env.RESEND_API_KEY) {
+		if (!env.RESEND_API_KEY)
 			return {
 				success: true,
 				simulated: true,
 			};
-		}
 
 		const text = buildContactEmailText(data);
 		const html = buildContactEmailHtml(data);
@@ -65,16 +56,19 @@ export class ResendEmailService implements IEmailService {
 			}),
 		);
 
-		if (result.error) {
-			const { status, data: errorData } = getErrorDetails(result.error);
+		if(isOk(result)) 
+			return {
+				success: true,
+				messageId: result.data.id,
+			}
 
-			console.error("[ResendEmailService] Failed to dispatch transmission:", {
-				status,
-				message: result.error.message,
-				details: errorData,
-			});
+		return ResendEmailService.handleError(result.error);
+	}
 
-			const bodyMessage =
+	private static handleError(error: Error): EmailDispatchResult {
+		const { data: errorData } = ResendEmailService.getErrorDetails(error);
+
+		const bodyMessage =
 				typeof errorData === "object" &&
 				errorData !== null &&
 				"message" in errorData
@@ -85,15 +79,17 @@ export class ResendEmailService implements IEmailService {
 				success: false,
 				error:
 					bodyMessage ||
-					result.error.message ||
+					error.message ||
 					"Failed to dispatch email transmission.",
-				details: result.error,
+				details: error,
 			};
-		}
+	}
 
+	private static getErrorDetails(error: Error): ApiErrorDetail {
+		const maybeHttp = error as Error & ApiErrorDetail;
 		return {
-			success: true,
-			messageId: result.data.id,
+			status: maybeHttp.status,
+			data: maybeHttp.data,
 		};
 	}
 }
