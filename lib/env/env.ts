@@ -14,8 +14,6 @@ export const env = createEnv({
 		GITHUB_PERSONAL_USERNAME: z.string().min(1).default("v1tor2003"),
 		GITHUB_WORK_TOKEN: z.string().min(1).optional(),
 		GITHUB_WORK_USERNAME: z.string().min(1).default("vitor-pires_tecnosul"),
-		RESUME_REPO_NAME: z.string().min(1).default("resume"),
-		RESUME_FILE_PATH: z.string().min(1).default("vitor-pires-resume.pdf"),
 	},
 	client: {},
 	runtimeEnv: {
@@ -24,12 +22,15 @@ export const env = createEnv({
 		RESEND_API_LOGGING: process.env.RESEND_API_LOGGING,
 		CONTACT_TO_EMAIL: process.env.CONTACT_TO_EMAIL,
 		CONTACT_FROM_EMAIL: process.env.CONTACT_FROM_EMAIL,
-		GITHUB_PERSONAL_TOKEN: process.env.GITHUB_PERSONAL_TOKEN,
-		GITHUB_PERSONAL_USERNAME: process.env.GITHUB_PERSONAL_USERNAME,
-		GITHUB_WORK_TOKEN: process.env.GITHUB_WORK_TOKEN,
+		GITHUB_PERSONAL_TOKEN:
+			process.env.GITHUB_PERSONAL_TOKEN ??
+			process.env.GITHUB_TOKEN ??
+			process.env.GH_TOKEN,
+		GITHUB_PERSONAL_USERNAME:
+			process.env.GITHUB_PERSONAL_USERNAME ?? process.env.RESUME_REPO_OWNER,
+		GITHUB_WORK_TOKEN:
+			process.env.GITHUB_WORK_TOKEN ?? process.env.GH_WORK_TOKEN,
 		GITHUB_WORK_USERNAME: process.env.GITHUB_WORK_USERNAME,
-		RESUME_REPO_NAME: process.env.RESUME_REPO_NAME,
-		RESUME_FILE_PATH: process.env.RESUME_FILE_PATH,
 	},
 	isServer: typeof window === "undefined" || process.env.NODE_ENV === "test",
 	emptyStringAsUndefined: true,
