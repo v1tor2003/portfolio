@@ -68,12 +68,10 @@ container
 	.bind<IGitHubService>(DI_TYPES.IGitHubService)
 	.toDynamicValue(
 		() =>
-			new GitHubService({
-				client: container.get<ApiClient>(DI_TYPES.GitHubApiClient),
-				contributionsClient: container.get<ApiClient>(
-					DI_TYPES.GitHubContributionsApiClient,
-				),
-			}),
+			new GitHubService(
+				container.get<ApiClient>(DI_TYPES.GitHubApiClient),
+				container.get<ApiClient>(DI_TYPES.GitHubContributionsApiClient),
+			),
 	)
 	.inSingletonScope();
 

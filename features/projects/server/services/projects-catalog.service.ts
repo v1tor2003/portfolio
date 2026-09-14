@@ -33,7 +33,7 @@ export class ProjectsCatalogService implements IProjectsCatalogService {
 	constructor(
 		@inject(DI_TYPES.IGitHubService)
 		private readonly gitHubService: IGitHubService,
-		private readonly username: string = env.RESUME_REPO_OWNER,
+		private readonly username: string = env.GITHUB_PERSONAL_USERNAME,
 	) {}
 
 	async getProjects(category?: ProjectCategory): Promise<Project[]> {

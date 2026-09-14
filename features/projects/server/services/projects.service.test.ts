@@ -11,10 +11,12 @@ function createTestProjectsService(options?: {
 	token?: string;
 	workToken?: string;
 }): IProjectsService {
-	const gitHubService = new GitHubService({
-		token: options?.token,
-		workToken: options?.workToken,
-	});
+	const gitHubService = new GitHubService(
+		resolveService(DI_TYPES.GitHubApiClient),
+		resolveService(DI_TYPES.GitHubContributionsApiClient),
+		options?.token,
+		options?.workToken,
+	);
 	const catalogService = new ProjectsCatalogService(gitHubService);
 	const activityService = new GitActivityService(gitHubService);
 	return new ProjectsService(catalogService, activityService);

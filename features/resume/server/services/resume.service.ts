@@ -20,8 +20,8 @@ export class ResumeService implements IResumeService {
 		@inject(DI_TYPES.IGitHubService)
 		private readonly gitHubService: IGitHubService,
 		readFallback: (locale?: ResumeLocale) => Buffer = ResumeService.defaultReadFallbackFile,
-		private readonly owner: string = env.RESUME_REPO_OWNER,
-		private readonly repo: string = env.RESUME_REPO_NAME,
+		private readonly owner: string = env.GITHUB_PERSONAL_USERNAME,
+		private readonly repo: string = "resume",
 	) {
 		this.readFallback = readFallback;
 	}
