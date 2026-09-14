@@ -4,7 +4,7 @@ import { useCallback, useState, useTransition } from "react";
 import {
 	type ContactActionResult,
 	sendContactEmail,
-} from "../server/send-contact-email";
+} from "../server/actions/send-contact-email";
 
 export interface UseEmailSenderReturn {
 	sendEmail: (data: unknown) => Promise<ContactActionResult>;

@@ -1,5 +1,5 @@
 import { Download } from "lucide-react";
-import type { ResumeLocale } from "../server/resume.service";
+import type { ResumeLocale } from "../server/services/resume.service";
 
 interface ResumeDownloadButtonProps {
 	className?: string;

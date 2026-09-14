@@ -1,13 +1,13 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ContactActionResult } from "../server/send-contact-email";
+import type { ContactActionResult } from "../server/actions/send-contact-email";
 import { useEmailSender } from "./useEmailSender";
 
-vi.mock("../server/send-contact-email", () => ({
+vi.mock("../server/actions/send-contact-email", () => ({
 	sendContactEmail: vi.fn(),
 }));
 
-import { sendContactEmail } from "../server/send-contact-email";
+import { sendContactEmail } from "../server/actions/send-contact-email";
 
 describe("useEmailSender Hook", () => {
 	beforeEach(() => {

@@ -1,7 +1,9 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getProjectsService, ProjectsSection } from "@/features/projects";
+import { type IProjectsService, ProjectsSection } from "@/features/projects";
+import { resolveService } from "@/lib/di/config";
+import { DI_TYPES } from "@/lib/di/types";
 
 export const metadata: Metadata = {
 	title: "Projects | Vítor Pires",
@@ -10,7 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-	const projectsService = getProjectsService();
+	const projectsService = resolveService<IProjectsService>(
+		DI_TYPES.IProjectsService,
+	);
 	const [projects, activity] = await Promise.all([
 		projectsService.getProjects(),
 		projectsService.getGitActivity(),
