@@ -135,7 +135,9 @@ describe("GitHubService", () => {
 							contributionCalendar: {
 								weeks: [
 									{
-										contributionDays: [{ date: "2026-08-10", contributionCount: 8 }],
+										contributionDays: [
+											{ date: "2026-08-10", contributionCount: 8 },
+										],
 									},
 								],
 							},
