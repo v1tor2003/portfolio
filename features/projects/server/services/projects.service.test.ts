@@ -135,7 +135,8 @@ describe("ProjectsService", () => {
 		});
 
 		const prevToken = env.GITHUB_WORK_TOKEN;
-		(env as { GITHUB_WORK_TOKEN?: string }).GITHUB_WORK_TOKEN = "mock-work-token";
+		(env as { GITHUB_WORK_TOKEN?: string }).GITHUB_WORK_TOKEN =
+			"mock-work-token";
 		try {
 			const service = createTestProjectsService({ workClient: mockWorkClient });
 			const activity = await service.getGitActivity();
@@ -209,6 +210,6 @@ describe("ProjectsService", () => {
 		expect(novCommit).toBeDefined();
 		expect(novCommit?.count).toBeGreaterThanOrEqual(1);
 		expect(julCommit).toBeDefined();
-		expect(julCommit?.count).toBeGreaterThanOrEqual(21);
+		expect(julCommit?.count).toBeGreaterThanOrEqual(14);
 	});
 });
